@@ -37,10 +37,6 @@
 #ifndef ADC_H
 #define ADC_H
 
-#define ADC_0 0
-#define ADC_1 1
-//enum class ADC_NUM {ADC_0, ADC_1}; // too verbose, but it'd avoid some mistakes
-
 // include ADC module class
 #include "ADC_Module.h"
 
@@ -71,7 +67,6 @@ class ADC
         /** Default constructor */
         ADC();
 
-
         // create both adc objects
 
         //! Object to control the ADC0
@@ -95,7 +90,10 @@ class ADC
         *   \param type can be ADC_REFERENCE::REF_3V3, ADC_REFERENCE::REF_1V2 (not for Teensy LC) or ADC_REFERENCE::REF_EXT
         *   \param adc_num ADC number to change.
         */
-        void setReference(ADC_REFERENCE type, int8_t adc_num = -1);
+        void setReference(ADC_REFERENCE type, ADC_NUM adc_num = ADC_NUM::ANY) __attribute__((always_inline)) {
+            adc[static_cast<uint8_t>(adc_num)]->setReference(type);
+            return;
+        }
 
 
         //! Change the resolution of the measurement.
@@ -108,21 +106,28 @@ class ADC
         *  Whenever you change the resolution, change also the comparison values (if you use them).
         *   \param adc_num ADC number to change.
         */
-        void setResolution(uint8_t bits, int8_t adc_num = -1);
+        void setResolution(uint8_t bits, ADC_NUM adc_num = ADC_NUM::ANY) __attribute__((always_inline)) {
+            adc[static_cast<uint8_t>(adc_num)]->setResolution(bits);
+            return;
+        }
 
         //! Returns the resolution of the ADC_Module.
         /**
         *   \param adc_num ADC number to query.
         *   \return the resolution of adc_num ADC.
         */
-        uint8_t getResolution(int8_t adc_num = -1);
+        uint8_t getResolution(ADC_NUM adc_num = ADC_NUM::ANY) __attribute__((always_inline)) {
+            return adc[static_cast<uint8_t>(adc_num)]->getResolution();
+        }
 
         //! Returns the maximum value for a measurement: 2^res-1.
         /**
         *   \param adc_num ADC number to query.
         *   \return the maximum value of adc_num ADC.
         */
-        uint32_t getMaxValue(int8_t adc_num = -1);
+        uint32_t getMaxValue(ADC_NUM adc_num = ADC_NUM::ANY) __attribute__((always_inline)) {
+            return adc[static_cast<uint8_t>(adc_num)]->getMaxValue();
+        }
 
 
         //! Sets the conversion speed (changes the ADC clock, ADCK)
@@ -144,7 +149,8 @@ class ADC
         * but if F_BUS<F_ADCK, you can't use VERY_HIGH_SPEED for sampling speed.
         *   \param adc_num ADC number to change.
         */
-        void setConversionSpeed(ADC_CONVERSION_SPEED speed, int8_t adc_num = -1);
+        void setConversionSpeed(ADC_CONVERSION_SPEED speed, ADC_NUM adc_num = ADC_NUM::ANY) __attribute__((always_inline)) {
+            adc[static_cast<uint8_t>(adc_num)]->setConversionSpeed(speed);}
 
 
         //! Sets the sampling speed
@@ -158,7 +164,9 @@ class ADC
         * VERY_HIGH_SPEED is the highest possible sampling speed (0 ADCK added).
         *   \param adc_num ADC number to change.
         */
-        void setSamplingSpeed(ADC_SAMPLING_SPEED speed, int8_t adc_num = -1);
+        void setSamplingSpeed(ADC_SAMPLING_SPEED speed, ADC_NUM adc_num = ADC_NUM::ANY) __attribute__((always_inline)) {
+            adc[static_cast<uint8_t>(adc_num)]->setSamplingSpeed(speed);
+        }
 
 
         //! Set the number of averages
@@ -166,7 +174,9 @@ class ADC
         * \param num can be 0, 4, 8, 16 or 32.
         *   \param adc_num ADC number to change.
         */
-        void setAveraging(uint8_t num, int8_t adc_num = -1);
+        void setAveraging(uint8_t num, ADC_NUM adc_num = ADC_NUM::ANY) __attribute__((always_inline)) {
+            adc[static_cast<uint8_t>(adc_num)]->setAveraging(num);
+        }
 
 
         //! Enable interrupts
@@ -174,13 +184,17 @@ class ADC
         *  (including hardware averages and if the comparison (if any) is true).
         *   \param adc_num ADC number to change.
         */
-        void enableInterrupts(int8_t adc_num = -1);
+        void enableInterrupts(ADC_NUM adc_num = ADC_NUM::ANY) __attribute__((always_inline)) {
+            adc[static_cast<uint8_t>(adc_num)]->enableInterrupts();
+        }
 
         //! Disable interrupts
         /**
         *   \param adc_num ADC number to change.
         */
-        void disableInterrupts(int8_t adc_num = -1);
+        void disableInterrupts(ADC_NUM adc_num = ADC_NUM::ANY) __attribute__((always_inline)) {
+            adc[static_cast<uint8_t>(adc_num)]->disableInterrupts();
+        }
 
 
         //! Enable DMA request
@@ -188,13 +202,17 @@ class ADC
         *  (including hardware averages and if the comparison (if any) is true).
         *   \param adc_num ADC number to change.
         */
-        void enableDMA(int8_t adc_num = -1);
+        void enableDMA(ADC_NUM adc_num = ADC_NUM::ANY) __attribute__((always_inline)) {
+            adc[static_cast<uint8_t>(adc_num)]->enableDMA();
+        }
 
         //! Disable ADC DMA request
         /**
         *   \param adc_num ADC number to change.
         */
-        void disableDMA(int8_t adc_num = -1);
+        void disableDMA(ADC_NUM adc_num = ADC_NUM::ANY) __attribute__((always_inline)) {
+            adc[static_cast<uint8_t>(adc_num)]->disableDMA();
+        }
 
 
         //! Enable the compare function to a single value
@@ -206,7 +224,9 @@ class ADC
         *   \param greaterThan true or false
         *   \param adc_num ADC number to change.
         */
-        void enableCompare(int16_t compValue, bool greaterThan, int8_t adc_num = -1);
+        void enableCompare(int16_t compValue, bool greaterThan, ADC_NUM adc_num = ADC_NUM::ANY) __attribute__((always_inline)) {
+            adc[static_cast<uint8_t>(adc_num)]->enableCompare(compValue, greaterThan);
+        }
 
         //! Enable the compare function to a range
         /** A conversion will be completed only when the ADC value is inside (insideRange=1) or outside (=0)
@@ -220,13 +240,17 @@ class ADC
         *   \param inclusive true or false
         *   \param adc_num ADC number to change.
         */
-        void enableCompareRange(int16_t lowerLimit, int16_t upperLimit, bool insideRange, bool inclusive, int8_t adc_num = -1);
+        void enableCompareRange(int16_t lowerLimit, int16_t upperLimit, bool insideRange, bool inclusive, ADC_NUM adc_num = ADC_NUM::ANY)  {
+            adc[static_cast<uint8_t>(adc_num)]->enableCompareRange(lowerLimit, upperLimit, insideRange, inclusive);
+        }
 
         //! Disable the compare function
         /**
         *   \param adc_num ADC number to change.
         */
-        void disableCompare(int8_t adc_num = -1);
+        void disableCompare(ADC_NUM adc_num = ADC_NUM::ANY) __attribute__((always_inline)) {
+            adc[static_cast<uint8_t>(adc_num)]->disableCompare();
+        }
 
 
         //! Enable and set PGA
@@ -235,21 +259,26 @@ class ADC
         *   \param gain can be 1, 2, 4, 8, 16, 32 or 64
         *   \param adc_num ADC number to change.
         */
-        void enablePGA(uint8_t gain, int8_t adc_num = -1);
+        void enablePGA(uint8_t gain, ADC_NUM adc_num = ADC_NUM::ANY) __attribute__((always_inline)) {
+            adc[static_cast<uint8_t>(adc_num)]->enablePGA(gain);
+        }
 
         //! Returns the PGA level
         /** PGA level = from 1 to 64
         *   \param adc_num ADC number to query.
         *   \return PGA level = from 1 to 64
         */
-        uint8_t getPGA(int8_t adc_num = -1);
+        uint8_t getPGA(ADC_NUM adc_num = ADC_NUM::ANY) __attribute__((always_inline)) {
+            return adc[static_cast<uint8_t>(adc_num)]->getPGA();
+        }
 
         //! Disable PGA
         /**
         *   \param adc_num ADC number to query
         */
-        void disablePGA(int8_t adc_num = -1);
-
+        void disablePGA(ADC_NUM adc_num = ADC_NUM::ANY) __attribute__((always_inline)) {
+            adc[static_cast<uint8_t>(adc_num)]->disablePGA();
+        }
 
 
         ////////////// INFORMATION ABOUT THE STATE OF THE ADC /////////////////
@@ -259,7 +288,9 @@ class ADC
         *   \param adc_num ADC number to query
         *   \return true if yes, false if not.
         */
-        bool isConverting(int8_t adc_num = -1);
+        bool isConverting(ADC_NUM adc_num = ADC_NUM::ANY) __attribute__((always_inline)) {
+            return adc[static_cast<uint8_t>(adc_num)]->isConverting();
+        }
 
         //! Is an ADC conversion ready?
         /** When a value is read this function returns 0 until a new value exists
@@ -267,21 +298,27 @@ class ADC
         *   \param adc_num ADC number to query
         *   \return true if yes, false if not.
         */
-        bool isComplete(int8_t adc_num = -1);
+        bool isComplete(ADC_NUM adc_num = ADC_NUM::ANY) __attribute__((always_inline)) {
+            return adc[static_cast<uint8_t>(adc_num)]->isComplete();
+        }
 
         //! Is the ADC in differential mode?
         /**
         *   \param adc_num ADC number to query
         *   \return true or false
         */
-        bool isDifferential(int8_t adc_num = -1);
+        bool isDifferential(ADC_NUM adc_num = ADC_NUM::ANY) __attribute__((always_inline)) {
+            return adc[static_cast<uint8_t>(adc_num)]->isDifferential();
+        }
 
         //! Is the ADC in continuous mode?
         /**
         *   \param adc_num ADC number to query
         *   \return true or false
         */
-        bool isContinuous(int8_t adc_num = -1);
+        bool isContinuous(ADC_NUM adc_num = ADC_NUM::ANY) __attribute__((always_inline)) {
+            return adc[static_cast<uint8_t>(adc_num)]->isContinuous();
+        }
 
 
 
@@ -297,7 +334,7 @@ class ADC
         *   \param adc_num ADC_X ADC module
         *   \return the value of the pin.
         */
-        int analogRead(uint8_t pin, int8_t adc_num = -1);
+        int analogRead(uint8_t pin, ADC_NUM adc_num = ADC_NUM::ANY);
 
         //! Returns the analog value of the special internal source, such as the temperature sensor.
         /** It calls analogRead(uint8_t pin) internally, with the correct value for the pin for all boards.
@@ -311,7 +348,7 @@ class ADC
         *   \param adc_num ADC_X ADC module
         *   \return the value of the pin.
         */
-        int analogRead(ADC_INTERNAL_SOURCE pin, int8_t adc_num = -1) __attribute__((always_inline)) {
+        int analogRead(ADC_INTERNAL_SOURCE pin, ADC_NUM adc_num = ADC_NUM::ANY) __attribute__((always_inline)) {
             return analogRead(static_cast<uint8_t>(pin), adc_num);
         }
 
@@ -326,7 +363,7 @@ class ADC
         *   \return the differential value of the pins, invalid pins return ADC_ERROR_VALUE.
         *   If a comparison has been set up and fails, it will return ADC_ERROR_VALUE.
         */
-        int analogReadDifferential(uint8_t pinP, uint8_t pinN, int8_t adc_num = -1);
+        int analogReadDifferential(uint8_t pinP, uint8_t pinN, ADC_NUM adc_num = ADC_NUM::ANY);
 
 
         /////////////// NON-BLOCKING CONVERSION METHODS //////////////
@@ -338,7 +375,7 @@ class ADC
         *   \param adc_num ADC_X ADC module
         *   \return true if the pin is valid, false otherwise.
         */
-        bool startSingleRead(uint8_t pin, int8_t adc_num = -1);
+        bool startSingleRead(uint8_t pin, ADC_NUM adc_num = ADC_NUM::ANY);
 
         //! Start a differential conversion between two pins (pinP - pinN) and enables interrupts.
         /** It returns immediately, get value with readSingle().
@@ -348,14 +385,16 @@ class ADC
         *   \param adc_num ADC_X ADC module
         *   \return true if the pins are valid, false otherwise.
         */
-        bool startSingleDifferential(uint8_t pinP, uint8_t pinN, int8_t adc_num = -1);
+        bool startSingleDifferential(uint8_t pinP, uint8_t pinN, ADC_NUM adc_num = ADC_NUM::ANY);
 
         //! Reads the analog value of a single conversion.
         /** Set the conversion with with startSingleRead(pin) or startSingleDifferential(pinP, pinN).
         *   \param adc_num ADC_X ADC module
         *   \return the converted value.
         */
-        int readSingle(int8_t adc_num = -1);
+        int readSingle(ADC_NUM adc_num = ADC_NUM::ANY) __attribute__((always_inline)) {
+            return adc[static_cast<uint8_t>(adc_num)]->readSingle();
+        }
 
 
 
@@ -367,7 +406,7 @@ class ADC
         *   \param adc_num ADC_X ADC module
         *   \return true if the pin is valid, false otherwise.
         */
-        bool startContinuous(uint8_t pin, int8_t adc_num = -1);
+        bool startContinuous(uint8_t pin, ADC_NUM adc_num = ADC_NUM::ANY);
 
         //! Starts continuous conversion between the pins (pinP-pinN).
         /** It returns as soon as the ADC is set, use analogReadContinuous() to read the value.
@@ -376,7 +415,7 @@ class ADC
         *   \param adc_num ADC_X ADC module
         *   \return true if the pins are valid, false otherwise.
         */
-        bool startContinuousDifferential(uint8_t pinP, uint8_t pinN, int8_t adc_num = -1);
+        bool startContinuousDifferential(uint8_t pinP, uint8_t pinN, ADC_NUM adc_num = ADC_NUM::ANY);
 
         //! Reads the analog value of a continuous conversion.
         /** Set the continuous conversion with with analogStartContinuous(pin) or startContinuousDifferential(pinP, pinN).
@@ -385,13 +424,17 @@ class ADC
         *   \param adc_num ADC_X ADC module
         *   \return the last converted value.
         */
-        int analogReadContinuous(int8_t adc_num = -1);
+        int analogReadContinuous(ADC_NUM adc_num = ADC_NUM::ANY) __attribute__((always_inline)) {
+            return adc[static_cast<uint8_t>(adc_num)]->analogReadContinuous();
+        }
 
         //! Stops continuous conversion
         /**
         *   \param adc_num ADC_X ADC module
         */
-        void stopContinuous(int8_t adc_num = -1);
+        void stopContinuous(ADC_NUM adc_num = ADC_NUM::ANY) __attribute__((always_inline)) {
+            adc[static_cast<uint8_t>(adc_num)]->stopContinuous();
+        }
 
 
 
@@ -425,7 +468,9 @@ class ADC
         *   \param pin1 pin in ADC1
         *   \return a Sync_result struct with the result of each ADC value.
         */
-        Sync_result analogSyncRead(uint8_t pin0, uint8_t pin1) __attribute__((always_inline)) {return analogSynchronizedRead(pin0, pin1);}
+        Sync_result analogSyncRead(uint8_t pin0, uint8_t pin1) __attribute__((always_inline)) {
+            return analogSynchronizedRead(pin0, pin1);
+        }
 
         //! Returns the differential analog values of both sets of pins, measured at the same time by the two ADC modules.
         /** It waits until the values are read and then returns the result as a struct Sync_result,

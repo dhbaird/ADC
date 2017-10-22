@@ -206,370 +206,18 @@ ADC::ADC() : // awkward initialization  so there are no -Wreorder warnings
     //digitalWriteFast(LED_BUILTIN, HIGH);
 
     // make sure the clocks to the ADC are on
-    SIM_SCGC6 |= SIM_SCGC6_ADC0;
+    atomic::setBitFlag(SIM_SCGC6, SIM_SCGC6_ADC0);
     #if ADC_NUM_ADCS>1
-    SIM_SCGC3 |= SIM_SCGC3_ADC1;
+    atomic::setBitFlag(SIM_SCGC3, SIM_SCGC3_ADC1);
     #endif
 
 }
 
 
-
-/* Set the voltage reference you prefer,
-*  type can be ADC_REF_3V3, ADC_REF_1V2 (not for Teensy LC) or ADC_REF_EXT
-*/
-void ADC::setReference(ADC_REFERENCE type, int8_t adc_num) {
-    if(adc_num==1){ // user wants ADC 1, do nothing if it's a Teensy 3.0
-        #if ADC_NUM_ADCS>=2 // Teensy 3.1
-        adc1->setReference(type);
-        #else
-        adc0->fail_flag |= ADC_ERROR_WRONG_ADC;
-        #endif
-        return;
     }
-    adc0->setReference(type); // adc_num isn't changed or has selected ADC0
-    return;
-}
-
-
-// Change the resolution of the measurement.
-/*
-*  \param bits is the number of bits of resolution.
-*  For single-ended measurements: 8, 10, 12 or 16 bits.
-*  For differential measurements: 9, 11, 13 or 16 bits.
-*  If you want something in between (11 bits single-ended for example) select the inmediate higher
-*  and shift the result one to the right.
-*  If you select, for example, 9 bits and then do a single-ended reading, the resolution will be adjusted to 8 bits
-*  In this case the comparison values will still be correct for analogRead and analogReadDifferential, but not
-*  for startSingle* or startContinous*, so whenever you change the resolution, change also the comparison values.
-*/
-void ADC::setResolution(uint8_t bits, int8_t adc_num) {
-    if(adc_num==1){ // user wants ADC 1, do nothing if it's a Teensy 3.0
-        #if ADC_NUM_ADCS>=2 // Teensy 3.1
-        adc1->setResolution(bits);
-        #else
-        adc0->fail_flag |= ADC_ERROR_WRONG_ADC;
-        #endif
-        return;
-    }
-    adc0->setResolution(bits); // adc_num isn't changed or has selected ADC0
-    return;
-}
-
-//! Returns the resolution of the ADC_Module.
-uint8_t ADC::getResolution(int8_t adc_num) {
-    if(adc_num==1){ // user wants ADC 1, do nothing if it's a Teensy 3.0
-        #if ADC_NUM_ADCS>=2 // Teensy 3.1
-        return adc1->getResolution();
-        #else
-        adc0->fail_flag |= ADC_ERROR_WRONG_ADC;
-        #endif
-        return 0;
-    }
-    return adc0->getResolution(); // adc_num isn't changed or has selected ADC0
 
 }
 
-//! Returns the maximum value for a measurement.
-uint32_t ADC::getMaxValue(int8_t adc_num) {
-    if(adc_num==1){ // user wants ADC 1, do nothing if it's a Teensy 3.0
-        #if ADC_NUM_ADCS>=2 // Teensy 3.1
-        return adc1->getMaxValue();
-        #else
-        adc0->fail_flag |= ADC_ERROR_WRONG_ADC;
-        #endif
-        return 1;
-    }
-    return adc0->getMaxValue();
-}
-
-
-// Sets the conversion speed
-/*
-* \param speed can be ADC_LOW_SPEED, ADC_MED_SPEED or ADC_HIGH_SPEED
-*
-*  It recalibrates at the end.
-*/
-void ADC::setConversionSpeed(ADC_CONVERSION_SPEED speed, int8_t adc_num) {
-    if(adc_num==1){ // user wants ADC 1, do nothing if it's a Teensy 3.0
-        #if ADC_NUM_ADCS>=2 // Teensy 3.1
-        adc1->setConversionSpeed(speed);
-        #else
-        adc0->fail_flag |= ADC_ERROR_WRONG_ADC;
-        #endif
-        return;
-    }
-    adc0->setConversionSpeed(speed); // adc_num isn't changed or has selected ADC0
-    return;
-
-}
-
-
-// Sets the sampling speed
-/* Increase the sampling speed for low impedance sources, decrease it for higher impedance ones.
-* \param speed can be any of the ADC_SAMPLING_SPEED enum: VERY_LOW_SPEED, LOW_SPEED, MED_SPEED, HIGH_SPEED or VERY_HIGH_SPEED.
-*
-* VERY_LOW_SPEED is the lowest possible sampling speed (+24 ADCK).
-* LOW_SPEED adds +16 ADCK.
-* MED_SPEED adds +10 ADCK.
-* HIGH_SPEED adds +6 ADCK.
-* VERY_HIGH_SPEED is the highest possible sampling speed (0 ADCK added).
-*/
-void ADC::setSamplingSpeed(ADC_SAMPLING_SPEED speed, int8_t adc_num) {
-    if(adc_num==1){ // user wants ADC 1, do nothing if it's a Teensy 3.0
-        #if ADC_NUM_ADCS>=2 // Teensy 3.1
-        adc1->setSamplingSpeed(speed);
-        #else
-        adc0->fail_flag |= ADC_ERROR_WRONG_ADC;
-        #endif
-        return;
-    }
-    adc0->setSamplingSpeed(speed); // adc_num isn't changed or has selected ADC0
-    return;
-
-}
-
-
-// Set the number of averages
-/*
-* \param num can be 0, 4, 8, 16 or 32.
-*/
-void ADC::setAveraging(uint8_t num, int8_t adc_num) {
-    if(adc_num==1){ // user wants ADC 1, do nothing if it's a Teensy 3.0
-        #if ADC_NUM_ADCS>=2 // Teensy 3.1
-        adc1->setAveraging(num);
-        #else
-        adc0->fail_flag |= ADC_ERROR_WRONG_ADC;
-        #endif
-        return;
-    }
-    adc0->setAveraging(num); // adc_num isn't changed or has selected ADC0
-    return;
-}
-
-
-// Enable interrupts
-/* An IRQ_ADC0 Interrupt will be raised when the conversion is completed
-*  (including hardware averages and if the comparison (if any) is true).
-*/
-void ADC::enableInterrupts(int8_t adc_num) {
-    if(adc_num==1){ // user wants ADC 1, do nothing if it's a Teensy 3.0
-        #if ADC_NUM_ADCS>=2 // Teensy 3.1
-        adc1->enableInterrupts();
-        #else
-        adc0->fail_flag |= ADC_ERROR_WRONG_ADC;
-        #endif
-        return;
-    }
-    adc0->enableInterrupts();
-    return;
-}
-
-// Disable interrupts
-void ADC::disableInterrupts(int8_t adc_num) {
-    if(adc_num==1){ // user wants ADC 1, do nothing if it's a Teensy 3.0
-        #if ADC_NUM_ADCS>=2 // Teensy 3.1
-        adc1->disableInterrupts();
-        #else
-        adc0->fail_flag |= ADC_ERROR_WRONG_ADC;
-        #endif
-        return;
-    }
-    adc0->disableInterrupts();
-    return;
-}
-
-
-// Enable DMA request
-/* An ADC DMA request will be raised when the conversion is completed
-*  (including hardware averages and if the comparison (if any) is true).
-*/
-void ADC::enableDMA(int8_t adc_num) {
-    if(adc_num==1){ // user wants ADC 1, do nothing if it's a Teensy 3.0
-        #if ADC_NUM_ADCS>=2 // Teensy 3.1
-        adc1->enableDMA();
-        #else
-        adc0->fail_flag |= ADC_ERROR_WRONG_ADC;
-        #endif
-        return;
-    }
-    adc0->enableDMA();
-    return;
-}
-
-// Disable ADC DMA request
-void ADC::disableDMA(int8_t adc_num) {
-    if(adc_num==1){ // user wants ADC 1, do nothing if it's a Teensy 3.0
-        #if ADC_NUM_ADCS>=2 // Teensy 3.1
-        adc1->disableDMA();
-        #else
-        adc0->fail_flag |= ADC_ERROR_WRONG_ADC;
-        #endif
-        return;
-    }
-    adc0->disableDMA();
-    return;
-}
-
-
-// Enable the compare function to a single value
-/* A conversion will be completed only when the ADC value
-*  is >= compValue (greaterThan=true) or < compValue (greaterThan=false)
-*  Call it after changing the resolution
-*  Use with interrupts or poll conversion completion with isComplete()
-*/
-void ADC::enableCompare(int16_t compValue, bool greaterThan, int8_t adc_num) {
-    if(adc_num==1){ // user wants ADC 1, do nothing if it's a Teensy 3.0
-        #if ADC_NUM_ADCS>=2 // Teensy 3.1
-        adc1->enableCompare(compValue, greaterThan);
-        #else
-        adc0->fail_flag |= ADC_ERROR_WRONG_ADC;
-        #endif
-        return;
-    }
-    adc0->enableCompare(compValue, greaterThan);
-    return;
-}
-
-// Enable the compare function to a range
-/* A conversion will be completed only when the ADC value is inside (insideRange=1) or outside (=0)
-*  the range given by (lowerLimit, upperLimit),including (inclusive=1) the limits or not (inclusive=0).
-*  See Table 31-78, p. 617 of the freescale manual.
-*  Call it after changing the resolution
-*  Use with interrupts or poll conversion completion with isComplete()
-*/
-void ADC::enableCompareRange(int16_t lowerLimit, int16_t upperLimit, bool insideRange, bool inclusive, int8_t adc_num) {
-    if(adc_num==1){ // user wants ADC 1, do nothing if it's a Teensy 3.0
-        #if ADC_NUM_ADCS>=2 // Teensy 3.1
-        adc1->enableCompareRange(lowerLimit, upperLimit, insideRange, inclusive);
-        #else
-        adc0->fail_flag |= ADC_ERROR_WRONG_ADC;
-        #endif
-        return;
-    }
-    adc0->enableCompareRange(lowerLimit, upperLimit, insideRange, inclusive);
-    return;
-}
-
-//! Disable the compare function
-void ADC::disableCompare(int8_t adc_num) {
-    if(adc_num==1){ // user wants ADC 1, do nothing if it's a Teensy 3.0
-        #if ADC_NUM_ADCS>=2 // Teensy 3.1
-        adc1->disableCompare();
-        #else
-        adc0->fail_flag |= ADC_ERROR_WRONG_ADC;
-        #endif
-        return;
-    }
-    adc0->disableCompare();
-    return;
-}
-
-
-// Enable and set PGA
-/* Enables the PGA and sets the gain
-*   Use only for signals lower than 1.2 V
-*   \param gain can be 1, 2, 4, 8, 16, 32 or 64
-*
-*/
-void ADC::enablePGA(uint8_t gain, int8_t adc_num) {
-    if(adc_num==1){ // user wants ADC 1, do nothing if it's a Teensy 3.0
-        #if ADC_NUM_ADCS>=2 // Teensy 3.1
-        adc1->enablePGA(gain);
-        #else
-        adc0->fail_flag |= ADC_ERROR_WRONG_ADC;
-        #endif
-        return;
-    }
-    adc0->enablePGA(gain);
-    return;
-}
-
-//! Returns the PGA level
-/** PGA level = 2^gain, from 0 to 64
-*/
-uint8_t ADC::getPGA(int8_t adc_num) {
-    if(adc_num==1){ // user wants ADC 1, do nothing if it's a Teensy 3.0
-        #if ADC_NUM_ADCS>=2 // Teensy 3.1
-        return adc1->getPGA();
-        #else
-        adc0->fail_flag |= ADC_ERROR_WRONG_ADC;
-        return 1;
-        #endif
-    }
-    return adc0->getPGA();
-}
-
-//! Disable PGA
-void ADC::disablePGA(int8_t adc_num) {
-    if(adc_num==1){ // user wants ADC 1, do nothing if it's a Teensy 3.0
-        #if ADC_NUM_ADCS>=2 // Teensy 3.1
-        adc1->disablePGA();
-        #else
-        adc0->fail_flag |= ADC_ERROR_WRONG_ADC;
-        #endif
-        return;
-    }
-    adc0->disablePGA();
-    return;
-}
-
-//! Is the ADC converting at the moment?
-bool ADC::isConverting(int8_t adc_num) {
-    if(adc_num==1){ // user wants ADC 1, do nothing if it's a Teensy 3.0
-        #if ADC_NUM_ADCS>=2 // Teensy 3.1
-        return adc1->isConverting();
-        #else
-        adc0->fail_flag |= ADC_ERROR_WRONG_ADC;
-        #endif
-        return false;
-    }
-    return adc0->isConverting();
-}
-
-// Is an ADC conversion ready?
-/*
-*  \return 1 if yes, 0 if not.
-*  When a value is read this function returns 0 until a new value exists
-*  So it only makes sense to call it before analogReadContinuous() or readSingle()
-*/
-bool ADC::isComplete(int8_t adc_num) {
-    if(adc_num==1){ // user wants ADC 1, do nothing if it's a Teensy 3.0
-        #if ADC_NUM_ADCS>=2 // Teensy 3.1
-        return adc1->isComplete();
-        #else
-        adc0->fail_flag |= ADC_ERROR_WRONG_ADC;
-        #endif
-        return false;
-    }
-    return adc0->isComplete();;
-}
-
-//! Is the ADC in differential mode?
-bool ADC::isDifferential(int8_t adc_num) {
-    if(adc_num==1){ // user wants ADC 1, do nothing if it's a Teensy 3.0
-        #if ADC_NUM_ADCS>=2 // Teensy 3.1
-        return adc1->isDifferential();
-        #else
-        adc0->fail_flag |= ADC_ERROR_WRONG_ADC;
-        #endif
-        return false;
-    }
-    return adc0->isDifferential();
-}
-
-//! Is the ADC in continuous mode?
-bool ADC::isContinuous(int8_t adc_num) {
-    if(adc_num==1){ // user wants ADC 1, do nothing if it's a Teensy 3.0
-        #if ADC_NUM_ADCS>=2 // Teensy 3.1
-        return adc1->isContinuous();
-        #else
-        adc0->fail_flag |= ADC_ERROR_WRONG_ADC;
-        #endif
-        return false;
-    }
-    return adc0->isContinuous();
-}
 
 
 /* Returns the analog value of the pin.
@@ -579,19 +227,13 @@ bool ADC::isContinuous(int8_t adc_num) {
 * If more than one ADC exists, it will select the module with less workload, you can force a selection using
 * adc_num. If you select ADC1 in Teensy 3.0 it will return ADC_ERROR_VALUE.
 */
-int ADC::analogRead(uint8_t pin, int8_t adc_num) {
+int ADC::analogRead(uint8_t pin, ADC_NUM adc_num) {
     #if ADC_NUM_ADCS==1
-    /* Teensy 3.0, LC
-    */
-    if( adc_num==1 ) { // If asked to use ADC1, return error
-        adc0->fail_flag |= ADC_ERROR_WRONG_ADC;
-        return ADC_ERROR_VALUE;
-    }
     return adc0->analogRead(pin); // use ADC0
-    #elif ADC_NUM_ADCS==2
+    #else
     /* Teensy 3.1
     */
-    if( adc_num==-1 ) { // use no ADC in particular
+    if(adc_num==ADC_NUM::ANY) { // use no ADC in particular
         // check which ADC can read the pin
         bool adc0Pin = adc0->checkPin(pin);
         bool adc1Pin = adc1->checkPin(pin);
@@ -611,15 +253,9 @@ int ADC::analogRead(uint8_t pin, int8_t adc_num) {
             adc1->fail_flag |= ADC_ERROR_WRONG_PIN;
             return ADC_ERROR_VALUE;   // all others are invalid
         }
+    } else {
+        adc[static_cast<uint8_t>(adc_num)]->analogRead(pin);
     }
-    else if( adc_num==0 ) { // user wants ADC0
-        return adc0->analogRead(pin);
-    }
-    else if( adc_num==1 ){ // user wants ADC 1
-        return adc1->analogRead(pin);
-    }
-    adc0->fail_flag |= ADC_ERROR_OTHER;
-    return ADC_ERROR_VALUE;
     #endif
 }
 
@@ -633,7 +269,7 @@ int ADC::analogRead(uint8_t pin, int8_t adc_num) {
 * If more than one ADC exists, it will select the module with less workload, you can force a selection using
 * adc_num. If you select ADC1 in Teensy 3.0 it will return ADC_ERROR_VALUE.
 */
-int ADC::analogReadDifferential(uint8_t pinP, uint8_t pinN, int8_t adc_num) {
+int ADC::analogReadDifferential(uint8_t pinP, uint8_t pinN, ADC_NUM adc_num) {
 
     #if ADC_NUM_ADCS==1
     /* Teensy 3.0, LC
@@ -685,7 +321,7 @@ int ADC::analogReadDifferential(uint8_t pinP, uint8_t pinN, int8_t adc_num) {
 *   This function is interrupt safe. The ADC interrupt will restore the adc to its previous settings and
 *   restart the adc if it stopped a measurement. If you modify the adc_isr then this won't happen.
 */
-bool ADC::startSingleRead(uint8_t pin, int8_t adc_num) {
+bool ADC::startSingleRead(uint8_t pin, ADC_NUM adc_num) {
     #if ADC_NUM_ADCS==1
     /* Teensy 3.0, LC
     */
@@ -738,7 +374,7 @@ bool ADC::startSingleRead(uint8_t pin, int8_t adc_num) {
 *   This function is interrupt safe. The ADC interrupt will restore the adc to its previous settings and
 *   restart the adc if it stopped a measurement. If you modify the adc_isr then this won't happen.
 */
-bool ADC::startSingleDifferential(uint8_t pinP, uint8_t pinN, int8_t adc_num) {
+bool ADC::startSingleDifferential(uint8_t pinP, uint8_t pinN, ADC_NUM adc_num) {
     #if ADC_NUM_ADCS==1
     /* Teensy 3.0, LC
     */
@@ -782,27 +418,11 @@ bool ADC::startSingleDifferential(uint8_t pinP, uint8_t pinN, int8_t adc_num) {
     #endif
 }
 
-// Reads the analog value of a single conversion.
-/* Set the conversion with with startSingleRead(pin) or startSingleDifferential(pinP, pinN).
-*   \return the converted value.
-*/
-int ADC::readSingle(int8_t adc_num) {
-    if(adc_num==1){ // user wants ADC 1, do nothing if it's a Teensy 3.0
-        #if ADC_NUM_ADCS>=2 // Teensy 3.1
-        return adc1->readSingle();
-        #else
-        adc0->fail_flag |= ADC_ERROR_WRONG_ADC;
-        return ADC_ERROR_VALUE;
-        #endif
-    }
-    return adc0->readSingle();
-}
-
 
 // Starts continuous conversion on the pin.
 /* It returns as soon as the ADC is set, use analogReadContinuous() to read the value.
 */
-bool ADC::startContinuous(uint8_t pin, int8_t adc_num) {
+bool ADC::startContinuous(uint8_t pin, ADC_NUM adc_num) {
 
     #if ADC_NUM_ADCS==1
     /* Teensy 3.0, LC
@@ -853,7 +473,7 @@ bool ADC::startContinuous(uint8_t pin, int8_t adc_num) {
 * \param pinN must be A11 (if pinP=A10) or A13 (if pinP=A12).
 * Other pins will return ADC_ERROR_DIFF_VALUE.
 */
-bool ADC::startContinuousDifferential(uint8_t pinP, uint8_t pinN, int8_t adc_num) {
+bool ADC::startContinuousDifferential(uint8_t pinP, uint8_t pinN, ADC_NUM adc_num) {
     #if ADC_NUM_ADCS==1
     /* Teensy 3.0, LC
     */
@@ -896,39 +516,6 @@ bool ADC::startContinuousDifferential(uint8_t pinP, uint8_t pinN, int8_t adc_num
     return false;
     #endif
 }
-
-//! Reads the analog value of a continuous conversion.
-/** Set the continuous conversion with with analogStartContinuous(pin) or startContinuousDifferential(pinP, pinN).
-*   \return the last converted value.
-*   If single-ended and 16 bits it's necessary to typecast it to an unsigned type (like uint16_t),
-*   otherwise values larger than 3.3/2 V are interpreted as negative!
-*/
-int ADC::analogReadContinuous(int8_t adc_num) {
-    if(adc_num==1){ // user wants ADC 1, do nothing if it's a Teensy 3.0
-        #if ADC_NUM_ADCS>=2
-        return adc1->analogReadContinuous();
-        #else
-        adc0->fail_flag |= ADC_ERROR_WRONG_ADC;
-        #endif
-        return false;
-    }
-    return adc0->analogReadContinuous();
-}
-
-//! Stops continuous conversion
-void ADC::stopContinuous(int8_t adc_num) {
-    if(adc_num==1){ // user wants ADC 1, do nothing if it's a Teensy 3.0
-        #if ADC_NUM_ADCS>=2 // Teensy 3.1
-        adc1->stopContinuous();
-        #else
-        adc0->fail_flag |= ADC_ERROR_WRONG_ADC;
-        #endif
-        return;
-    }
-    adc0->stopContinuous();
-    return;
-}
-
 
 
 //////////////// SYNCHRONIZED BLOCKING METHODS //////////////////

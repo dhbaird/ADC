@@ -65,6 +65,21 @@
         #define ADC_NUM_ADCS (2)
 #endif
 
+#if ADC_NUM_ADCS == 1
+enum class ADC_NUM : int8_t {
+    ADC_0 = 0,
+    ANY = -1
+};
+#else
+enum class ADC_NUM : int8_t {
+    ADC_0 = 0,
+    ADC_1 = 1,
+    ANY = -1
+};
+#endif
+//enum class ADC_NUM {ADC_0, ADC_1}; // too verbose, but it'd avoid some mistakes
+
+
 // Use DMA?
 #if defined(ADC_TEENSY_3_1) // Teensy 3.1
         #define ADC_USE_DMA (1)
