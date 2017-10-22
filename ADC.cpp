@@ -274,7 +274,7 @@ int ADC::analogReadDifferential(uint8_t pinP, uint8_t pinN, ADC_NUM adc_num) {
     #if ADC_NUM_ADCS==1
     /* Teensy 3.0, LC
     */
-    if( adc_num==1 ) { // If asked to use ADC1, return error
+    if( adc_num==ADC_NUM::ADC_1 ) { // If asked to use ADC1, return error
         adc0->fail_flag |= ADC_ERROR_WRONG_ADC;
         return ADC_ERROR_VALUE;
     }
@@ -282,7 +282,7 @@ int ADC::analogReadDifferential(uint8_t pinP, uint8_t pinN, ADC_NUM adc_num) {
     #elif ADC_NUM_ADCS==2
     /* Teensy 3.1
     */
-    if( adc_num==-1 ) { // use no ADC in particular
+    if( adc_num==ADC_NUM::ANY ) { // use no ADC in particular
         // check which ADC can read the pin
         bool adc0Pin = adc0->checkDifferentialPins(pinP, pinN);
         bool adc1Pin = adc1->checkDifferentialPins(pinP, pinN);
@@ -303,10 +303,10 @@ int ADC::analogReadDifferential(uint8_t pinP, uint8_t pinN, ADC_NUM adc_num) {
             return ADC_ERROR_VALUE;   // all others are invalid
         }
     }
-    else if( adc_num==0 ) { // user wants ADC0
+    else if( adc_num==ADC_NUM::ADC_0 ) { // user wants ADC0
         return adc0->analogReadDifferential(pinP, pinN);
     }
-    else if( adc_num==1 ){ // user wants ADC 1
+    else if( adc_num==ADC_NUM::ADC_1 ){ // user wants ADC 1
         return adc1->analogReadDifferential(pinP, pinN);
     }
     adc0->fail_flag |= ADC_ERROR_OTHER;
@@ -325,7 +325,7 @@ bool ADC::startSingleRead(uint8_t pin, ADC_NUM adc_num) {
     #if ADC_NUM_ADCS==1
     /* Teensy 3.0, LC
     */
-    if( adc_num==1 ) { // If asked to use ADC1, return error
+    if( adc_num==ADC_NUM::ADC_1 ) { // If asked to use ADC1, return error
         adc0->fail_flag |= ADC_ERROR_WRONG_ADC;
         return false;
     }
@@ -333,7 +333,7 @@ bool ADC::startSingleRead(uint8_t pin, ADC_NUM adc_num) {
     #elif ADC_NUM_ADCS==2
     /* Teensy 3.1
     */
-    if( adc_num==-1 ) { // use no ADC in particular
+    if( adc_num==ADC_NUM::ANY ) { // use no ADC in particular
         // check which ADC can read the pin
         bool adc0Pin = adc0->checkPin(pin);
         bool adc1Pin = adc1->checkPin(pin);
@@ -355,10 +355,10 @@ bool ADC::startSingleRead(uint8_t pin, ADC_NUM adc_num) {
             return false;   // all others are invalid
         }
     }
-    else if( adc_num==0 ) { // user wants ADC0
+    else if( adc_num==ADC_NUM::ADC_0 ) { // user wants ADC0
         return adc0->startSingleRead(pin);
     }
-    else if( adc_num==1 ){ // user wants ADC 1
+    else if( adc_num==ADC_NUM::ADC_1 ){ // user wants ADC 1
         return adc1->startSingleRead(pin);
     }
     adc0->fail_flag |= ADC_ERROR_OTHER;
@@ -378,7 +378,7 @@ bool ADC::startSingleDifferential(uint8_t pinP, uint8_t pinN, ADC_NUM adc_num) {
     #if ADC_NUM_ADCS==1
     /* Teensy 3.0, LC
     */
-    if( adc_num==1 ) { // If asked to use ADC1, return error
+    if( adc_num==ADC_NUM::ADC_1 ) { // If asked to use ADC1, return error
         adc0->fail_flag |= ADC_ERROR_WRONG_ADC;
         return false;
     }
@@ -386,7 +386,7 @@ bool ADC::startSingleDifferential(uint8_t pinP, uint8_t pinN, ADC_NUM adc_num) {
     #elif ADC_NUM_ADCS==2
     /* Teensy 3.1
     */
-    if( adc_num==-1 ) { // use no ADC in particular
+    if( adc_num==ADC_NUM::ANY ) { // use no ADC in particular
         // check which ADC can read the pin
         bool adc0Pin = adc0->checkDifferentialPins(pinP, pinN);
         bool adc1Pin = adc1->checkDifferentialPins(pinP, pinN);
@@ -407,10 +407,10 @@ bool ADC::startSingleDifferential(uint8_t pinP, uint8_t pinN, ADC_NUM adc_num) {
             return false;   // all others are invalid
         }
     }
-    else if( adc_num==0 ) { // user wants ADC0
+    else if( adc_num==ADC_NUM::ADC_0 ) { // user wants ADC0
         return adc0->startSingleDifferential(pinP, pinN);
     }
-    else if( adc_num==1 ){ // user wants ADC 1
+    else if( adc_num==ADC_NUM::ADC_1 ){ // user wants ADC 1
         return adc1->startSingleDifferential(pinP, pinN);
     }
     adc0->fail_flag |= ADC_ERROR_OTHER;
@@ -427,7 +427,7 @@ bool ADC::startContinuous(uint8_t pin, ADC_NUM adc_num) {
     #if ADC_NUM_ADCS==1
     /* Teensy 3.0, LC
     */
-    if( adc_num==1 ) { // If asked to use ADC1, return error
+    if( adc_num==ADC_NUM::ADC_1 ) { // If asked to use ADC1, return error
         adc0->fail_flag |= ADC_ERROR_WRONG_ADC;
         return false;
     }
@@ -435,7 +435,7 @@ bool ADC::startContinuous(uint8_t pin, ADC_NUM adc_num) {
     #elif ADC_NUM_ADCS==2
     /* Teensy 3.1
     */
-    if( adc_num==-1 ) { // use no ADC in particular
+    if( adc_num==ADC_NUM::ANY ) { // use no ADC in particular
         // check which ADC can read the pin
         bool adc0Pin = adc0->checkPin(pin);
         bool adc1Pin = adc1->checkPin(pin);
@@ -456,10 +456,10 @@ bool ADC::startContinuous(uint8_t pin, ADC_NUM adc_num) {
             return false;   // all others are invalid
         }
     }
-    else if( adc_num==0 ) { // user wants ADC0
+    else if( adc_num==ADC_NUM::ADC_0 ) { // user wants ADC0
         return adc0->startContinuous(pin);
     }
-    else if( adc_num==1 ){ // user wants ADC 1
+    else if( adc_num==ADC_NUM::ADC_1 ){ // user wants ADC 1
         return adc1->startContinuous(pin);
     }
     adc0->fail_flag |= ADC_ERROR_OTHER;
@@ -477,7 +477,7 @@ bool ADC::startContinuousDifferential(uint8_t pinP, uint8_t pinN, ADC_NUM adc_nu
     #if ADC_NUM_ADCS==1
     /* Teensy 3.0, LC
     */
-    if( adc_num==1 ) { // If asked to use ADC1, return error
+    if( adc_num==ADC_NUM::ADC_1 ) { // If asked to use ADC1, return error
         adc0->fail_flag |= ADC_ERROR_WRONG_ADC;
         return false;
     }
@@ -485,7 +485,7 @@ bool ADC::startContinuousDifferential(uint8_t pinP, uint8_t pinN, ADC_NUM adc_nu
     #elif ADC_NUM_ADCS==2
     /* Teensy 3.1
     */
-    if( adc_num==-1 ) { // use no ADC in particular
+    if( adc_num==ADC_NUM::ANY ) { // use no ADC in particular
         // check which ADC can read the pin
         bool adc0Pin = adc0->checkDifferentialPins(pinP, pinN);
         bool adc1Pin = adc1->checkDifferentialPins(pinP, pinN);
@@ -506,10 +506,10 @@ bool ADC::startContinuousDifferential(uint8_t pinP, uint8_t pinN, ADC_NUM adc_nu
             return false;   // all others are invalid
         }
     }
-    else if( adc_num==0 ) { // user wants ADC0
+    else if( adc_num==ADC_NUM::ADC_0 ) { // user wants ADC0
         return adc0->startContinuousDifferential(pinP, pinN);
     }
-    else if( adc_num==1 ){ // user wants ADC 1
+    else if( adc_num==ADC_NUM::ADC_1 ){ // user wants ADC 1
         return adc1->startContinuousDifferential(pinP, pinN);
     }
     adc0->fail_flag |= ADC_ERROR_OTHER;
