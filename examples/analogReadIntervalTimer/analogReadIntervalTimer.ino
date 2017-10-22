@@ -31,7 +31,7 @@ const int ledPin = LED_BUILTIN;
 const int readPin0 = A10;
 const int period0 = 120; // us
 
-const int readPin1 = A11;
+const int readPin1 = A9;
 const int period1 = 120; // us
 
 const int readPeriod = 100000; // us
@@ -49,10 +49,10 @@ void setup() {
 
     pinMode(ledPin, OUTPUT); // led blinks every loop
 
-    pinMode(ledPin+1, OUTPUT); // timer0 starts a measurement
-    pinMode(ledPin+2, OUTPUT); // timer1 starts a measurement
-    pinMode(ledPin+3, OUTPUT); // adc0_isr, measurement finished for readPin0
-    pinMode(ledPin+4, OUTPUT); // adc0_isr, measurement finished for readPin1
+    pinMode(A14, OUTPUT); // timer0 starts a measurement
+    pinMode(A15, OUTPUT); // timer1 starts a measurement
+    pinMode(A16, OUTPUT); // adc0_isr, measurement finished for readPin0
+    pinMode(A17, OUTPUT); // adc0_isr, measurement finished for readPin1
 
     pinMode(readPin0, INPUT);
     pinMode(readPin1, INPUT);
@@ -65,7 +65,7 @@ void setup() {
     // reference can be ADC_REFERENCE::REF_3V3, ADC_REFERENCE::REF_1V2 (not for Teensy LC) or ADC_REFERENCE::REF_EXT.
     //adc->setReference(ADC_REFERENCE::REF_1V2, ADC_NUM::ADC_0); // change all 3.3 to 1.2 if you change the reference to 1V2
 
-    adc->setAveraging(16); // set number of averages
+    adc->setAveraging(8); // set number of averages
     adc->setResolution(12); // set bits of resolution
 
     // it can be any of the ADC_CONVERSION_SPEED enum: VERY_LOW_SPEED, LOW_SPEED, MED_SPEED, HIGH_SPEED_16BITS, HIGH_SPEED or VERY_HIGH_SPEED
@@ -76,20 +76,12 @@ void setup() {
     // it can be any of the ADC_MED_SPEED enum: VERY_LOW_SPEED, LOW_SPEED, MED_SPEED, HIGH_SPEED or VERY_HIGH_SPEED
     adc->setSamplingSpeed(ADC_SAMPLING_SPEED::MED_SPEED); // change the sampling speed
 
-    // always call the compare functions after changing the resolution!
-    //adc->enableCompare(1.0/3.3*adc->getMaxValue(ADC_NUM::ADC_0), 0, ADC_NUM::ADC_0); // measurement will be ready if value < 1.0V
-    //adc->enableCompareRange(1.0*adc->getMaxValue(ADC_NUM::ADC_0)/3.3, 2.0*adc->getMaxValue(ADC_NUM::ADC_0)/3.3, 0, 1, ADC_NUM::ADC_0); // ready if value lies out of [1.0,2.0] V
-
-    // If you enable interrupts, notice that the isr will read the result, so that isComplete() will return false (most of the time)
-    //adc->enableInterrupts(ADC_NUM::ADC_0);
-
-
     Serial.println("Starting Timers");
 
     // start the timers, if it's not possible, startTimerValuex will be false
     startTimerValue0 = timer0.begin(timer0_callback, period0);
     // wait enough time for the first timer conversion to finish (depends on resolution and averaging),
-    // with 16 averages, 12 bits, and ADC_MED_SPEED in both sampling and conversion speeds it takes about 36 us.
+    // with 8 averages, 12 bits, and ADC_MED_SPEED in both sampling and conversion speeds it takes about 28 us.
     delayMicroseconds(25); // if we wait less than 36us the timer1 will interrupt the conversion
     // initiated by timer0. The adc_isr will restart the timer0's measurement.
 
@@ -99,7 +91,7 @@ void setup() {
     // Pin 16 is the adc_isr when there's a new measurement on readpin0
     // Pin 17 is the adc_isr when there's a new measurement on readpin1
 
-    // Timer0 starts a comversion and 25 us later timer1 starts a new one, "pausing" the first, about 36 us later timer1's conversion
+    // Timer0 starts a conversion and 25 us later timer1 starts a new one, "pausing" the first, about 36 us later timer1's conversion
     // is done, and timer0's is restarted, 36 us later timer0's conversion finishes. About 14 us later timer0 starts a new conversion again.
     // (times don't add up to 120 us because the timer_callbacks and adc_isr take time to execute, about 2.5 us and 1 us, respectively)
     // so in the worst case timer0 gets a new value in about twice as long as it would take alone.
@@ -160,11 +152,14 @@ void loop() {
 // in my low-res oscilloscope this function seems to take 1.5-2 us.
 void timer0_callback(void) {
 
-    digitalWriteFast(ledPin+1, HIGH);
+    digitalWriteFast(A14, HIGH);
+    for(int i=0; i<100; i++) { // make it take longer so I can see it better in my cheap oscilloscope
+        __asm__ volatile ("nop");
+    }
 
-    adc->startSingleRead(readPin0, ADC_NUM::ADC_0); // also: startSingleDifferential, analogSynchronizedRead, analogSynchronizedReadDifferential
+    adc->adc0->startSingleRead(readPin0); // also: startSingleDifferential, analogSynchronizedRead, analogSynchronizedReadDifferential
 
-    digitalWriteFast(ledPin+1, LOW);
+    digitalWriteFast(A14, LOW);
     //digitalWriteFast(ledPin+1, !digitalReadFast(ledPin+1));
 
 }
@@ -173,11 +168,14 @@ void timer0_callback(void) {
 // start the measurement
 void timer1_callback(void) {
 
-    digitalWriteFast(ledPin+2, HIGH);
+    digitalWriteFast(A15, HIGH);
+    for(int i=0; i<100; i++) {
+        __asm__ volatile ("nop");
+    }
 
-    adc->startSingleRead(readPin1, ADC_NUM::ADC_0);
+    adc->adc0->startSingleRead(readPin1);
 
-    digitalWriteFast(ledPin+2, LOW);
+    digitalWriteFast(A15, LOW);
 
 }
 
@@ -187,18 +185,25 @@ void adc0_isr() {
 
     uint8_t pin = ADC::sc1a2channelADC0[ADC0_SC1A&ADC_SC1A_CHANNELS]; // the bits 0-4 of ADC0_SC1A have the channel
 
+
     // add value to correct buffer
     if(pin==readPin0) {
-        digitalWriteFast(ledPin+3, HIGH);
+        digitalWriteFast(A16, HIGH);
+        for(int i=0; i<100; i++) {
+            __asm__ volatile ("nop");
+        }
         buffer0->write(adc->readSingle());
-        digitalWriteFast(ledPin+3, LOW);
+        digitalWriteFast(A16, LOW);
     } else if(pin==readPin1) {
-        digitalWriteFast(ledPin+4, HIGH);
+        digitalWriteFast(A17, HIGH);
+        for(int i=0; i<100; i++) {
+            __asm__ volatile ("nop");
+        }
         buffer1->write(adc->readSingle());
         if(adc->adc0->isConverting()) {
             digitalWriteFast(LED_BUILTIN, 1);
         }
-        digitalWriteFast(ledPin+4, LOW);
+        digitalWriteFast(A17, LOW);
     } else { // clear interrupt anyway
         adc->readSingle();
     }
