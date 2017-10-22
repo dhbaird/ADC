@@ -406,7 +406,7 @@ class ADC
         * If a comparison has been set up and fails, it will return ADC_ERROR_VALUE.
         * This function is interrupt safe, so it will restore the adc to the state it was before being called
         * If more than one ADC exists, it will select the module with less workload, you can force a selection using
-        * adc_num. If you select ADC1 in Teensy 3.0 it will return ADC_ERROR_VALUE.
+        * adc_num.
         *   \param pin can be any of the analog pins
         *   \param adc_num ADC_NUM enum member. Selects the ADC module to use.
         *   \return the value of the pin.

@@ -332,6 +332,9 @@ static const ADC_Module::ADC_NLIST&#160;</td><td class="memItemRight" valign="bo
 <a class="anchor" id="ab5d4fc435fdd2d56dcd699024ef563b5"></a>
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">int ADC::analogRead </td>
@@ -351,19 +354,24 @@ static const ADC_Module::ADC_NLIST&#160;</td><td class="memItemRight" valign="bo
           <td></td><td></td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
 <p>Returns the analog value of the pin. </p>
 <p>It waits until the value is read and then returns the result. If a comparison has been set up and fails, it will return ADC_ERROR_VALUE. This function is interrupt safe, so it will restore the adc to the state it was before being called If more than one <a class="el" href="class_a_d_c.html">ADC</a> exists, it will select the module with less workload, you can force a selection using adc_num. If you select ADC1 in Teensy 3.0 it will return ADC_ERROR_VALUE. </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">pin</td><td>can be any of the analog pins </td></tr>
-    <tr><td class="paramname">adc_num</td><td>ADC_X <a class="el" href="class_a_d_c.html">ADC</a> module </td></tr>
+    <tr><td class="paramname">adc_num</td><td>ADC_NUM enum member. Selects the <a class="el" href="class_a_d_c.html">ADC</a> module to use. </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the value of the pin. </dd></dl>
 
-<p>Definition at line <a class="el" href="_a_d_c_8cpp_source.html#l00258">258</a> of file <a class="el" href="_a_d_c_8cpp_source.html">ADC.cpp</a>.</p>
+<p>Definition at line <a class="el" href="_a_d_c_8h_source.html#l00414">414</a> of file <a class="el" href="_a_d_c_8h_source.html">ADC.h</a>.</p>
 
 </div>
 </div>
@@ -403,13 +411,13 @@ static const ADC_Module::ADC_NLIST&#160;</td><td class="memItemRight" valign="bo
 <p>It calls analogRead(uint8_t pin) internally, with the correct value for the pin for all boards. Possible values: TEMP_SENSOR, Temperature sensor. VREF_OUT, 1.2 V reference (switch on first using <a class="el" href="_v_r_e_f_8h_source.html">VREF.h</a>). BANDGAP, BANDGAP (switch on first using <a class="el" href="_v_r_e_f_8h_source.html">VREF.h</a>). VREFH, High <a class="el" href="namespace_v_r_e_f.html" title="Controls the Teensy internal voltage reference module (VREFV1) ">VREF</a>. VREFL, Low <a class="el" href="namespace_v_r_e_f.html" title="Controls the Teensy internal voltage reference module (VREFV1) ">VREF</a>. </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">pin</td><td>ADC_INTERNAL_SOURCE to read. </td></tr>
-    <tr><td class="paramname">adc_num</td><td>ADC_X <a class="el" href="class_a_d_c.html">ADC</a> module </td></tr>
+    <tr><td class="paramname">adc_num</td><td>ADC_NUM enum member. Selects the <a class="el" href="class_a_d_c.html">ADC</a> module to use. </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the value of the pin. </dd></dl>
 
-<p>Definition at line <a class="el" href="_a_d_c_8h_source.html#l00354">354</a> of file <a class="el" href="_a_d_c_8h_source.html">ADC.h</a>.</p>
+<p>Definition at line <a class="el" href="_a_d_c_8h_source.html#l00436">436</a> of file <a class="el" href="_a_d_c_8h_source.html">ADC.h</a>.</p>
 
 </div>
 </div>
@@ -438,19 +446,22 @@ static const ADC_Module::ADC_NLIST&#160;</td><td class="memItemRight" valign="bo
 <p>Reads the analog value of a continuous conversion. </p>
 <p>Set the continuous conversion with with analogStartContinuous(pin) or startContinuousDifferential(pinP, pinN). If single-ended and 16 bits it's necessary to typecast it to an unsigned type (like uint16_t), otherwise values larger than 3.3/2 V are interpreted as negative! </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">adc_num</td><td>ADC_X <a class="el" href="class_a_d_c.html">ADC</a> module </td></tr>
+    <tr><td class="paramname">adc_num</td><td>ADC_NUM enum member. Selects the <a class="el" href="class_a_d_c.html">ADC</a> module to use. </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the last converted value. </dd></dl>
 
-<p>Definition at line <a class="el" href="_a_d_c_8h_source.html#l00430">430</a> of file <a class="el" href="_a_d_c_8h_source.html">ADC.h</a>.</p>
+<p>Definition at line <a class="el" href="_a_d_c_8h_source.html#l00542">542</a> of file <a class="el" href="_a_d_c_8h_source.html">ADC.h</a>.</p>
 
 </div>
 </div>
 <a class="anchor" id="ae891a854271eef7284728c6c59eacdfb"></a>
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">int ADC::analogReadDifferential </td>
@@ -476,6 +487,11 @@ static const ADC_Module::ADC_NLIST&#160;</td><td class="memItemRight" valign="bo
           <td></td><td></td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
 <p>Reads the differential analog value of two pins (pinP - pinN). </p>
@@ -483,13 +499,13 @@ static const ADC_Module::ADC_NLIST&#160;</td><td class="memItemRight" valign="bo
   <table class="params">
     <tr><td class="paramname">pinP</td><td>must be A10 or A12. </td></tr>
     <tr><td class="paramname">pinN</td><td>must be A11 (if pinP=A10) or A13 (if pinP=A12). </td></tr>
-    <tr><td class="paramname">adc_num</td><td>ADC_X <a class="el" href="class_a_d_c.html">ADC</a> module </td></tr>
+    <tr><td class="paramname">adc_num</td><td>ADC_NUM enum member. Selects the <a class="el" href="class_a_d_c.html">ADC</a> module to use. </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the differential value of the pins, invalid pins return ADC_ERROR_VALUE. If a comparison has been set up and fails, it will return ADC_ERROR_VALUE. </dd></dl>
 
-<p>Definition at line <a class="el" href="_a_d_c_8cpp_source.html#l00301">301</a> of file <a class="el" href="_a_d_c_8cpp_source.html">ADC.cpp</a>.</p>
+<p>Definition at line <a class="el" href="_a_d_c_8h_source.html#l00451">451</a> of file <a class="el" href="_a_d_c_8h_source.html">ADC.h</a>.</p>
 
 </div>
 </div>
@@ -527,7 +543,7 @@ static const ADC_Module::ADC_NLIST&#160;</td><td class="memItemRight" valign="bo
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>a <a class="el" href="struct_a_d_c_1_1_sync__result.html" title="Struct for synchronous measurements. ">Sync_result</a> struct with the result of each <a class="el" href="class_a_d_c.html">ADC</a> value. </dd></dl>
 
-<p>Definition at line <a class="el" href="_a_d_c_8cpp_source.html#l00561">561</a> of file <a class="el" href="_a_d_c_8cpp_source.html">ADC.cpp</a>.</p>
+<p>Definition at line <a class="el" href="_a_d_c_8cpp_source.html#l00228">228</a> of file <a class="el" href="_a_d_c_8cpp_source.html">ADC.cpp</a>.</p>
 
 </div>
 </div>
@@ -579,7 +595,7 @@ static const ADC_Module::ADC_NLIST&#160;</td><td class="memItemRight" valign="bo
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>a <a class="el" href="struct_a_d_c_1_1_sync__result.html" title="Struct for synchronous measurements. ">Sync_result</a> struct with the result of each differential <a class="el" href="class_a_d_c.html">ADC</a> value. </dd></dl>
 
-<p>Definition at line <a class="el" href="_a_d_c_8cpp_source.html#l00646">646</a> of file <a class="el" href="_a_d_c_8cpp_source.html">ADC.cpp</a>.</p>
+<p>Definition at line <a class="el" href="_a_d_c_8cpp_source.html#l00313">313</a> of file <a class="el" href="_a_d_c_8cpp_source.html">ADC.cpp</a>.</p>
 
 </div>
 </div>
@@ -625,7 +641,7 @@ static const ADC_Module::ADC_NLIST&#160;</td><td class="memItemRight" valign="bo
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>a <a class="el" href="struct_a_d_c_1_1_sync__result.html" title="Struct for synchronous measurements. ">Sync_result</a> struct with the result of each <a class="el" href="class_a_d_c.html">ADC</a> value. </dd></dl>
 
-<p>Definition at line <a class="el" href="_a_d_c_8h_source.html#l00475">475</a> of file <a class="el" href="_a_d_c_8h_source.html">ADC.h</a>.</p>
+<p>Definition at line <a class="el" href="_a_d_c_8h_source.html#l00587">587</a> of file <a class="el" href="_a_d_c_8h_source.html">ADC.h</a>.</p>
 
 </div>
 </div>
@@ -685,7 +701,7 @@ static const ADC_Module::ADC_NLIST&#160;</td><td class="memItemRight" valign="bo
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>a <a class="el" href="struct_a_d_c_1_1_sync__result.html" title="Struct for synchronous measurements. ">Sync_result</a> struct with the result of each differential <a class="el" href="class_a_d_c.html">ADC</a> value. </dd></dl>
 
-<p>Definition at line <a class="el" href="_a_d_c_8h_source.html#l00500">500</a> of file <a class="el" href="_a_d_c_8h_source.html">ADC.h</a>.</p>
+<p>Definition at line <a class="el" href="_a_d_c_8h_source.html#l00612">612</a> of file <a class="el" href="_a_d_c_8h_source.html">ADC.h</a>.</p>
 
 </div>
 </div>
@@ -714,12 +730,12 @@ static const ADC_Module::ADC_NLIST&#160;</td><td class="memItemRight" valign="bo
 <p>Disable the compare function. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">adc_num</td><td><a class="el" href="class_a_d_c.html">ADC</a> number to change. </td></tr>
+    <tr><td class="paramname">adc_num</td><td>ADC_NUM enum member. Selects the <a class="el" href="class_a_d_c.html">ADC</a> module to use. </td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="_a_d_c_8h_source.html#l00254">254</a> of file <a class="el" href="_a_d_c_8h_source.html">ADC.h</a>.</p>
+<p>Definition at line <a class="el" href="_a_d_c_8h_source.html#l00328">328</a> of file <a class="el" href="_a_d_c_8h_source.html">ADC.h</a>.</p>
 
 </div>
 </div>
@@ -748,12 +764,12 @@ static const ADC_Module::ADC_NLIST&#160;</td><td class="memItemRight" valign="bo
 <p>Disable <a class="el" href="class_a_d_c.html">ADC</a> DMA request. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">adc_num</td><td><a class="el" href="class_a_d_c.html">ADC</a> number to change. </td></tr>
+    <tr><td class="paramname">adc_num</td><td>ADC_NUM enum member. Selects the <a class="el" href="class_a_d_c.html">ADC</a> module to use. </td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="_a_d_c_8h_source.html#l00216">216</a> of file <a class="el" href="_a_d_c_8h_source.html">ADC.h</a>.</p>
+<p>Definition at line <a class="el" href="_a_d_c_8h_source.html#l00290">290</a> of file <a class="el" href="_a_d_c_8h_source.html">ADC.h</a>.</p>
 
 </div>
 </div>
@@ -782,12 +798,12 @@ static const ADC_Module::ADC_NLIST&#160;</td><td class="memItemRight" valign="bo
 <p>Disable interrupts. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">adc_num</td><td><a class="el" href="class_a_d_c.html">ADC</a> number to change. </td></tr>
+    <tr><td class="paramname">adc_num</td><td>ADC_NUM enum member. Selects the <a class="el" href="class_a_d_c.html">ADC</a> module to use. </td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="_a_d_c_8h_source.html#l00198">198</a> of file <a class="el" href="_a_d_c_8h_source.html">ADC.h</a>.</p>
+<p>Definition at line <a class="el" href="_a_d_c_8h_source.html#l00272">272</a> of file <a class="el" href="_a_d_c_8h_source.html">ADC.h</a>.</p>
 
 </div>
 </div>
@@ -816,12 +832,12 @@ static const ADC_Module::ADC_NLIST&#160;</td><td class="memItemRight" valign="bo
 <p>Disable PGA. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">adc_num</td><td><a class="el" href="class_a_d_c.html">ADC</a> number to query </td></tr>
+    <tr><td class="paramname">adc_num</td><td>ADC_NUM enum member. Selects the <a class="el" href="class_a_d_c.html">ADC</a> module to use. </td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="_a_d_c_8h_source.html#l00282">282</a> of file <a class="el" href="_a_d_c_8h_source.html">ADC.h</a>.</p>
+<p>Definition at line <a class="el" href="_a_d_c_8h_source.html#l00356">356</a> of file <a class="el" href="_a_d_c_8h_source.html">ADC.h</a>.</p>
 
 </div>
 </div>
@@ -868,12 +884,12 @@ static const ADC_Module::ADC_NLIST&#160;</td><td class="memItemRight" valign="bo
   <table class="params">
     <tr><td class="paramname">compValue</td><td>value to compare </td></tr>
     <tr><td class="paramname">greaterThan</td><td>true or false </td></tr>
-    <tr><td class="paramname">adc_num</td><td><a class="el" href="class_a_d_c.html">ADC</a> number to change. </td></tr>
+    <tr><td class="paramname">adc_num</td><td>ADC_NUM enum member. Selects the <a class="el" href="class_a_d_c.html">ADC</a> module to use. </td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="_a_d_c_8h_source.html#l00230">230</a> of file <a class="el" href="_a_d_c_8h_source.html">ADC.h</a>.</p>
+<p>Definition at line <a class="el" href="_a_d_c_8h_source.html#l00304">304</a> of file <a class="el" href="_a_d_c_8h_source.html">ADC.h</a>.</p>
 
 </div>
 </div>
@@ -934,12 +950,12 @@ static const ADC_Module::ADC_NLIST&#160;</td><td class="memItemRight" valign="bo
     <tr><td class="paramname">upperLimit</td><td>upper value to compare </td></tr>
     <tr><td class="paramname">insideRange</td><td>true or false </td></tr>
     <tr><td class="paramname">inclusive</td><td>true or false </td></tr>
-    <tr><td class="paramname">adc_num</td><td><a class="el" href="class_a_d_c.html">ADC</a> number to change. </td></tr>
+    <tr><td class="paramname">adc_num</td><td>ADC_NUM enum member. Selects the <a class="el" href="class_a_d_c.html">ADC</a> module to use. </td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="_a_d_c_8h_source.html#l00246">246</a> of file <a class="el" href="_a_d_c_8h_source.html">ADC.h</a>.</p>
+<p>Definition at line <a class="el" href="_a_d_c_8h_source.html#l00320">320</a> of file <a class="el" href="_a_d_c_8h_source.html">ADC.h</a>.</p>
 
 </div>
 </div>
@@ -968,12 +984,12 @@ static const ADC_Module::ADC_NLIST&#160;</td><td class="memItemRight" valign="bo
 <p>Enable DMA request. </p>
 <p>An <a class="el" href="class_a_d_c.html">ADC</a> DMA request will be raised when the conversion is completed (including hardware averages and if the comparison (if any) is true). </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">adc_num</td><td><a class="el" href="class_a_d_c.html">ADC</a> number to change. </td></tr>
+    <tr><td class="paramname">adc_num</td><td>ADC_NUM enum member. Selects the <a class="el" href="class_a_d_c.html">ADC</a> module to use. </td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="_a_d_c_8h_source.html#l00208">208</a> of file <a class="el" href="_a_d_c_8h_source.html">ADC.h</a>.</p>
+<p>Definition at line <a class="el" href="_a_d_c_8h_source.html#l00282">282</a> of file <a class="el" href="_a_d_c_8h_source.html">ADC.h</a>.</p>
 
 </div>
 </div>
@@ -1002,12 +1018,12 @@ static const ADC_Module::ADC_NLIST&#160;</td><td class="memItemRight" valign="bo
 <p>Enable interrupts. </p>
 <p>An IRQ_ADCx Interrupt will be raised when the conversion is completed (including hardware averages and if the comparison (if any) is true). </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">adc_num</td><td><a class="el" href="class_a_d_c.html">ADC</a> number to change. </td></tr>
+    <tr><td class="paramname">adc_num</td><td>ADC_NUM enum member. Selects the <a class="el" href="class_a_d_c.html">ADC</a> module to use. </td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="_a_d_c_8h_source.html#l00190">190</a> of file <a class="el" href="_a_d_c_8h_source.html">ADC.h</a>.</p>
+<p>Definition at line <a class="el" href="_a_d_c_8h_source.html#l00264">264</a> of file <a class="el" href="_a_d_c_8h_source.html">ADC.h</a>.</p>
 
 </div>
 </div>
@@ -1047,12 +1063,12 @@ static const ADC_Module::ADC_NLIST&#160;</td><td class="memItemRight" valign="bo
 <p>Enables the PGA and sets the gain Use only for signals lower than 1.2 V and only in differential mode </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">gain</td><td>can be 1, 2, 4, 8, 16, 32 or 64 </td></tr>
-    <tr><td class="paramname">adc_num</td><td><a class="el" href="class_a_d_c.html">ADC</a> number to change. </td></tr>
+    <tr><td class="paramname">adc_num</td><td>ADC_NUM enum member. Selects the <a class="el" href="class_a_d_c.html">ADC</a> module to use. </td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="_a_d_c_8h_source.html#l00265">265</a> of file <a class="el" href="_a_d_c_8h_source.html">ADC.h</a>.</p>
+<p>Definition at line <a class="el" href="_a_d_c_8h_source.html#l00339">339</a> of file <a class="el" href="_a_d_c_8h_source.html">ADC.h</a>.</p>
 
 </div>
 </div>
@@ -1081,13 +1097,13 @@ static const ADC_Module::ADC_NLIST&#160;</td><td class="memItemRight" valign="bo
 <p>Returns the maximum value for a measurement: 2^res-1. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">adc_num</td><td><a class="el" href="class_a_d_c.html">ADC</a> number to query. </td></tr>
+    <tr><td class="paramname">adc_num</td><td>ADC_NUM enum member. Selects the <a class="el" href="class_a_d_c.html">ADC</a> module to use.. </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the maximum value of adc_num <a class="el" href="class_a_d_c.html">ADC</a>. </dd></dl>
 
-<p>Definition at line <a class="el" href="_a_d_c_8h_source.html#l00131">131</a> of file <a class="el" href="_a_d_c_8h_source.html">ADC.h</a>.</p>
+<p>Definition at line <a class="el" href="_a_d_c_8h_source.html#l00205">205</a> of file <a class="el" href="_a_d_c_8h_source.html">ADC.h</a>.</p>
 
 </div>
 </div>
@@ -1116,13 +1132,13 @@ static const ADC_Module::ADC_NLIST&#160;</td><td class="memItemRight" valign="bo
 <p>Returns the PGA level. </p>
 <p>PGA level = from 1 to 64 </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">adc_num</td><td><a class="el" href="class_a_d_c.html">ADC</a> number to query. </td></tr>
+    <tr><td class="paramname">adc_num</td><td>ADC_NUM enum member. Selects the <a class="el" href="class_a_d_c.html">ADC</a> module to use. </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>PGA level = from 1 to 64 </dd></dl>
 
-<p>Definition at line <a class="el" href="_a_d_c_8h_source.html#l00274">274</a> of file <a class="el" href="_a_d_c_8h_source.html">ADC.h</a>.</p>
+<p>Definition at line <a class="el" href="_a_d_c_8h_source.html#l00348">348</a> of file <a class="el" href="_a_d_c_8h_source.html">ADC.h</a>.</p>
 
 </div>
 </div>
@@ -1151,13 +1167,13 @@ static const ADC_Module::ADC_NLIST&#160;</td><td class="memItemRight" valign="bo
 <p>Returns the resolution of the <a class="el" href="class_a_d_c___module.html">ADC_Module</a>. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">adc_num</td><td><a class="el" href="class_a_d_c.html">ADC</a> number to query. </td></tr>
+    <tr><td class="paramname">adc_num</td><td>ADC_NUM enum member. Selects the <a class="el" href="class_a_d_c.html">ADC</a> module to use.. </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the resolution of adc_num <a class="el" href="class_a_d_c.html">ADC</a>. </dd></dl>
 
-<p>Definition at line <a class="el" href="_a_d_c_8h_source.html#l00122">122</a> of file <a class="el" href="_a_d_c_8h_source.html">ADC.h</a>.</p>
+<p>Definition at line <a class="el" href="_a_d_c_8h_source.html#l00196">196</a> of file <a class="el" href="_a_d_c_8h_source.html">ADC.h</a>.</p>
 
 </div>
 </div>
@@ -1186,13 +1202,13 @@ static const ADC_Module::ADC_NLIST&#160;</td><td class="memItemRight" valign="bo
 <p>Is an <a class="el" href="class_a_d_c.html">ADC</a> conversion ready? </p>
 <p>When a value is read this function returns 0 until a new value exists So it only makes sense to call it with continuous or non-blocking methods </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">adc_num</td><td><a class="el" href="class_a_d_c.html">ADC</a> number to query </td></tr>
+    <tr><td class="paramname">adc_num</td><td>ADC_NUM enum member. Selects the <a class="el" href="class_a_d_c.html">ADC</a> module to use. </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>true if yes, false if not. </dd></dl>
 
-<p>Definition at line <a class="el" href="_a_d_c_8h_source.html#l00304">304</a> of file <a class="el" href="_a_d_c_8h_source.html">ADC.h</a>.</p>
+<p>Definition at line <a class="el" href="_a_d_c_8h_source.html#l00378">378</a> of file <a class="el" href="_a_d_c_8h_source.html">ADC.h</a>.</p>
 
 </div>
 </div>
@@ -1221,13 +1237,13 @@ static const ADC_Module::ADC_NLIST&#160;</td><td class="memItemRight" valign="bo
 <p>Is the <a class="el" href="class_a_d_c.html">ADC</a> in continuous mode? </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">adc_num</td><td><a class="el" href="class_a_d_c.html">ADC</a> number to query </td></tr>
+    <tr><td class="paramname">adc_num</td><td>ADC_NUM enum member. Selects the <a class="el" href="class_a_d_c.html">ADC</a> module to use. </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>true or false </dd></dl>
 
-<p>Definition at line <a class="el" href="_a_d_c_8h_source.html#l00322">322</a> of file <a class="el" href="_a_d_c_8h_source.html">ADC.h</a>.</p>
+<p>Definition at line <a class="el" href="_a_d_c_8h_source.html#l00396">396</a> of file <a class="el" href="_a_d_c_8h_source.html">ADC.h</a>.</p>
 
 </div>
 </div>
@@ -1256,13 +1272,13 @@ static const ADC_Module::ADC_NLIST&#160;</td><td class="memItemRight" valign="bo
 <p>Is the <a class="el" href="class_a_d_c.html">ADC</a> converting at the moment? </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">adc_num</td><td><a class="el" href="class_a_d_c.html">ADC</a> number to query </td></tr>
+    <tr><td class="paramname">adc_num</td><td>ADC_NUM enum member. Selects the <a class="el" href="class_a_d_c.html">ADC</a> module to use. </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>true if yes, false if not. </dd></dl>
 
-<p>Definition at line <a class="el" href="_a_d_c_8h_source.html#l00294">294</a> of file <a class="el" href="_a_d_c_8h_source.html">ADC.h</a>.</p>
+<p>Definition at line <a class="el" href="_a_d_c_8h_source.html#l00368">368</a> of file <a class="el" href="_a_d_c_8h_source.html">ADC.h</a>.</p>
 
 </div>
 </div>
@@ -1291,13 +1307,13 @@ static const ADC_Module::ADC_NLIST&#160;</td><td class="memItemRight" valign="bo
 <p>Is the <a class="el" href="class_a_d_c.html">ADC</a> in differential mode? </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">adc_num</td><td><a class="el" href="class_a_d_c.html">ADC</a> number to query </td></tr>
+    <tr><td class="paramname">adc_num</td><td>ADC_NUM enum member. Selects the <a class="el" href="class_a_d_c.html">ADC</a> module to use. </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>true or false </dd></dl>
 
-<p>Definition at line <a class="el" href="_a_d_c_8h_source.html#l00313">313</a> of file <a class="el" href="_a_d_c_8h_source.html">ADC.h</a>.</p>
+<p>Definition at line <a class="el" href="_a_d_c_8h_source.html#l00387">387</a> of file <a class="el" href="_a_d_c_8h_source.html">ADC.h</a>.</p>
 
 </div>
 </div>
@@ -1323,7 +1339,7 @@ static const ADC_Module::ADC_NLIST&#160;</td><td class="memItemRight" valign="bo
 </div><div class="memdoc">
 <p>ERROR PRINTING ///// Prints the human-readable error from all <a class="el" href="class_a_d_c.html">ADC</a>, if any. </p>
 
-<p>Definition at line <a class="el" href="_a_d_c_8h_source.html#l00567">567</a> of file <a class="el" href="_a_d_c_8h_source.html">ADC.h</a>.</p>
+<p>Definition at line <a class="el" href="_a_d_c_8h_source.html#l00679">679</a> of file <a class="el" href="_a_d_c_8h_source.html">ADC.h</a>.</p>
 
 </div>
 </div>
@@ -1352,13 +1368,13 @@ static const ADC_Module::ADC_NLIST&#160;</td><td class="memItemRight" valign="bo
 <p>Reads the analog value of a single conversion. </p>
 <p>Set the conversion with with startSingleRead(pin) or startSingleDifferential(pinP, pinN). </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">adc_num</td><td>ADC_X <a class="el" href="class_a_d_c.html">ADC</a> module </td></tr>
+    <tr><td class="paramname">adc_num</td><td>ADC_NUM enum member. Selects the <a class="el" href="class_a_d_c.html">ADC</a> module to use. </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the converted value. </dd></dl>
 
-<p>Definition at line <a class="el" href="_a_d_c_8h_source.html#l00398">398</a> of file <a class="el" href="_a_d_c_8h_source.html">ADC.h</a>.</p>
+<p>Definition at line <a class="el" href="_a_d_c_8h_source.html#l00498">498</a> of file <a class="el" href="_a_d_c_8h_source.html">ADC.h</a>.</p>
 
 </div>
 </div>
@@ -1378,7 +1394,7 @@ static const ADC_Module::ADC_NLIST&#160;</td><td class="memItemRight" valign="bo
 <p>Returns the values of both ADCs. </p>
 <dl class="section return"><dt>Returns</dt><dd>the converted value. </dd></dl>
 
-<p>Definition at line <a class="el" href="_a_d_c_8cpp_source.html#l00915">915</a> of file <a class="el" href="_a_d_c_8cpp_source.html">ADC.cpp</a>.</p>
+<p>Definition at line <a class="el" href="_a_d_c_8cpp_source.html#l00582">582</a> of file <a class="el" href="_a_d_c_8cpp_source.html">ADC.cpp</a>.</p>
 
 </div>
 </div>
@@ -1398,7 +1414,7 @@ static const ADC_Module::ADC_NLIST&#160;</td><td class="memItemRight" valign="bo
 <p>Reads the analog value of a single conversion. </p>
 <dl class="section return"><dt>Returns</dt><dd>the converted value. </dd></dl>
 
-<p>Definition at line <a class="el" href="_a_d_c_8cpp_source.html#l00837">837</a> of file <a class="el" href="_a_d_c_8cpp_source.html">ADC.cpp</a>.</p>
+<p>Definition at line <a class="el" href="_a_d_c_8cpp_source.html#l00504">504</a> of file <a class="el" href="_a_d_c_8cpp_source.html">ADC.cpp</a>.</p>
 
 </div>
 </div>
@@ -1438,12 +1454,12 @@ static const ADC_Module::ADC_NLIST&#160;</td><td class="memItemRight" valign="bo
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">num</td><td>can be 0, 4, 8, 16 or 32. </td></tr>
-    <tr><td class="paramname">adc_num</td><td><a class="el" href="class_a_d_c.html">ADC</a> number to change. </td></tr>
+    <tr><td class="paramname">adc_num</td><td>ADC_NUM enum member. Selects the <a class="el" href="class_a_d_c.html">ADC</a> module to use. </td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="_a_d_c_8h_source.html#l00180">180</a> of file <a class="el" href="_a_d_c_8h_source.html">ADC.h</a>.</p>
+<p>Definition at line <a class="el" href="_a_d_c_8h_source.html#l00254">254</a> of file <a class="el" href="_a_d_c_8h_source.html">ADC.h</a>.</p>
 
 </div>
 </div>
@@ -1489,12 +1505,12 @@ static const ADC_Module::ADC_NLIST&#160;</td><td class="memItemRight" valign="bo
 <p>VERY_LOW_SPEED is guaranteed to be the lowest possible speed within specs for resolutions less than 16 bits (higher than 1 MHz), it's different from LOW_SPEED only for 24, 4 or 2 MHz bus frequency. LOW_SPEED is guaranteed to be the lowest possible speed within specs for all resolutions (higher than 2 MHz). MED_SPEED is always &gt;= LOW_SPEED and &lt;= HIGH_SPEED. HIGH_SPEED_16BITS is guaranteed to be the highest possible speed within specs for all resolutions (lower or eq than 12 MHz). HIGH_SPEED is guaranteed to be the highest possible speed within specs for resolutions less than 16 bits (lower or eq than 18 MHz). VERY_HIGH_SPEED may be out of specs, it's different from HIGH_SPEED only for 48, 40 or 24 MHz bus frequency.</p>
 <p>Additionally the conversion speed can also be ADACK_2_4, ADACK_4_0, ADACK_5_2 and ADACK_6_2, where the numbers are the frequency of the <a class="el" href="class_a_d_c.html">ADC</a> clock (ADCK) in MHz and are independent on the bus speed. This is useful if you are using the Teensy at a very low clock frequency but want faster conversions, but if F_BUS&lt;F_ADCK, you can't use VERY_HIGH_SPEED for sampling speed. </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">adc_num</td><td><a class="el" href="class_a_d_c.html">ADC</a> number to change. </td></tr>
+    <tr><td class="paramname">adc_num</td><td>ADC_NUM enum member. Selects the <a class="el" href="class_a_d_c.html">ADC</a> module to use. </td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="_a_d_c_8h_source.html#l00155">155</a> of file <a class="el" href="_a_d_c_8h_source.html">ADC.h</a>.</p>
+<p>Definition at line <a class="el" href="_a_d_c_8h_source.html#l00229">229</a> of file <a class="el" href="_a_d_c_8h_source.html">ADC.h</a>.</p>
 
 </div>
 </div>
@@ -1534,12 +1550,12 @@ static const ADC_Module::ADC_NLIST&#160;</td><td class="memItemRight" valign="bo
 <p>It recalibrates at the end. </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">type</td><td>can be <a class="el" href="_a_d_c___module_8h.html#a1edb7e48507f5c04ef3db68b5d5b01c9acbdca6103ed9d1895ad7cabeda125dac">ADC_REFERENCE::REF_3V3</a>, <a class="el" href="_a_d_c___module_8h.html#a1edb7e48507f5c04ef3db68b5d5b01c9a77f9ecbcb2044013c35ce1156c14b3a0">ADC_REFERENCE::REF_1V2</a> (not for Teensy LC) or <a class="el" href="_a_d_c___module_8h.html#a1edb7e48507f5c04ef3db68b5d5b01c9a5f3cc7cfab06012c0aa6a4b8a5a77161">ADC_REFERENCE::REF_EXT</a> </td></tr>
-    <tr><td class="paramname">adc_num</td><td><a class="el" href="class_a_d_c.html">ADC</a> number to change. </td></tr>
+    <tr><td class="paramname">adc_num</td><td>ADC_NUM enum member. Selects the <a class="el" href="class_a_d_c.html">ADC</a> module to use. </td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="_a_d_c_8h_source.html#l00096">96</a> of file <a class="el" href="_a_d_c_8h_source.html">ADC.h</a>.</p>
+<p>Definition at line <a class="el" href="_a_d_c_8h_source.html#l00170">170</a> of file <a class="el" href="_a_d_c_8h_source.html">ADC.h</a>.</p>
 
 </div>
 </div>
@@ -1579,12 +1595,12 @@ static const ADC_Module::ADC_NLIST&#160;</td><td class="memItemRight" valign="bo
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">bits</td><td>is the number of bits of resolution. For single-ended measurements: 8, 10, 12 or 16 bits. For differential measurements: 9, 11, 13 or 16 bits. If you want something in between (11 bits single-ended for example) select the immediate higher and shift the result one to the right. Whenever you change the resolution, change also the comparison values (if you use them). </td></tr>
-    <tr><td class="paramname">adc_num</td><td><a class="el" href="class_a_d_c.html">ADC</a> number to change. </td></tr>
+    <tr><td class="paramname">adc_num</td><td>ADC_NUM enum member. Selects the <a class="el" href="class_a_d_c.html">ADC</a> module to use. </td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="_a_d_c_8h_source.html#l00112">112</a> of file <a class="el" href="_a_d_c_8h_source.html">ADC.h</a>.</p>
+<p>Definition at line <a class="el" href="_a_d_c_8h_source.html#l00186">186</a> of file <a class="el" href="_a_d_c_8h_source.html">ADC.h</a>.</p>
 
 </div>
 </div>
@@ -1629,18 +1645,21 @@ static const ADC_Module::ADC_NLIST&#160;</td><td class="memItemRight" valign="bo
 </dl>
 <p>VERY_LOW_SPEED is the lowest possible sampling speed (+24 ADCK). LOW_SPEED adds +16 ADCK. MED_SPEED adds +10 ADCK. HIGH_SPEED adds +6 ADCK. VERY_HIGH_SPEED is the highest possible sampling speed (0 ADCK added). </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">adc_num</td><td><a class="el" href="class_a_d_c.html">ADC</a> number to change. </td></tr>
+    <tr><td class="paramname">adc_num</td><td>ADC_NUM enum member. Selects the <a class="el" href="class_a_d_c.html">ADC</a> module to use. </td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="_a_d_c_8h_source.html#l00170">170</a> of file <a class="el" href="_a_d_c_8h_source.html">ADC.h</a>.</p>
+<p>Definition at line <a class="el" href="_a_d_c_8h_source.html#l00244">244</a> of file <a class="el" href="_a_d_c_8h_source.html">ADC.h</a>.</p>
 
 </div>
 </div>
 <a class="anchor" id="ab7644f0af942512ac2f8c5730a33bd0b"></a>
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">bool ADC::startContinuous </td>
@@ -1660,25 +1679,33 @@ static const ADC_Module::ADC_NLIST&#160;</td><td class="memItemRight" valign="bo
           <td></td><td></td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
 <p>Starts continuous conversion on the pin. </p>
 <p>It returns as soon as the <a class="el" href="class_a_d_c.html">ADC</a> is set, use <a class="el" href="class_a_d_c.html#ad71a95823edc9d0eb5c87345cbdad2dc" title="Reads the analog value of a continuous conversion. ">analogReadContinuous()</a> to read the value. </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">pin</td><td>can be any of the analog pins </td></tr>
-    <tr><td class="paramname">adc_num</td><td>ADC_X <a class="el" href="class_a_d_c.html">ADC</a> module </td></tr>
+    <tr><td class="paramname">adc_num</td><td>ADC_NUM enum member. Selects the <a class="el" href="class_a_d_c.html">ADC</a> module to use. </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>true if the pin is valid, false otherwise. </dd></dl>
 
-<p>Definition at line <a class="el" href="_a_d_c_8cpp_source.html#l00454">454</a> of file <a class="el" href="_a_d_c_8cpp_source.html">ADC.cpp</a>.</p>
+<p>Definition at line <a class="el" href="_a_d_c_8h_source.html#l00512">512</a> of file <a class="el" href="_a_d_c_8h_source.html">ADC.h</a>.</p>
 
 </div>
 </div>
 <a class="anchor" id="a609128ed1a6964471face44af7e52776"></a>
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">bool ADC::startContinuousDifferential </td>
@@ -1704,6 +1731,11 @@ static const ADC_Module::ADC_NLIST&#160;</td><td class="memItemRight" valign="bo
           <td></td><td></td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
 <p>Starts continuous conversion between the pins (pinP-pinN). </p>
@@ -1711,19 +1743,22 @@ static const ADC_Module::ADC_NLIST&#160;</td><td class="memItemRight" valign="bo
   <table class="params">
     <tr><td class="paramname">pinP</td><td>must be A10 or A12. </td></tr>
     <tr><td class="paramname">pinN</td><td>must be A11 (if pinP=A10) or A13 (if pinP=A12). </td></tr>
-    <tr><td class="paramname">adc_num</td><td>ADC_X <a class="el" href="class_a_d_c.html">ADC</a> module </td></tr>
+    <tr><td class="paramname">adc_num</td><td>ADC_NUM enum member. Selects the <a class="el" href="class_a_d_c.html">ADC</a> module to use. </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>true if the pins are valid, false otherwise. </dd></dl>
 
-<p>Definition at line <a class="el" href="_a_d_c_8cpp_source.html#l00505">505</a> of file <a class="el" href="_a_d_c_8cpp_source.html">ADC.cpp</a>.</p>
+<p>Definition at line <a class="el" href="_a_d_c_8h_source.html#l00527">527</a> of file <a class="el" href="_a_d_c_8h_source.html">ADC.h</a>.</p>
 
 </div>
 </div>
 <a class="anchor" id="a141580ebe8a243c0173025720c61db69"></a>
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">bool ADC::startSingleDifferential </td>
@@ -1749,6 +1784,11 @@ static const ADC_Module::ADC_NLIST&#160;</td><td class="memItemRight" valign="bo
           <td></td><td></td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
 <p>Start a differential conversion between two pins (pinP - pinN) and enables interrupts. </p>
@@ -1756,19 +1796,22 @@ static const ADC_Module::ADC_NLIST&#160;</td><td class="memItemRight" valign="bo
   <table class="params">
     <tr><td class="paramname">pinP</td><td>must be A10 or A12. </td></tr>
     <tr><td class="paramname">pinN</td><td>must be A11 (if pinP=A10) or A13 (if pinP=A12). </td></tr>
-    <tr><td class="paramname">adc_num</td><td>ADC_X <a class="el" href="class_a_d_c.html">ADC</a> module </td></tr>
+    <tr><td class="paramname">adc_num</td><td>ADC_NUM enum member. Selects the <a class="el" href="class_a_d_c.html">ADC</a> module to use. </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>true if the pins are valid, false otherwise. </dd></dl>
 
-<p>Definition at line <a class="el" href="_a_d_c_8cpp_source.html#l00406">406</a> of file <a class="el" href="_a_d_c_8cpp_source.html">ADC.cpp</a>.</p>
+<p>Definition at line <a class="el" href="_a_d_c_8h_source.html#l00485">485</a> of file <a class="el" href="_a_d_c_8h_source.html">ADC.h</a>.</p>
 
 </div>
 </div>
 <a class="anchor" id="ad03a20d1a3f080cbd970878d8208df42"></a>
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">bool ADC::startSingleRead </td>
@@ -1788,19 +1831,24 @@ static const ADC_Module::ADC_NLIST&#160;</td><td class="memItemRight" valign="bo
           <td></td><td></td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
 <p>Starts an analog measurement on the pin and enables interrupts. </p>
 <p>It returns immediately, get value with <a class="el" href="class_a_d_c.html#ac06a383d4c70d38da873df6be2b940e4" title="Reads the analog value of a single conversion. ">readSingle()</a>. If this function interrupts a measurement, it stores the settings in adc_config </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">pin</td><td>can be any of the analog pins </td></tr>
-    <tr><td class="paramname">adc_num</td><td>ADC_X <a class="el" href="class_a_d_c.html">ADC</a> module </td></tr>
+    <tr><td class="paramname">adc_num</td><td>ADC_NUM enum member. Selects the <a class="el" href="class_a_d_c.html">ADC</a> module to use. </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>true if the pin is valid, false otherwise. </dd></dl>
 
-<p>Definition at line <a class="el" href="_a_d_c_8cpp_source.html#l00353">353</a> of file <a class="el" href="_a_d_c_8cpp_source.html">ADC.cpp</a>.</p>
+<p>Definition at line <a class="el" href="_a_d_c_8h_source.html#l00469">469</a> of file <a class="el" href="_a_d_c_8h_source.html">ADC.h</a>.</p>
 
 </div>
 </div>
@@ -1839,7 +1887,7 @@ static const ADC_Module::ADC_NLIST&#160;</td><td class="memItemRight" valign="bo
 <dl class="section return"><dt>Returns</dt><dd>true if the pins are valid, false otherwise.</dd></dl>
 <p>Use readSynchronizedContinuous to get the values </p>
 
-<p>Definition at line <a class="el" href="_a_d_c_8cpp_source.html#l00853">853</a> of file <a class="el" href="_a_d_c_8cpp_source.html">ADC.cpp</a>.</p>
+<p>Definition at line <a class="el" href="_a_d_c_8cpp_source.html#l00520">520</a> of file <a class="el" href="_a_d_c_8cpp_source.html">ADC.cpp</a>.</p>
 
 </div>
 </div>
@@ -1892,7 +1940,7 @@ static const ADC_Module::ADC_NLIST&#160;</td><td class="memItemRight" valign="bo
 <dl class="section return"><dt>Returns</dt><dd>true if the pins are valid, false otherwise.</dd></dl>
 <p>Use readSynchronizedContinuous to get the values </p>
 
-<p>Definition at line <a class="el" href="_a_d_c_8cpp_source.html#l00885">885</a> of file <a class="el" href="_a_d_c_8cpp_source.html">ADC.cpp</a>.</p>
+<p>Definition at line <a class="el" href="_a_d_c_8cpp_source.html#l00552">552</a> of file <a class="el" href="_a_d_c_8cpp_source.html">ADC.cpp</a>.</p>
 
 </div>
 </div>
@@ -1944,7 +1992,7 @@ static const ADC_Module::ADC_NLIST&#160;</td><td class="memItemRight" valign="bo
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>true if the pins are valid, false otherwise. </dd></dl>
 
-<p>Definition at line <a class="el" href="_a_d_c_8cpp_source.html#l00790">790</a> of file <a class="el" href="_a_d_c_8cpp_source.html">ADC.cpp</a>.</p>
+<p>Definition at line <a class="el" href="_a_d_c_8cpp_source.html#l00457">457</a> of file <a class="el" href="_a_d_c_8cpp_source.html">ADC.cpp</a>.</p>
 
 </div>
 </div>
@@ -1982,7 +2030,7 @@ static const ADC_Module::ADC_NLIST&#160;</td><td class="memItemRight" valign="bo
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>true if the pins are valid, false otherwise. </dd></dl>
 
-<p>Definition at line <a class="el" href="_a_d_c_8cpp_source.html#l00739">739</a> of file <a class="el" href="_a_d_c_8cpp_source.html">ADC.cpp</a>.</p>
+<p>Definition at line <a class="el" href="_a_d_c_8cpp_source.html#l00406">406</a> of file <a class="el" href="_a_d_c_8cpp_source.html">ADC.cpp</a>.</p>
 
 </div>
 </div>
@@ -2011,12 +2059,12 @@ static const ADC_Module::ADC_NLIST&#160;</td><td class="memItemRight" valign="bo
 <p>Stops continuous conversion. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">adc_num</td><td>ADC_X <a class="el" href="class_a_d_c.html">ADC</a> module </td></tr>
+    <tr><td class="paramname">adc_num</td><td>ADC_NUM enum member. Selects the <a class="el" href="class_a_d_c.html">ADC</a> module to use. </td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="_a_d_c_8h_source.html#l00438">438</a> of file <a class="el" href="_a_d_c_8h_source.html">ADC.h</a>.</p>
+<p>Definition at line <a class="el" href="_a_d_c_8h_source.html#l00550">550</a> of file <a class="el" href="_a_d_c_8h_source.html">ADC.h</a>.</p>
 
 </div>
 </div>
@@ -2030,7 +2078,7 @@ static const ADC_Module::ADC_NLIST&#160;</td><td class="memItemRight" valign="bo
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="class_a_d_c.html">ADC</a></li>
-    <li class="footer">Generated on Sun Oct 22 2017 14:46:24 for ADC by
+    <li class="footer">Generated on Sun Oct 22 2017 17:38:32 for ADC by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.11 </li>
   </ul>
