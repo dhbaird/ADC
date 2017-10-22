@@ -90,7 +90,7 @@ class ADC
         *   \param type can be ADC_REFERENCE::REF_3V3, ADC_REFERENCE::REF_1V2 (not for Teensy LC) or ADC_REFERENCE::REF_EXT
         *   \param adc_num ADC number to change.
         */
-        void setReference(ADC_REFERENCE type, ADC_NUM adc_num = ADC_NUM::ANY) __attribute__((always_inline)) {
+        void setReference(ADC_REFERENCE type, ADC_NUM adc_num = ADC_NUM::ADC_0) __attribute__((always_inline)) {
             adc[static_cast<uint8_t>(adc_num)]->setReference(type);
             return;
         }
@@ -106,7 +106,7 @@ class ADC
         *  Whenever you change the resolution, change also the comparison values (if you use them).
         *   \param adc_num ADC number to change.
         */
-        void setResolution(uint8_t bits, ADC_NUM adc_num = ADC_NUM::ANY) __attribute__((always_inline)) {
+        void setResolution(uint8_t bits, ADC_NUM adc_num = ADC_NUM::ADC_0) __attribute__((always_inline)) {
             adc[static_cast<uint8_t>(adc_num)]->setResolution(bits);
             return;
         }
@@ -116,7 +116,7 @@ class ADC
         *   \param adc_num ADC number to query.
         *   \return the resolution of adc_num ADC.
         */
-        uint8_t getResolution(ADC_NUM adc_num = ADC_NUM::ANY) __attribute__((always_inline)) {
+        uint8_t getResolution(ADC_NUM adc_num = ADC_NUM::ADC_0) __attribute__((always_inline)) {
             return adc[static_cast<uint8_t>(adc_num)]->getResolution();
         }
 
@@ -125,7 +125,7 @@ class ADC
         *   \param adc_num ADC number to query.
         *   \return the maximum value of adc_num ADC.
         */
-        uint32_t getMaxValue(ADC_NUM adc_num = ADC_NUM::ANY) __attribute__((always_inline)) {
+        uint32_t getMaxValue(ADC_NUM adc_num = ADC_NUM::ADC_0) __attribute__((always_inline)) {
             return adc[static_cast<uint8_t>(adc_num)]->getMaxValue();
         }
 
@@ -149,7 +149,7 @@ class ADC
         * but if F_BUS<F_ADCK, you can't use VERY_HIGH_SPEED for sampling speed.
         *   \param adc_num ADC number to change.
         */
-        void setConversionSpeed(ADC_CONVERSION_SPEED speed, ADC_NUM adc_num = ADC_NUM::ANY) __attribute__((always_inline)) {
+        void setConversionSpeed(ADC_CONVERSION_SPEED speed, ADC_NUM adc_num = ADC_NUM::ADC_0) __attribute__((always_inline)) {
             adc[static_cast<uint8_t>(adc_num)]->setConversionSpeed(speed);}
 
 
@@ -164,7 +164,7 @@ class ADC
         * VERY_HIGH_SPEED is the highest possible sampling speed (0 ADCK added).
         *   \param adc_num ADC number to change.
         */
-        void setSamplingSpeed(ADC_SAMPLING_SPEED speed, ADC_NUM adc_num = ADC_NUM::ANY) __attribute__((always_inline)) {
+        void setSamplingSpeed(ADC_SAMPLING_SPEED speed, ADC_NUM adc_num = ADC_NUM::ADC_0) __attribute__((always_inline)) {
             adc[static_cast<uint8_t>(adc_num)]->setSamplingSpeed(speed);
         }
 
@@ -174,7 +174,7 @@ class ADC
         * \param num can be 0, 4, 8, 16 or 32.
         *   \param adc_num ADC number to change.
         */
-        void setAveraging(uint8_t num, ADC_NUM adc_num = ADC_NUM::ANY) __attribute__((always_inline)) {
+        void setAveraging(uint8_t num, ADC_NUM adc_num = ADC_NUM::ADC_0) __attribute__((always_inline)) {
             adc[static_cast<uint8_t>(adc_num)]->setAveraging(num);
         }
 
@@ -184,7 +184,7 @@ class ADC
         *  (including hardware averages and if the comparison (if any) is true).
         *   \param adc_num ADC number to change.
         */
-        void enableInterrupts(ADC_NUM adc_num = ADC_NUM::ANY) __attribute__((always_inline)) {
+        void enableInterrupts(ADC_NUM adc_num = ADC_NUM::ADC_0) __attribute__((always_inline)) {
             adc[static_cast<uint8_t>(adc_num)]->enableInterrupts();
         }
 
@@ -192,7 +192,7 @@ class ADC
         /**
         *   \param adc_num ADC number to change.
         */
-        void disableInterrupts(ADC_NUM adc_num = ADC_NUM::ANY) __attribute__((always_inline)) {
+        void disableInterrupts(ADC_NUM adc_num = ADC_NUM::ADC_0) __attribute__((always_inline)) {
             adc[static_cast<uint8_t>(adc_num)]->disableInterrupts();
         }
 
@@ -202,7 +202,7 @@ class ADC
         *  (including hardware averages and if the comparison (if any) is true).
         *   \param adc_num ADC number to change.
         */
-        void enableDMA(ADC_NUM adc_num = ADC_NUM::ANY) __attribute__((always_inline)) {
+        void enableDMA(ADC_NUM adc_num = ADC_NUM::ADC_0) __attribute__((always_inline)) {
             adc[static_cast<uint8_t>(adc_num)]->enableDMA();
         }
 
@@ -210,7 +210,7 @@ class ADC
         /**
         *   \param adc_num ADC number to change.
         */
-        void disableDMA(ADC_NUM adc_num = ADC_NUM::ANY) __attribute__((always_inline)) {
+        void disableDMA(ADC_NUM adc_num = ADC_NUM::ADC_0) __attribute__((always_inline)) {
             adc[static_cast<uint8_t>(adc_num)]->disableDMA();
         }
 
@@ -224,7 +224,7 @@ class ADC
         *   \param greaterThan true or false
         *   \param adc_num ADC number to change.
         */
-        void enableCompare(int16_t compValue, bool greaterThan, ADC_NUM adc_num = ADC_NUM::ANY) __attribute__((always_inline)) {
+        void enableCompare(int16_t compValue, bool greaterThan, ADC_NUM adc_num = ADC_NUM::ADC_0) __attribute__((always_inline)) {
             adc[static_cast<uint8_t>(adc_num)]->enableCompare(compValue, greaterThan);
         }
 
@@ -240,7 +240,7 @@ class ADC
         *   \param inclusive true or false
         *   \param adc_num ADC number to change.
         */
-        void enableCompareRange(int16_t lowerLimit, int16_t upperLimit, bool insideRange, bool inclusive, ADC_NUM adc_num = ADC_NUM::ANY)  {
+        void enableCompareRange(int16_t lowerLimit, int16_t upperLimit, bool insideRange, bool inclusive, ADC_NUM adc_num = ADC_NUM::ADC_0)  {
             adc[static_cast<uint8_t>(adc_num)]->enableCompareRange(lowerLimit, upperLimit, insideRange, inclusive);
         }
 
@@ -248,7 +248,7 @@ class ADC
         /**
         *   \param adc_num ADC number to change.
         */
-        void disableCompare(ADC_NUM adc_num = ADC_NUM::ANY) __attribute__((always_inline)) {
+        void disableCompare(ADC_NUM adc_num = ADC_NUM::ADC_0) __attribute__((always_inline)) {
             adc[static_cast<uint8_t>(adc_num)]->disableCompare();
         }
 
@@ -259,7 +259,7 @@ class ADC
         *   \param gain can be 1, 2, 4, 8, 16, 32 or 64
         *   \param adc_num ADC number to change.
         */
-        void enablePGA(uint8_t gain, ADC_NUM adc_num = ADC_NUM::ANY) __attribute__((always_inline)) {
+        void enablePGA(uint8_t gain, ADC_NUM adc_num = ADC_NUM::ADC_0) __attribute__((always_inline)) {
             adc[static_cast<uint8_t>(adc_num)]->enablePGA(gain);
         }
 
@@ -268,7 +268,7 @@ class ADC
         *   \param adc_num ADC number to query.
         *   \return PGA level = from 1 to 64
         */
-        uint8_t getPGA(ADC_NUM adc_num = ADC_NUM::ANY) __attribute__((always_inline)) {
+        uint8_t getPGA(ADC_NUM adc_num = ADC_NUM::ADC_0) __attribute__((always_inline)) {
             return adc[static_cast<uint8_t>(adc_num)]->getPGA();
         }
 
@@ -276,7 +276,7 @@ class ADC
         /**
         *   \param adc_num ADC number to query
         */
-        void disablePGA(ADC_NUM adc_num = ADC_NUM::ANY) __attribute__((always_inline)) {
+        void disablePGA(ADC_NUM adc_num = ADC_NUM::ADC_0) __attribute__((always_inline)) {
             adc[static_cast<uint8_t>(adc_num)]->disablePGA();
         }
 
@@ -288,7 +288,7 @@ class ADC
         *   \param adc_num ADC number to query
         *   \return true if yes, false if not.
         */
-        bool isConverting(ADC_NUM adc_num = ADC_NUM::ANY) __attribute__((always_inline)) {
+        bool isConverting(ADC_NUM adc_num = ADC_NUM::ADC_0) __attribute__((always_inline)) {
             return adc[static_cast<uint8_t>(adc_num)]->isConverting();
         }
 
@@ -298,7 +298,7 @@ class ADC
         *   \param adc_num ADC number to query
         *   \return true if yes, false if not.
         */
-        bool isComplete(ADC_NUM adc_num = ADC_NUM::ANY) __attribute__((always_inline)) {
+        bool isComplete(ADC_NUM adc_num = ADC_NUM::ADC_0) __attribute__((always_inline)) {
             return adc[static_cast<uint8_t>(adc_num)]->isComplete();
         }
 
@@ -307,7 +307,7 @@ class ADC
         *   \param adc_num ADC number to query
         *   \return true or false
         */
-        bool isDifferential(ADC_NUM adc_num = ADC_NUM::ANY) __attribute__((always_inline)) {
+        bool isDifferential(ADC_NUM adc_num = ADC_NUM::ADC_0) __attribute__((always_inline)) {
             return adc[static_cast<uint8_t>(adc_num)]->isDifferential();
         }
 
@@ -316,7 +316,7 @@ class ADC
         *   \param adc_num ADC number to query
         *   \return true or false
         */
-        bool isContinuous(ADC_NUM adc_num = ADC_NUM::ANY) __attribute__((always_inline)) {
+        bool isContinuous(ADC_NUM adc_num = ADC_NUM::ADC_0) __attribute__((always_inline)) {
             return adc[static_cast<uint8_t>(adc_num)]->isContinuous();
         }
 
@@ -392,7 +392,7 @@ class ADC
         *   \param adc_num ADC_X ADC module
         *   \return the converted value.
         */
-        int readSingle(ADC_NUM adc_num = ADC_NUM::ANY) __attribute__((always_inline)) {
+        int readSingle(ADC_NUM adc_num = ADC_NUM::ADC_0) __attribute__((always_inline)) {
             return adc[static_cast<uint8_t>(adc_num)]->readSingle();
         }
 
@@ -424,7 +424,7 @@ class ADC
         *   \param adc_num ADC_X ADC module
         *   \return the last converted value.
         */
-        int analogReadContinuous(ADC_NUM adc_num = ADC_NUM::ANY) __attribute__((always_inline)) {
+        int analogReadContinuous(ADC_NUM adc_num = ADC_NUM::ADC_0) __attribute__((always_inline)) {
             return adc[static_cast<uint8_t>(adc_num)]->analogReadContinuous();
         }
 
@@ -432,7 +432,7 @@ class ADC
         /**
         *   \param adc_num ADC_X ADC module
         */
-        void stopContinuous(ADC_NUM adc_num = ADC_NUM::ANY) __attribute__((always_inline)) {
+        void stopContinuous(ADC_NUM adc_num = ADC_NUM::ADC_0) __attribute__((always_inline)) {
             adc[static_cast<uint8_t>(adc_num)]->stopContinuous();
         }
 

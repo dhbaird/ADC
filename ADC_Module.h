@@ -64,19 +64,16 @@
 #elif defined(ADC_TEENSY_3_6) // Teensy 3.6
         #define ADC_NUM_ADCS (2)
 #endif
+/*! \file */
+/*! Select the ADC module to use */
+enum class ADC_NUM : int8_t {
+    ANY = -1,   // DON'T USE!
+    ADC_0 = 0,  /*!< ADC0 */
+    #if ADC_NUM_ADCS == 2
+    ADC_1 = 1,  /*!< ADC1 */
+    #endif
+};
 
-#if ADC_NUM_ADCS == 1
-enum class ADC_NUM : int8_t {
-    ADC_0 = 0,
-    ANY = -1
-};
-#else
-enum class ADC_NUM : int8_t {
-    ADC_0 = 0,
-    ADC_1 = 1,
-    ANY = -1
-};
-#endif
 //enum class ADC_NUM {ADC_0, ADC_1}; // too verbose, but it'd avoid some mistakes
 
 
