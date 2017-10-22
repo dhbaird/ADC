@@ -55,12 +55,86 @@ class ADC
         ADC_Module adc1_obj;
         #endif
 
-        //! Number of ADC objects
+        // Number of ADC objects
         const uint8_t num_ADCs = ADC_NUM_ADCS;
 
+        // Workload-based dispatch policy:
+        // Dispatch conversion to the selected ADC. If no specific ADC is selected (ADC_NUM::ANY):
+        // Check which ADC can handle the pin, if both:
+        // Use the ADC with lesser workload
+        // If only one ADC can measure pin, use it.
         template<typename ret_type, typename... Args>
         ret_type workload_dispatch_policy(bool (ADC_Module::*check_fun)(Args... args),
-                                          ret_type (ADC_Module::*conversion_fun)(Args... args), ADC_NUM adc_num, Args... args);
+                                          ret_type (ADC_Module::*conversion_fun)(Args... args), ADC_NUM adc_num, Args... args) {
+            #if ADC_NUM_ADCS==1
+            return (adc0->*conversion_fun)(args...); // use ADC0
+            #else
+            if(adc_num==ADC_NUM::ANY) { // use no ADC in particular
+                // check which ADC can read the pin
+                bool adc0Pin = (adc0->*check_fun)(args...);
+                bool adc1Pin = (adc1->*check_fun)(args...);
+
+                if(adc0Pin && adc1Pin)  { // Both ADCs
+                    if( (adc0->num_measurements) > (adc1->num_measurements)) { // use the ADC with less workload
+                        return (adc1->*conversion_fun)(args...);
+                    } else {
+                        return (adc0->*conversion_fun)(args...);
+                    }
+                } else if(adc0Pin) { // ADC0
+                    return (adc0->*conversion_fun)(args...);
+                } else if(adc1Pin) { // ADC1
+                    return (adc1->*conversion_fun)(args...);
+                } else { // pin not valid in any ADC
+                    adc0->fail_flag |= ADC_ERROR_WRONG_PIN;
+                    adc1->fail_flag |= ADC_ERROR_WRONG_PIN;
+                    return ADC_ERROR_VALUE;   // all others are invalid
+                }
+            } else { // Use a specific ADC
+                return (adc[static_cast<uint8_t>(adc_num)]->*conversion_fun)(args...);
+            }
+            #endif // ADC_NUM_ADCS
+        }
+
+        // Simple dispatch policy:
+        // Dispatch conversion to the selected ADC. If no specific ADC is selected (ADC_NUM::ANY):
+        // Check if ADC0 can handle it, if so, use it.
+        // If not, check ADC1, if so, use it.
+        template<typename ret_type, typename... Args>
+        ret_type simple_dispatch_policy(bool (ADC_Module::*check_fun)(Args... args),
+                                        ret_type (ADC_Module::*conversion_fun)(Args... args), ADC_NUM adc_num, Args... args) {
+            #if ADC_NUM_ADCS==1
+            return (adc0->*conversion_fun)(args...); // use ADC0
+            #else
+            if(adc_num==ADC_NUM::ANY) { // use no ADC in particular
+                // check which ADC can read the pin
+                bool adc0Pin = (adc0->*check_fun)(args...);
+                if(adc0Pin) { // ADC0
+                    return (adc0->*conversion_fun)(args...);
+                }
+
+                bool adc1Pin = (adc1->*check_fun)(args...);
+                if(adc1Pin) { // ADC1
+                    return (adc1->*conversion_fun)(args...);
+                }
+
+                // Not valid for any ADC
+                adc0->fail_flag |= ADC_ERROR_WRONG_PIN;
+                adc1->fail_flag |= ADC_ERROR_WRONG_PIN;
+                return ADC_ERROR_VALUE;   // all others are invalid
+            } else { // Use a specific ADC
+                return (adc[static_cast<uint8_t>(adc_num)]->*conversion_fun)(args...);
+            }
+            #endif // ADC_NUM_ADCS
+        }
+
+        // Change the return function to the policy that you want: workload_dispatch_policy or simple_dispatch_policy.
+        template<typename ret_type, typename... Args>
+        __attribute__((always_inline)) ret_type dispatch_policy(bool (ADC_Module::*check_fun)(Args... args),
+                                 ret_type (ADC_Module::*conversion_fun)(Args... args),
+                                 ADC_NUM adc_num, Args... args) {
+            return workload_dispatch_policy(check_fun, conversion_fun, adc_num, args...);
+            //return simple_dispatch_policy(check_fun, conversion_fun, adc_num, args...);
+        }
 
 
     public:
@@ -91,7 +165,7 @@ class ADC
         //! Set the voltage reference you prefer, default is vcc
         /*! It recalibrates at the end.
         *   \param type can be ADC_REFERENCE::REF_3V3, ADC_REFERENCE::REF_1V2 (not for Teensy LC) or ADC_REFERENCE::REF_EXT
-        *   \param adc_num ADC number to change.
+        *   \param adc_num ADC_NUM enum member. Selects the ADC module to use.
         */
         void setReference(ADC_REFERENCE type, ADC_NUM adc_num = ADC_NUM::ADC_0) __attribute__((always_inline)) {
             adc[static_cast<uint8_t>(adc_num)]->setReference(type);
@@ -107,7 +181,7 @@ class ADC
         *  If you want something in between (11 bits single-ended for example) select the immediate higher
         *  and shift the result one to the right.
         *  Whenever you change the resolution, change also the comparison values (if you use them).
-        *   \param adc_num ADC number to change.
+        *   \param adc_num ADC_NUM enum member. Selects the ADC module to use.
         */
         void setResolution(uint8_t bits, ADC_NUM adc_num = ADC_NUM::ADC_0) __attribute__((always_inline)) {
             adc[static_cast<uint8_t>(adc_num)]->setResolution(bits);
@@ -116,7 +190,7 @@ class ADC
 
         //! Returns the resolution of the ADC_Module.
         /**
-        *   \param adc_num ADC number to query.
+        *   \param adc_num ADC_NUM enum member. Selects the ADC module to use..
         *   \return the resolution of adc_num ADC.
         */
         uint8_t getResolution(ADC_NUM adc_num = ADC_NUM::ADC_0) __attribute__((always_inline)) {
@@ -125,7 +199,7 @@ class ADC
 
         //! Returns the maximum value for a measurement: 2^res-1.
         /**
-        *   \param adc_num ADC number to query.
+        *   \param adc_num ADC_NUM enum member. Selects the ADC module to use..
         *   \return the maximum value of adc_num ADC.
         */
         uint32_t getMaxValue(ADC_NUM adc_num = ADC_NUM::ADC_0) __attribute__((always_inline)) {
@@ -150,7 +224,7 @@ class ADC
         * where the numbers are the frequency of the ADC clock (ADCK) in MHz and are independent on the bus speed.
         * This is useful if you are using the Teensy at a very low clock frequency but want faster conversions,
         * but if F_BUS<F_ADCK, you can't use VERY_HIGH_SPEED for sampling speed.
-        *   \param adc_num ADC number to change.
+        *   \param adc_num ADC_NUM enum member. Selects the ADC module to use.
         */
         void setConversionSpeed(ADC_CONVERSION_SPEED speed, ADC_NUM adc_num = ADC_NUM::ADC_0) __attribute__((always_inline)) {
             adc[static_cast<uint8_t>(adc_num)]->setConversionSpeed(speed);}
@@ -165,7 +239,7 @@ class ADC
         * MED_SPEED adds +10 ADCK.
         * HIGH_SPEED adds +6 ADCK.
         * VERY_HIGH_SPEED is the highest possible sampling speed (0 ADCK added).
-        *   \param adc_num ADC number to change.
+        *   \param adc_num ADC_NUM enum member. Selects the ADC module to use.
         */
         void setSamplingSpeed(ADC_SAMPLING_SPEED speed, ADC_NUM adc_num = ADC_NUM::ADC_0) __attribute__((always_inline)) {
             adc[static_cast<uint8_t>(adc_num)]->setSamplingSpeed(speed);
@@ -175,7 +249,7 @@ class ADC
         //! Set the number of averages
         /*!
         * \param num can be 0, 4, 8, 16 or 32.
-        *   \param adc_num ADC number to change.
+        *   \param adc_num ADC_NUM enum member. Selects the ADC module to use.
         */
         void setAveraging(uint8_t num, ADC_NUM adc_num = ADC_NUM::ADC_0) __attribute__((always_inline)) {
             adc[static_cast<uint8_t>(adc_num)]->setAveraging(num);
@@ -185,7 +259,7 @@ class ADC
         //! Enable interrupts
         /** An IRQ_ADCx Interrupt will be raised when the conversion is completed
         *  (including hardware averages and if the comparison (if any) is true).
-        *   \param adc_num ADC number to change.
+        *   \param adc_num ADC_NUM enum member. Selects the ADC module to use.
         */
         void enableInterrupts(ADC_NUM adc_num = ADC_NUM::ADC_0) __attribute__((always_inline)) {
             adc[static_cast<uint8_t>(adc_num)]->enableInterrupts();
@@ -193,7 +267,7 @@ class ADC
 
         //! Disable interrupts
         /**
-        *   \param adc_num ADC number to change.
+        *   \param adc_num ADC_NUM enum member. Selects the ADC module to use.
         */
         void disableInterrupts(ADC_NUM adc_num = ADC_NUM::ADC_0) __attribute__((always_inline)) {
             adc[static_cast<uint8_t>(adc_num)]->disableInterrupts();
@@ -203,7 +277,7 @@ class ADC
         //! Enable DMA request
         /** An ADC DMA request will be raised when the conversion is completed
         *  (including hardware averages and if the comparison (if any) is true).
-        *   \param adc_num ADC number to change.
+        *   \param adc_num ADC_NUM enum member. Selects the ADC module to use.
         */
         void enableDMA(ADC_NUM adc_num = ADC_NUM::ADC_0) __attribute__((always_inline)) {
             adc[static_cast<uint8_t>(adc_num)]->enableDMA();
@@ -211,7 +285,7 @@ class ADC
 
         //! Disable ADC DMA request
         /**
-        *   \param adc_num ADC number to change.
+        *   \param adc_num ADC_NUM enum member. Selects the ADC module to use.
         */
         void disableDMA(ADC_NUM adc_num = ADC_NUM::ADC_0) __attribute__((always_inline)) {
             adc[static_cast<uint8_t>(adc_num)]->disableDMA();
@@ -225,7 +299,7 @@ class ADC
         *  Use with interrupts or poll conversion completion with isComplete()
         *   \param compValue value to compare
         *   \param greaterThan true or false
-        *   \param adc_num ADC number to change.
+        *   \param adc_num ADC_NUM enum member. Selects the ADC module to use.
         */
         void enableCompare(int16_t compValue, bool greaterThan, ADC_NUM adc_num = ADC_NUM::ADC_0) __attribute__((always_inline)) {
             adc[static_cast<uint8_t>(adc_num)]->enableCompare(compValue, greaterThan);
@@ -241,7 +315,7 @@ class ADC
         *   \param upperLimit upper value to compare
         *   \param insideRange true or false
         *   \param inclusive true or false
-        *   \param adc_num ADC number to change.
+        *   \param adc_num ADC_NUM enum member. Selects the ADC module to use.
         */
         void enableCompareRange(int16_t lowerLimit, int16_t upperLimit, bool insideRange, bool inclusive, ADC_NUM adc_num = ADC_NUM::ADC_0)  {
             adc[static_cast<uint8_t>(adc_num)]->enableCompareRange(lowerLimit, upperLimit, insideRange, inclusive);
@@ -249,7 +323,7 @@ class ADC
 
         //! Disable the compare function
         /**
-        *   \param adc_num ADC number to change.
+        *   \param adc_num ADC_NUM enum member. Selects the ADC module to use.
         */
         void disableCompare(ADC_NUM adc_num = ADC_NUM::ADC_0) __attribute__((always_inline)) {
             adc[static_cast<uint8_t>(adc_num)]->disableCompare();
@@ -260,7 +334,7 @@ class ADC
         /** Enables the PGA and sets the gain
         *   Use only for signals lower than 1.2 V and only in differential mode
         *   \param gain can be 1, 2, 4, 8, 16, 32 or 64
-        *   \param adc_num ADC number to change.
+        *   \param adc_num ADC_NUM enum member. Selects the ADC module to use.
         */
         void enablePGA(uint8_t gain, ADC_NUM adc_num = ADC_NUM::ADC_0) __attribute__((always_inline)) {
             adc[static_cast<uint8_t>(adc_num)]->enablePGA(gain);
@@ -268,7 +342,7 @@ class ADC
 
         //! Returns the PGA level
         /** PGA level = from 1 to 64
-        *   \param adc_num ADC number to query.
+        *   \param adc_num ADC_NUM enum member. Selects the ADC module to use.
         *   \return PGA level = from 1 to 64
         */
         uint8_t getPGA(ADC_NUM adc_num = ADC_NUM::ADC_0) __attribute__((always_inline)) {
@@ -277,7 +351,7 @@ class ADC
 
         //! Disable PGA
         /**
-        *   \param adc_num ADC number to query
+        *   \param adc_num ADC_NUM enum member. Selects the ADC module to use.
         */
         void disablePGA(ADC_NUM adc_num = ADC_NUM::ADC_0) __attribute__((always_inline)) {
             adc[static_cast<uint8_t>(adc_num)]->disablePGA();
@@ -288,7 +362,7 @@ class ADC
 
         //! Is the ADC converting at the moment?
         /**
-        *   \param adc_num ADC number to query
+        *   \param adc_num ADC_NUM enum member. Selects the ADC module to use.
         *   \return true if yes, false if not.
         */
         bool isConverting(ADC_NUM adc_num = ADC_NUM::ADC_0) __attribute__((always_inline)) {
@@ -298,7 +372,7 @@ class ADC
         //! Is an ADC conversion ready?
         /** When a value is read this function returns 0 until a new value exists
         *   So it only makes sense to call it with continuous or non-blocking methods
-        *   \param adc_num ADC number to query
+        *   \param adc_num ADC_NUM enum member. Selects the ADC module to use.
         *   \return true if yes, false if not.
         */
         bool isComplete(ADC_NUM adc_num = ADC_NUM::ADC_0) __attribute__((always_inline)) {
@@ -307,7 +381,7 @@ class ADC
 
         //! Is the ADC in differential mode?
         /**
-        *   \param adc_num ADC number to query
+        *   \param adc_num ADC_NUM enum member. Selects the ADC module to use.
         *   \return true or false
         */
         bool isDifferential(ADC_NUM adc_num = ADC_NUM::ADC_0) __attribute__((always_inline)) {
@@ -316,7 +390,7 @@ class ADC
 
         //! Is the ADC in continuous mode?
         /**
-        *   \param adc_num ADC number to query
+        *   \param adc_num ADC_NUM enum member. Selects the ADC module to use.
         *   \return true or false
         */
         bool isContinuous(ADC_NUM adc_num = ADC_NUM::ADC_0) __attribute__((always_inline)) {
@@ -334,10 +408,18 @@ class ADC
         * If more than one ADC exists, it will select the module with less workload, you can force a selection using
         * adc_num. If you select ADC1 in Teensy 3.0 it will return ADC_ERROR_VALUE.
         *   \param pin can be any of the analog pins
-        *   \param adc_num ADC_X ADC module
+        *   \param adc_num ADC_NUM enum member. Selects the ADC module to use.
         *   \return the value of the pin.
         */
-        int analogRead(uint8_t pin, ADC_NUM adc_num = ADC_NUM::ANY);
+        int analogRead(uint8_t pin, ADC_NUM adc_num = ADC_NUM::ANY) __attribute__((always_inline)) {
+            #if ADC_NUM_ADCS==1
+            return adc0->analogRead(pin); // use ADC0
+            #else
+            // dispatch to the right ADC module depending on the policy that we want.
+            return dispatch_policy(&ADC_Module::checkPin, &ADC_Module::analogRead, adc_num, pin);
+            #endif // ADC_NUM_ADCS
+        }
+
 
         //! Returns the analog value of the special internal source, such as the temperature sensor.
         /** It calls analogRead(uint8_t pin) internally, with the correct value for the pin for all boards.
@@ -348,7 +430,7 @@ class ADC
         *   VREFH, High VREF.
         *   VREFL, Low VREF.
         *   \param pin ADC_INTERNAL_SOURCE to read.
-        *   \param adc_num ADC_X ADC module
+        *   \param adc_num ADC_NUM enum member. Selects the ADC module to use.
         *   \return the value of the pin.
         */
         int analogRead(ADC_INTERNAL_SOURCE pin, ADC_NUM adc_num = ADC_NUM::ANY) __attribute__((always_inline)) {
@@ -362,11 +444,17 @@ class ADC
         * adc_num
         *   \param pinP must be A10 or A12.
         *   \param pinN must be A11 (if pinP=A10) or A13 (if pinP=A12).
-        *   \param adc_num ADC_X ADC module
+        *   \param adc_num ADC_NUM enum member. Selects the ADC module to use.
         *   \return the differential value of the pins, invalid pins return ADC_ERROR_VALUE.
         *   If a comparison has been set up and fails, it will return ADC_ERROR_VALUE.
         */
-        int analogReadDifferential(uint8_t pinP, uint8_t pinN, ADC_NUM adc_num = ADC_NUM::ANY);
+        int analogReadDifferential(uint8_t pinP, uint8_t pinN, ADC_NUM adc_num = ADC_NUM::ANY) __attribute__((always_inline)) {
+            #if ADC_NUM_ADCS==1
+            return adc0->analogReadDifferential(pinP, pinN); // use ADC0
+            #else
+            return dispatch_policy(&ADC_Module::checkDifferentialPins, &ADC_Module::analogReadDifferential, adc_num, pinP, pinN);
+            #endif // ADC_NUM_ADCS
+        }
 
 
         /////////////// NON-BLOCKING CONVERSION METHODS //////////////
@@ -375,24 +463,36 @@ class ADC
         /** It returns immediately, get value with readSingle().
         *   If this function interrupts a measurement, it stores the settings in adc_config
         *   \param pin can be any of the analog pins
-        *   \param adc_num ADC_X ADC module
+        *   \param adc_num ADC_NUM enum member. Selects the ADC module to use.
         *   \return true if the pin is valid, false otherwise.
         */
-        bool startSingleRead(uint8_t pin, ADC_NUM adc_num = ADC_NUM::ANY);
+        bool startSingleRead(uint8_t pin, ADC_NUM adc_num = ADC_NUM::ANY) __attribute__((always_inline)) {
+            #if ADC_NUM_ADCS==1
+            return adc0->startSingleRead(pin); // use ADC0
+            #else
+            return dispatch_policy(&ADC_Module::checkPin, &ADC_Module::startSingleRead, adc_num, pin);
+            #endif // ADC_NUM_ADCS
+        }
 
         //! Start a differential conversion between two pins (pinP - pinN) and enables interrupts.
         /** It returns immediately, get value with readSingle().
         *   If this function interrupts a measurement, it stores the settings in adc_config
         *   \param pinP must be A10 or A12.
         *   \param pinN must be A11 (if pinP=A10) or A13 (if pinP=A12).
-        *   \param adc_num ADC_X ADC module
+        *   \param adc_num ADC_NUM enum member. Selects the ADC module to use.
         *   \return true if the pins are valid, false otherwise.
         */
-        bool startSingleDifferential(uint8_t pinP, uint8_t pinN, ADC_NUM adc_num = ADC_NUM::ANY);
+        bool startSingleDifferential(uint8_t pinP, uint8_t pinN, ADC_NUM adc_num = ADC_NUM::ANY) __attribute__((always_inline)) {
+            #if ADC_NUM_ADCS==1
+            return adc0->startSingleDifferential(pinP, pinN); // use ADC0
+            #else
+            return dispatch_policy(&ADC_Module::checkDifferentialPins, &ADC_Module::startSingleDifferential, adc_num, pinP, pinN);
+            #endif // ADC_NUM_ADCS
+        }
 
         //! Reads the analog value of a single conversion.
         /** Set the conversion with with startSingleRead(pin) or startSingleDifferential(pinP, pinN).
-        *   \param adc_num ADC_X ADC module
+        *   \param adc_num ADC_NUM enum member. Selects the ADC module to use.
         *   \return the converted value.
         */
         int readSingle(ADC_NUM adc_num = ADC_NUM::ADC_0) __attribute__((always_inline)) {
@@ -406,25 +506,37 @@ class ADC
         //! Starts continuous conversion on the pin.
         /** It returns as soon as the ADC is set, use analogReadContinuous() to read the value.
         *   \param pin can be any of the analog pins
-        *   \param adc_num ADC_X ADC module
+        *   \param adc_num ADC_NUM enum member. Selects the ADC module to use.
         *   \return true if the pin is valid, false otherwise.
         */
-        bool startContinuous(uint8_t pin, ADC_NUM adc_num = ADC_NUM::ANY);
+        bool startContinuous(uint8_t pin, ADC_NUM adc_num = ADC_NUM::ANY) __attribute__((always_inline)) {
+            #if ADC_NUM_ADCS==1
+            return adc0->startContinuous(pin); // use ADC0
+            #else
+            return dispatch_policy(&ADC_Module::checkPin, &ADC_Module::startContinuous, adc_num, pin);
+            #endif // ADC_NUM_ADCS
+        }
 
         //! Starts continuous conversion between the pins (pinP-pinN).
         /** It returns as soon as the ADC is set, use analogReadContinuous() to read the value.
         *   \param pinP must be A10 or A12.
         *   \param pinN must be A11 (if pinP=A10) or A13 (if pinP=A12).
-        *   \param adc_num ADC_X ADC module
+        *   \param adc_num ADC_NUM enum member. Selects the ADC module to use.
         *   \return true if the pins are valid, false otherwise.
         */
-        bool startContinuousDifferential(uint8_t pinP, uint8_t pinN, ADC_NUM adc_num = ADC_NUM::ANY);
+        bool startContinuousDifferential(uint8_t pinP, uint8_t pinN, ADC_NUM adc_num = ADC_NUM::ANY) __attribute__((always_inline)) {
+            #if ADC_NUM_ADCS==1
+            return adc0->startContinuousDifferential(pinP, pinN); // use ADC0
+            #else
+            return dispatch_policy(&ADC_Module::checkDifferentialPins, &ADC_Module::startContinuousDifferential, adc_num, pinP, pinN);
+            #endif // ADC_NUM_ADCS
+        }
 
         //! Reads the analog value of a continuous conversion.
         /** Set the continuous conversion with with analogStartContinuous(pin) or startContinuousDifferential(pinP, pinN).
         *   If single-ended and 16 bits it's necessary to typecast it to an unsigned type (like uint16_t),
         *   otherwise values larger than 3.3/2 V are interpreted as negative!
-        *   \param adc_num ADC_X ADC module
+        *   \param adc_num ADC_NUM enum member. Selects the ADC module to use.
         *   \return the last converted value.
         */
         int analogReadContinuous(ADC_NUM adc_num = ADC_NUM::ADC_0) __attribute__((always_inline)) {
@@ -433,7 +545,7 @@ class ADC
 
         //! Stops continuous conversion
         /**
-        *   \param adc_num ADC_X ADC module
+        *   \param adc_num ADC_NUM enum member. Selects the ADC module to use.
         */
         void stopContinuous(ADC_NUM adc_num = ADC_NUM::ADC_0) __attribute__((always_inline)) {
             adc[static_cast<uint8_t>(adc_num)]->stopContinuous();
