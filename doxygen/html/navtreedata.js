@@ -1,7 +1,7 @@
 var NAVTREE =
 [
   [ "ADC", "index.html", [
-    [ "ADC", "md_E:_Users_Villanueva_Arduino_libraries_ADC_README.html", null ],
+    [ "LICENSE", "md_E:_Users_Villanueva_Arduino_libraries_ADC_LICENSE.html", null ],
     [ "Namespaces", null, [
       [ "Namespace List", "namespaces.html", "namespaces" ],
       [ "Namespace Members", "namespacemembers.html", [
@@ -30,8 +30,7 @@ var NAVTREE =
 
 var NAVTREEINDEX =
 [
-"_a_d_c_8h_source.html",
-"pages.html"
+"_a_d_c_8cpp_source.html"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

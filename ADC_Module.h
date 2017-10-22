@@ -65,9 +65,9 @@
         #define ADC_NUM_ADCS (2)
 #endif
 /*! \file */
-/*! Select the ADC module to use */
+/*! Select the ADC module to use. */
 enum class ADC_NUM : int8_t {
-    ANY = -1,   // DON'T USE!
+    ANY = -1,   // DON'T USE. INTERNAL USE.!
     ADC_0 = 0,  /*!< ADC0 */
     #if ADC_NUM_ADCS == 2
     ADC_1 = 1,  /*!< ADC1 */
@@ -140,8 +140,8 @@ enum class ADC_REF_SOURCE : uint8_t {REF_DEFAULT = 0, REF_ALT = 1, REF_NONE = 2}
 /*! Reference for the ADC */
 enum class ADC_REFERENCE : uint8_t {
     REF_3V3 = ADC_REF_SOURCE::REF_DEFAULT, /*!< 3.3 volts */
-    REF_1V2 = ADC_REF_SOURCE::REF_ALT, /*!< 1.2 volts */
-    REF_EXT = ADC_REF_SOURCE::REF_DEFAULT, /*!< External VREF */
+    REF_1V2 = ADC_REF_SOURCE::REF_ALT, /*!< 1.2 volts (VREF) */
+    REF_EXT = ADC_REF_SOURCE::REF_DEFAULT, /*!< External AREF */
     NONE = ADC_REF_SOURCE::REF_NONE // internal, do not use
 };
 #elif defined(ADC_TEENSY_LC)
@@ -151,7 +151,7 @@ enum class ADC_REFERENCE : uint8_t {
 /*! Reference for the ADC */
 enum class ADC_REFERENCE : uint8_t {
     REF_3V3 = ADC_REF_SOURCE::REF_ALT, /*!< 3.3 volts */
-    REF_EXT = ADC_REF_SOURCE::REF_DEFAULT, /*!< External VREF */
+    REF_EXT = ADC_REF_SOURCE::REF_DEFAULT, /*!< External AREF */
     NONE = ADC_REF_SOURCE::REF_NONE // internal, do not use
 };
 #endif
@@ -469,12 +469,11 @@ class ADC_Module {
 
 public:
 
-    //! Dictionary with the differential pins as keys and the SC1A number as values
-    /** Internal, do not use.
-    */
+    // Dictionary with the differential pins as keys and the SC1A number as values. Internal, do not use.
     struct ADC_NLIST {
-        //! Pin and corresponding SC1A value.
-        uint8_t pin, sc1a;
+        // ADC Pin and corresponding SC1A value.
+        uint8_t pin;
+        uint8_t sc1a;
     };
 
     //! Constructor
