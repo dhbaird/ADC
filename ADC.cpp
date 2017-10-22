@@ -213,9 +213,36 @@ ADC::ADC() : // awkward initialization  so there are no -Wreorder warnings
 
 }
 
+template<typename ret_type, typename... Args>
+ret_type ADC::workload_dispatch_policy(bool (ADC_Module::*check_fun)(Args... args),
+                                       ret_type (ADC_Module::*conversion_fun)(Args... args), ADC_NUM adc_num, Args... args) {
+    #if ADC_NUM_ADCS==1
+    return (adc0->*conversion_fun)(args...); // use ADC0
+    #else
+    if(adc_num==ADC_NUM::ANY) { // use no ADC in particular
+        // check which ADC can read the pin
+        bool adc0Pin = (adc0->*check_fun)(args...);
+        bool adc1Pin = (adc1->*check_fun)(args...);
 
+        if(adc0Pin && adc1Pin)  { // Both ADCs
+            if( (adc0->num_measurements) > (adc1->num_measurements)) { // use the ADC with less workload
+                return (adc1->*conversion_fun)(args...);
+            } else {
+                return (adc0->*conversion_fun)(args...);
+            }
+        } else if(adc0Pin) { // ADC0
+            return (adc0->*conversion_fun)(args...);
+        } else if(adc1Pin) { // ADC1
+            return (adc1->*conversion_fun)(args...);
+        } else { // pin not valid in any ADC
+            adc0->fail_flag |= ADC_ERROR_WRONG_PIN;
+            adc1->fail_flag |= ADC_ERROR_WRONG_PIN;
+            return ADC_ERROR_VALUE;   // all others are invalid
+        }
+    } else {
+        (adc[static_cast<uint8_t>(adc_num)]->*conversion_fun)(args...);
     }
-
+    #endif // ADC_NUM_ADCS
 }
 
 

@@ -40,9 +40,6 @@
 // include ADC module class
 #include "ADC_Module.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /** Class ADC: Controls the Teensy 3.x ADC
 *
@@ -60,6 +57,10 @@ class ADC
 
         //! Number of ADC objects
         const uint8_t num_ADCs = ADC_NUM_ADCS;
+
+        template<typename ret_type, typename... Args>
+        ret_type workload_dispatch_policy(bool (ADC_Module::*check_fun)(Args... args),
+                                          ret_type (ADC_Module::*conversion_fun)(Args... args), ADC_NUM adc_num, Args... args);
 
 
     public:
@@ -602,13 +603,6 @@ class ADC
 
 
 };
-
-
-
-
-#ifdef __cplusplus
-}
-#endif
 
 
 #endif // ADC_H
