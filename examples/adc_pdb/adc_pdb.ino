@@ -28,10 +28,10 @@ void setup() {
 
     ////// ADC1 /////
     #if ADC_NUM_ADCS>1
-    adc->setAveraging(1, ADC_1); // set number of averages
-    adc->setResolution(8, ADC_1); // set bits of resolution
-    adc->setConversionSpeed(ADC_CONVERSION_SPEED::VERY_HIGH_SPEED, ADC_1); // change the conversion speed
-    adc->setSamplingSpeed(ADC_SAMPLING_SPEED::VERY_HIGH_SPEED, ADC_1); // change the sampling speed
+    adc->setAveraging(1, ADC_NUM::ADC_1); // set number of averages
+    adc->setResolution(8, ADC_NUM::ADC_1); // set bits of resolution
+    adc->setConversionSpeed(ADC_CONVERSION_SPEED::VERY_HIGH_SPEED, ADC_NUM::ADC_1); // change the conversion speed
+    adc->setSamplingSpeed(ADC_SAMPLING_SPEED::VERY_HIGH_SPEED, ADC_NUM::ADC_1); // change the sampling speed
     #endif
 
     Serial.println("End setup");
@@ -48,12 +48,12 @@ void loop() {
         c = Serial.read();
         if(c=='v') { // value
             Serial.print("Value ADC0: ");
-            value = (uint16_t)adc->readSingle(ADC_0); // the unsigned is necessary for 16 bits, otherwise values larger than 3.3/2 V are negative!
-            Serial.println(value*3.3/adc->getMaxValue(ADC_0), DEC);
+            value = (uint16_t)adc->readSingle(ADC_NUM::ADC_0); // the unsigned is necessary for 16 bits, otherwise values larger than 3.3/2 V are negative!
+            Serial.println(value*3.3/adc->getMaxValue(ADC_NUM::ADC_0), DEC);
             #if ADC_NUM_ADCS>1
             Serial.print("Value ADC1: ");
-            value2 = (uint16_t)adc->readSingle(ADC_1); // the unsigned is necessary for 16 bits, otherwise values larger than 3.3/2 V are negative!
-            Serial.println(value2*3.3/adc->getMaxValue(ADC_1), DEC);
+            value2 = (uint16_t)adc->readSingle(ADC_NUM::ADC_1); // the unsigned is necessary for 16 bits, otherwise values larger than 3.3/2 V are negative!
+            Serial.println(value2*3.3/adc->getMaxValue(ADC_NUM::ADC_1), DEC);
             #endif
         } else if(c=='s') { // start pdb, before pressing enter write the frequency in Hz
             uint32_t freq = Serial.parseInt();
@@ -68,12 +68,12 @@ void loop() {
                 Serial.println(" Hz.");
                 adc->adc0->stopPDB();
                 adc->adc0->startSingleRead(readPin); // call this to setup everything before the pdb starts, differential is also possible
-                adc->enableInterrupts(ADC_0);
+                adc->enableInterrupts(ADC_NUM::ADC_0);
                 adc->adc0->startPDB(freq); //frequency in Hz
                 #if ADC_NUM_ADCS>1
                 adc->adc1->stopPDB();
                 adc->adc1->startSingleRead(readPin2); // call this to setup everything before the pdb starts
-                adc->enableInterrupts(ADC_1);
+                adc->enableInterrupts(ADC_NUM::ADC_1);
                 adc->adc1->startPDB(freq); //frequency in Hz
                 #endif
             }

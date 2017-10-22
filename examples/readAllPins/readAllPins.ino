@@ -57,7 +57,7 @@ void setup() {
 
     ///// ADC0 ////
     // reference can be ADC_REFERENCE::REF_3V3, ADC_REFERENCE::REF_1V2 (not for Teensy LC) or ADC_REFERENCE::REF_EXT.
-    //adc->setReference(ADC_REFERENCE::REF_1V2, ADC_0); // change all 3.3 to 1.2 if you change the reference to 1V2
+    //adc->setReference(ADC_REFERENCE::REF_1V2, ADC_NUM::ADC_0); // change all 3.3 to 1.2 if you change the reference to 1V2
 
     adc->setAveraging(16); // set number of averages
     adc->setResolution(16); // set bits of resolution
@@ -71,29 +71,29 @@ void setup() {
     adc->setSamplingSpeed(ADC_SAMPLING_SPEED::MED_SPEED); // change the sampling speed
 
     // always call the compare functions after changing the resolution!
-    //adc->enableCompare(1.0/3.3*adc->getMaxValue(ADC_0), 0, ADC_0); // measurement will be ready if value < 1.0V
-    //adc->enableCompareRange(1.0*adc->getMaxValue(ADC_0)/3.3, 2.0*adc->getMaxValue(ADC_0)/3.3, 0, 1, ADC_0); // ready if value lies out of [1.0,2.0] V
+    //adc->enableCompare(1.0/3.3*adc->getMaxValue(ADC_NUM::ADC_0), 0, ADC_NUM::ADC_0); // measurement will be ready if value < 1.0V
+    //adc->enableCompareRange(1.0*adc->getMaxValue(ADC_NUM::ADC_0)/3.3, 2.0*adc->getMaxValue(ADC_NUM::ADC_0)/3.3, 0, 1, ADC_NUM::ADC_0); // ready if value lies out of [1.0,2.0] V
 
     // If you enable interrupts, notice that the isr will read the result, so that isComplete() will return false (most of the time)
-    //adc->enableInterrupts(ADC_0);
+    //adc->enableInterrupts(ADC_NUM::ADC_0);
 
 
     ////// ADC1 /////
     #if ADC_NUM_ADCS>1
-    adc->setAveraging(16, ADC_1); // set number of averages
-    adc->setResolution(16, ADC_1); // set bits of resolution
-    adc->setConversionSpeed(ADC_CONVERSION_SPEED::MED_SPEED, ADC_1); // change the conversion speed
-    adc->setSamplingSpeed(ADC_SAMPLING_SPEED::MED_SPEED, ADC_1); // change the sampling speed
+    adc->setAveraging(16, ADC_NUM::ADC_1); // set number of averages
+    adc->setResolution(16, ADC_NUM::ADC_1); // set bits of resolution
+    adc->setConversionSpeed(ADC_CONVERSION_SPEED::MED_SPEED, ADC_NUM::ADC_1); // change the conversion speed
+    adc->setSamplingSpeed(ADC_SAMPLING_SPEED::MED_SPEED, ADC_NUM::ADC_1); // change the sampling speed
 
-    //adc->setReference(ADC_REFERENCE::REF_1V2, ADC_1);
+    //adc->setReference(ADC_REFERENCE::REF_1V2, ADC_NUM::ADC_1);
 
     // always call the compare functions after changing the resolution!
-    //adc->enableCompare(1.0/3.3*adc->getMaxValue(ADC_1), 0, ADC_1); // measurement will be ready if value < 1.0V
-    //adc->enableCompareRange(1.0*adc->getMaxValue(ADC_1)/3.3, 2.0*adc->getMaxValue(ADC_1)/3.3, 0, 1, ADC_1); // ready if value lies out of [1.0,2.0] V
+    //adc->enableCompare(1.0/3.3*adc->getMaxValue(ADC_NUM::ADC_1), 0, ADC_NUM::ADC_1); // measurement will be ready if value < 1.0V
+    //adc->enableCompareRange(1.0*adc->getMaxValue(ADC_NUM::ADC_1)/3.3, 2.0*adc->getMaxValue(ADC_NUM::ADC_1)/3.3, 0, 1, ADC_NUM::ADC_1); // ready if value lies out of [1.0,2.0] V
 
 
     // If you enable interrupts, note that the isr will read the result, so that isComplete() will return false (most of the time)
-    //adc->enableInterrupts(ADC_1);
+    //adc->enableInterrupts(ADC_NUM::ADC_1);
 
     #endif
 
@@ -110,7 +110,7 @@ void loop() {
         Serial.print("A");
         Serial.print(i);
         Serial.print(": ");
-        Serial.print(value*3.3/adc->getMaxValue(ADC_0), 2);
+        Serial.print(value*3.3/adc->getMaxValue(ADC_NUM::ADC_0), 2);
         Serial.print(". ");
         if(i==9) {
             Serial.println();
@@ -128,7 +128,7 @@ void loop() {
         value = adc->analogReadDifferential(adc_pins_diff[i], adc_pins_diff[i+1]); // read a new value, will return ADC_ERROR_VALUE if the comparison is false.
         Serial.print(i);
         Serial.print(": ");
-        Serial.print(value*3.3/adc->getMaxValue(ADC_0), 2);
+        Serial.print(value*3.3/adc->getMaxValue(ADC_NUM::ADC_0), 2);
         Serial.print(". ");
     }
     Serial.println();
@@ -137,7 +137,7 @@ void loop() {
     Serial.print("Temperature sensor (approx.): ");
     value = adc->analogRead(ADC_INTERNAL_SOURCE::TEMP_SENSOR); // read a new value, will return ADC_ERROR_VALUE if the comparison is false.
     Serial.print(": ");
-    float volts = value*3.3/adc->getMaxValue(ADC_0);
+    float volts = value*3.3/adc->getMaxValue(ADC_NUM::ADC_0);
     Serial.print(25-(volts-0.72)/1.7*1000, 2); // slope is 1.6 for T3.0
     Serial.println(" C.");
 

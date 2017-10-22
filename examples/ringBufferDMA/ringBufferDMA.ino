@@ -18,14 +18,14 @@ const uint8_t buffer_size = 8;
 DMAMEM static volatile int16_t __attribute__((aligned(buffer_size+0))) buffer[buffer_size];
 
 // use dma with ADC0
-RingBufferDMA *dmaBuffer = new RingBufferDMA(buffer, buffer_size, ADC_0);
+RingBufferDMA *dmaBuffer = new RingBufferDMA(buffer, buffer_size, ADC_NUM::ADC_0);
 
 #if ADC_NUM_ADCS>1
 //const int buffer_size2 = 8;
 //DMAMEM static volatile int16_t __attribute__((aligned(buffer_size2+0))) buffer2[buffer_size2];
 //
 //// use dma with ADC1
-//RingBufferDMA *dmaBuffer2 = new RingBufferDMA(buffer2, buffer_size2, ADC_1);
+//RingBufferDMA *dmaBuffer2 = new RingBufferDMA(buffer2, buffer_size2, ADC_NUM::ADC_1);
 #endif // defined
 
 void setup() {
@@ -36,21 +36,21 @@ void setup() {
     Serial.begin(9600);
 
     // reference can be ADC_REFERENCE::REF_3V3, ADC_REFERENCE::REF_1V2 (not for Teensy LC) or ADC_REF_EXT.
-    //adc->setReference(ADC_REFERENCE::REF_1V2, ADC_0); // change all 3.3 to 1.2 if you change the reference to 1V2
+    //adc->setReference(ADC_REFERENCE::REF_1V2, ADC_NUM::ADC_0); // change all 3.3 to 1.2 if you change the reference to 1V2
 
     adc->setAveraging(8); // set number of averages
     adc->setResolution(12); // set bits of resolution
 
 
     // always call the compare functions after changing the resolution!
-    //adc->enableCompare(1.0/3.3*adc->getMaxValue(ADC_0), 0, ADC_0); // measurement will be ready if value < 1.0V
-    //adc->enableCompareRange(1.0*adc->getMaxValue(ADC_1)/3.3, 2.0*adc->getMaxValue(ADC_1)/3.3, 0, 1, ADC_1); // ready if value lies out of [1.0,2.0] V
+    //adc->enableCompare(1.0/3.3*adc->getMaxValue(ADC_NUM::ADC_0), 0, ADC_NUM::ADC_0); // measurement will be ready if value < 1.0V
+    //adc->enableCompareRange(1.0*adc->getMaxValue(ADC_NUM::ADC_1)/3.3, 2.0*adc->getMaxValue(ADC_NUM::ADC_1)/3.3, 0, 1, ADC_NUM::ADC_1); // ready if value lies out of [1.0,2.0] V
 
     // enable DMA and interrupts
-    adc->enableDMA(ADC_0);
+    adc->enableDMA(ADC_NUM::ADC_0);
 
     // ADC interrupt enabled isn't mandatory for DMA to work.
-    adc->enableInterrupts(ADC_0);
+    adc->enableInterrupts(ADC_NUM::ADC_0);
 }
 
 char c=0;
@@ -65,7 +65,7 @@ void loop() {
             dmaBuffer->start(&dmaBuffer_isr);
       } else if(c=='c') { // start conversion
           Serial.println("Conversion: ");
-          adc->analogRead(readPin, ADC_0);
+          adc->analogRead(readPin, ADC_NUM::ADC_0);
       } else if(c=='p') { // print buffer
           printBuffer();
       } else if(c=='l') { // toggle led
