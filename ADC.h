@@ -77,8 +77,10 @@ class ADC
         #endif
 
         #if ADC_NUM_ADCS==1
+        //! Array of all ADC modules
         ADC_Module *const adc[ADC_NUM_ADCS] = {adc0};
         #else
+        //! Array of all ADC modules
         ADC_Module *const adc[ADC_NUM_ADCS] = {adc0, adc1};
         #endif
 
@@ -446,7 +448,8 @@ class ADC
         /** result_adc0 has the result from ADC0 and result_adc1 from ADC1.
         */
         struct Sync_result{
-            int32_t result_adc0, result_adc1;
+            int32_t result_adc0; /*!< Result of ADC0 */
+            int32_t result_adc1; /*!< Result of ADC1 */
         };
 
         //////////////// SYNCHRONIZED BLOCKING METHODS //////////////////
