@@ -107,7 +107,9 @@ $(document).ready(function(){initNavTree('_a_d_c___module_8h.html','');});
 <div class="header">
   <div class="summary">
 <a href="#nested-classes">Classes</a> &#124;
-<a href="#enum-members">Enumerations</a>  </div>
+<a href="#namespaces">Namespaces</a> &#124;
+<a href="#enum-members">Enumerations</a> &#124;
+<a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
 <div class="title">ADC_Module.h File Reference</div>  </div>
 </div><!--header-->
@@ -125,8 +127,41 @@ Classes</h2></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Store the config of the adc.  <a href="struct_a_d_c___module_1_1_a_d_c___config.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="namespaces"></a>
+Namespaces</h2></td></tr>
+<tr class="memitem:namespace_a_d_c___error"><td class="memItemLeft" align="right" valign="top"> &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_a_d_c___error.html">ADC_Error</a></td></tr>
+<tr class="memdesc:namespace_a_d_c___error"><td class="mdescLeft">&#160;</td><td class="mdescRight">Handle <a class="el" href="class_a_d_c.html">ADC</a> errors. <br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="enum-members"></a>
 Enumerations</h2></td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
+Functions</h2></td></tr>
+<tr class="memitem:a337067b357a7e18fca400b079b5bfbc0"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a337067b357a7e18fca400b079b5bfbc0"></a>
+constexpr ADC_ERROR&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_a_d_c___error.html#a337067b357a7e18fca400b079b5bfbc0">ADC_Error::operator|</a> (ADC_ERROR lhs, ADC_ERROR rhs)</td></tr>
+<tr class="memdesc:a337067b357a7e18fca400b079b5bfbc0"><td class="mdescLeft">&#160;</td><td class="mdescRight">OR operator for ADC_ERRORs. <br /></td></tr>
+<tr class="separator:a337067b357a7e18fca400b079b5bfbc0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac436412e6b60308bd5bb363d90f7a05e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac436412e6b60308bd5bb363d90f7a05e"></a>
+constexpr ADC_ERROR&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_a_d_c___error.html#ac436412e6b60308bd5bb363d90f7a05e">ADC_Error::operator&amp;</a> (ADC_ERROR lhs, ADC_ERROR rhs)</td></tr>
+<tr class="memdesc:ac436412e6b60308bd5bb363d90f7a05e"><td class="mdescLeft">&#160;</td><td class="mdescRight">AND operator for ADC_ERRORs. <br /></td></tr>
+<tr class="separator:ac436412e6b60308bd5bb363d90f7a05e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab1d7c83ff81f72b1e9690ae24efc2190"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab1d7c83ff81f72b1e9690ae24efc2190"></a>
+ADC_ERROR&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_a_d_c___error.html#ab1d7c83ff81f72b1e9690ae24efc2190">ADC_Error::operator|=</a> (volatile ADC_ERROR &amp;lhs, ADC_ERROR rhs)</td></tr>
+<tr class="memdesc:ab1d7c83ff81f72b1e9690ae24efc2190"><td class="mdescLeft">&#160;</td><td class="mdescRight">|= operator for ADC_ERRORs, it changes the left hand side ADC_ERROR. <br /></td></tr>
+<tr class="separator:ab1d7c83ff81f72b1e9690ae24efc2190"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afcbca3f91f365bb21c085ed4537306e3"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="afcbca3f91f365bb21c085ed4537306e3"></a>
+ADC_ERROR&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_a_d_c___error.html#afcbca3f91f365bb21c085ed4537306e3">ADC_Error::operator&amp;=</a> (volatile ADC_ERROR &amp;lhs, ADC_ERROR rhs)</td></tr>
+<tr class="memdesc:afcbca3f91f365bb21c085ed4537306e3"><td class="mdescLeft">&#160;</td><td class="mdescRight">&amp;= operator for ADC_ERRORs, it changes the left hand side ADC_ERROR. <br /></td></tr>
+<tr class="separator:afcbca3f91f365bb21c085ed4537306e3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a36047431f5ca2999fa1e00c91cec9b07"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a36047431f5ca2999fa1e00c91cec9b07"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_a_d_c___error.html#a36047431f5ca2999fa1e00c91cec9b07">ADC_Error::printError</a> (ADC_ERROR fail_flag, uint8_t ADC_num=0)</td></tr>
+<tr class="memdesc:a36047431f5ca2999fa1e00c91cec9b07"><td class="mdescLeft">&#160;</td><td class="mdescRight">Prints the human-readable error, if any. <br /></td></tr>
+<tr class="separator:a36047431f5ca2999fa1e00c91cec9b07"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a64f8b37cfbed7042a33984192cc9de88"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a64f8b37cfbed7042a33984192cc9de88"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_a_d_c___error.html#a64f8b37cfbed7042a33984192cc9de88">ADC_Error::resetError</a> (volatile ADC_ERROR &amp;fail_flag)</td></tr>
+<tr class="memdesc:a64f8b37cfbed7042a33984192cc9de88"><td class="mdescLeft">&#160;</td><td class="mdescRight">Resets all errors from the <a class="el" href="class_a_d_c.html">ADC</a>, if any. <br /></td></tr>
+<tr class="separator:a64f8b37cfbed7042a33984192cc9de88"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Enumeration Type Documentation</h2>
 <a class="anchor" id="ac34be55b6924d2fde288f7e176ac62b2"></a>
@@ -180,7 +215,7 @@ Enumerations</h2></td></tr>
 </td></tr>
 </table>
 
-<p>Definition at line <a class="el" href="_a_d_c___module_8h_source.html#l00382">382</a> of file <a class="el" href="_a_d_c___module_8h_source.html">ADC_Module.h</a>.</p>
+<p>Definition at line <a class="el" href="_a_d_c___module_8h_source.html#l00359">359</a> of file <a class="el" href="_a_d_c___module_8h_source.html">ADC_Module.h</a>.</p>
 
 </div>
 </div>
@@ -325,7 +360,7 @@ Enumerations</h2></td></tr>
 </td></tr>
 </table>
 
-<p>Definition at line <a class="el" href="_a_d_c___module_8h_source.html#l00399">399</a> of file <a class="el" href="_a_d_c___module_8h_source.html">ADC_Module.h</a>.</p>
+<p>Definition at line <a class="el" href="_a_d_c___module_8h_source.html#l00376">376</a> of file <a class="el" href="_a_d_c___module_8h_source.html">ADC_Module.h</a>.</p>
 
 </div>
 </div>
@@ -335,7 +370,7 @@ Enumerations</h2></td></tr>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="_a_d_c___module_8h.html">ADC_Module.h</a></li>
-    <li class="footer">Generated on Sun Oct 22 2017 17:38:32 for ADC by
+    <li class="footer">Generated on Sun Oct 29 2017 14:52:51 for ADC by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.11 </li>
   </ul>

@@ -5,5 +5,7 @@ var searchData=
   ['adack_5f5_5f2',['ADACK_5_2',['../_a_d_c___module_8h.html#ac34be55b6924d2fde288f7e176ac62b2aea3ed1028424e989dfeefd71250907b7',1,'ADC_Module.h']]],
   ['adack_5f6_5f2',['ADACK_6_2',['../_a_d_c___module_8h.html#ac34be55b6924d2fde288f7e176ac62b2ac168966569a6773f0227ea1b761c6fd7',1,'ADC_Module.h']]],
   ['adc_5f0',['ADC_0',['../_a_d_c___module_8h.html#a1568125f474323eb121d696874615bdaa3ee8dc6ca9b7c05f53bed698eb74cde7',1,'ADC_Module.h']]],
-  ['adc_5f1',['ADC_1',['../_a_d_c___module_8h.html#a1568125f474323eb121d696874615bdaa7db4c68e0a85031797c43decd8fa42c8',1,'ADC_Module.h']]]
+  ['adc_5f1',['ADC_1',['../_a_d_c___module_8h.html#a1568125f474323eb121d696874615bdaa7db4c68e0a85031797c43decd8fa42c8',1,'ADC_Module.h']]],
+  ['analog_5fdiff_5fread',['ANALOG_DIFF_READ',['../namespace_a_d_c___error.html#ad050c44d1f3422d02e5f9726edeee8f0ad46625d92e7d639cc2cfcce4451a11a1',1,'ADC_Error']]],
+  ['analog_5fread',['ANALOG_READ',['../namespace_a_d_c___error.html#ad050c44d1f3422d02e5f9726edeee8f0a563cea047bb978769e53c9a565f9a31b',1,'ADC_Error']]]
 ];

@@ -56,6 +56,6 @@ var class_a_d_c___module =
     [ "wait_for_cal", "class_a_d_c___module.html#a4fb69b5b2d07c3fc8f5f0bbbf05dfa2a", null ],
     [ "ADC_num", "class_a_d_c___module.html#a29c327df90f71838a36efd3c3b68dd8c", null ],
     [ "adcWasInUse", "class_a_d_c___module.html#a34f6f7878889aa3644b279f9440dc0bf", null ],
-    [ "fail_flag", "class_a_d_c___module.html#a955464266681b30897677ec31a40e529", null ],
+    [ "fail_flag", "class_a_d_c___module.html#a2d0cc3360073881658e578faf4ae5632", null ],
     [ "num_measurements", "class_a_d_c___module.html#a27fdc83a7dbe3a8c8c24fc4273414256", null ]
 ];

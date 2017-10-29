@@ -315,9 +315,9 @@ uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_d_c___module.html#a27fdc83a7dbe3a8c8c24fc4273414256">num_measurements</a></td></tr>
 <tr class="memdesc:a27fdc83a7dbe3a8c8c24fc4273414256"><td class="mdescLeft">&#160;</td><td class="mdescRight">Number of measurements that the <a class="el" href="class_a_d_c.html">ADC</a> is performing. <br /></td></tr>
 <tr class="separator:a27fdc83a7dbe3a8c8c24fc4273414256"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a955464266681b30897677ec31a40e529"><td class="memItemLeft" align="right" valign="top">volatile uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_d_c___module.html#a955464266681b30897677ec31a40e529">fail_flag</a></td></tr>
-<tr class="memdesc:a955464266681b30897677ec31a40e529"><td class="mdescLeft">&#160;</td><td class="mdescRight">This flag indicates that some kind of error took place.  <a href="#a955464266681b30897677ec31a40e529">More...</a><br /></td></tr>
-<tr class="separator:a955464266681b30897677ec31a40e529"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2d0cc3360073881658e578faf4ae5632"><td class="memItemLeft" align="right" valign="top">volatile ADC_ERROR&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_d_c___module.html#a2d0cc3360073881658e578faf4ae5632">fail_flag</a></td></tr>
+<tr class="memdesc:a2d0cc3360073881658e578faf4ae5632"><td class="mdescLeft">&#160;</td><td class="mdescRight">This flag indicates that some kind of error took place.  <a href="#a2d0cc3360073881658e578faf4ae5632">More...</a><br /></td></tr>
+<tr class="separator:a2d0cc3360073881658e578faf4ae5632"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a29c327df90f71838a36efd3c3b68dd8c"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a29c327df90f71838a36efd3c3b68dd8c"></a>
 const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_d_c___module.html#a29c327df90f71838a36efd3c3b68dd8c">ADC_num</a></td></tr>
 <tr class="memdesc:a29c327df90f71838a36efd3c3b68dd8c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Which adc is this? <br /></td></tr>
@@ -326,7 +326,7 @@ const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" h
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Class <a class="el" href="class_a_d_c___module.html">ADC_Module</a>: Implements all functions of the Teensy 3.x, LC analog to digital converter </p>
 
-<p>Definition at line <a class="el" href="_a_d_c___module_8h_source.html#l00468">468</a> of file <a class="el" href="_a_d_c___module_8h_source.html">ADC_Module.h</a>.</p>
+<p>Definition at line <a class="el" href="_a_d_c___module_8h_source.html#l00519">519</a> of file <a class="el" href="_a_d_c___module_8h_source.html">ADC_Module.h</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="acb8f504a1ad15b1fb3a047dec3e1b9d7"></a>
 <div class="memitem">
@@ -431,7 +431,7 @@ const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" h
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the value of the pin. </dd></dl>
 
-<p>Definition at line <a class="el" href="_a_d_c___module_8h_source.html#l00783">783</a> of file <a class="el" href="_a_d_c___module_8h_source.html">ADC_Module.h</a>.</p>
+<p>Definition at line <a class="el" href="_a_d_c___module_8h_source.html#l00834">834</a> of file <a class="el" href="_a_d_c___module_8h_source.html">ADC_Module.h</a>.</p>
 
 </div>
 </div>
@@ -459,7 +459,7 @@ const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" h
 <p>Reads the analog value of a continuous conversion. </p>
 <p>Set the continuous conversion with with analogStartContinuous(pin) or startContinuousDifferential(pinP, pinN). </p><dl class="section return"><dt>Returns</dt><dd>the last converted value. If single-ended and 16 bits it's necessary to typecast it to an unsigned type (like uint16_t), otherwise values larger than 3.3/2 V are interpreted as negative! </dd></dl>
 
-<p>Definition at line <a class="el" href="_a_d_c___module_8h_source.html#l00850">850</a> of file <a class="el" href="_a_d_c___module_8h_source.html">ADC_Module.h</a>.</p>
+<p>Definition at line <a class="el" href="_a_d_c___module_8h_source.html#l00901">901</a> of file <a class="el" href="_a_d_c___module_8h_source.html">ADC_Module.h</a>.</p>
 
 </div>
 </div>
@@ -804,7 +804,7 @@ const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" h
 <p>Is an <a class="el" href="class_a_d_c.html">ADC</a> conversion ready? </p>
 <dl class="section return"><dt>Returns</dt><dd>true if yes, false if not. When a value is read this function returns false until a new value exists, so it only makes sense to call it before <a class="el" href="class_a_d_c___module.html#a8bddd248a9d52110b923fa94438f7f0a" title="Reads the analog value of a continuous conversion. ">analogReadContinuous()</a> or <a class="el" href="class_a_d_c___module.html#a60d0edc82fd1dbb2e20d090a53718ce2" title="Reads the analog value of a single conversion. ">readSingle()</a> </dd></dl>
 
-<p>Definition at line <a class="el" href="_a_d_c___module_8h_source.html#l00691">691</a> of file <a class="el" href="_a_d_c___module_8h_source.html">ADC_Module.h</a>.</p>
+<p>Definition at line <a class="el" href="_a_d_c___module_8h_source.html#l00742">742</a> of file <a class="el" href="_a_d_c___module_8h_source.html">ADC_Module.h</a>.</p>
 
 </div>
 </div>
@@ -832,7 +832,7 @@ const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" h
 <p>Is the <a class="el" href="class_a_d_c.html">ADC</a> in continuous mode? </p>
 <dl class="section return"><dt>Returns</dt><dd>true or false </dd></dl>
 
-<p>Definition at line <a class="el" href="_a_d_c___module_8h_source.html#l00710">710</a> of file <a class="el" href="_a_d_c___module_8h_source.html">ADC_Module.h</a>.</p>
+<p>Definition at line <a class="el" href="_a_d_c___module_8h_source.html#l00761">761</a> of file <a class="el" href="_a_d_c___module_8h_source.html">ADC_Module.h</a>.</p>
 
 </div>
 </div>
@@ -860,7 +860,7 @@ const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" h
 <p>Is the <a class="el" href="class_a_d_c.html">ADC</a> converting at the moment? </p>
 <dl class="section return"><dt>Returns</dt><dd>true or false </dd></dl>
 
-<p>Definition at line <a class="el" href="_a_d_c___module_8h_source.html#l00679">679</a> of file <a class="el" href="_a_d_c___module_8h_source.html">ADC_Module.h</a>.</p>
+<p>Definition at line <a class="el" href="_a_d_c___module_8h_source.html#l00730">730</a> of file <a class="el" href="_a_d_c___module_8h_source.html">ADC_Module.h</a>.</p>
 
 </div>
 </div>
@@ -888,7 +888,7 @@ const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" h
 <p>Is the <a class="el" href="class_a_d_c.html">ADC</a> in differential mode? </p>
 <dl class="section return"><dt>Returns</dt><dd>true or false </dd></dl>
 
-<p>Definition at line <a class="el" href="_a_d_c___module_8h_source.html#l00701">701</a> of file <a class="el" href="_a_d_c___module_8h_source.html">ADC_Module.h</a>.</p>
+<p>Definition at line <a class="el" href="_a_d_c___module_8h_source.html#l00752">752</a> of file <a class="el" href="_a_d_c___module_8h_source.html">ADC_Module.h</a>.</p>
 
 </div>
 </div>
@@ -916,7 +916,7 @@ const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" h
 <p>Is the PGA function enabled? </p>
 <dl class="section return"><dt>Returns</dt><dd>true or false </dd></dl>
 
-<p>Definition at line <a class="el" href="_a_d_c___module_8h_source.html#l00720">720</a> of file <a class="el" href="_a_d_c___module_8h_source.html">ADC_Module.h</a>.</p>
+<p>Definition at line <a class="el" href="_a_d_c___module_8h_source.html#l00771">771</a> of file <a class="el" href="_a_d_c___module_8h_source.html">ADC_Module.h</a>.</p>
 
 </div>
 </div>
@@ -944,7 +944,7 @@ const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" h
 <p>Reads the analog value of a single conversion. </p>
 <p>Set the conversion with with startSingleRead(pin) or startSingleDifferential(pinP, pinN). </p><dl class="section return"><dt>Returns</dt><dd>the converted value. </dd></dl>
 
-<p>Definition at line <a class="el" href="_a_d_c___module_8h_source.html#l00822">822</a> of file <a class="el" href="_a_d_c___module_8h_source.html">ADC_Module.h</a>.</p>
+<p>Definition at line <a class="el" href="_a_d_c___module_8h_source.html#l00873">873</a> of file <a class="el" href="_a_d_c___module_8h_source.html">ADC_Module.h</a>.</p>
 
 </div>
 </div>
@@ -1324,20 +1324,20 @@ const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" h
 </div>
 </div>
 <h2 class="groupheader">Member Data Documentation</h2>
-<a class="anchor" id="a955464266681b30897677ec31a40e529"></a>
+<a class="anchor" id="a2d0cc3360073881658e578faf4ae5632"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">volatile uint16_t ADC_Module::fail_flag</td>
+          <td class="memname">volatile ADC_ERROR ADC_Module::fail_flag</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 <p>This flag indicates that some kind of error took place. </p>
-<p>Use the defines at the beggining of this file to find out what caused the fail. </p>
+<p>Use the defines at the beginning of this file to find out what caused the fail. </p>
 
-<p>Definition at line <a class="el" href="_a_d_c___module_8h_source.html#l00923">923</a> of file <a class="el" href="_a_d_c___module_8h_source.html">ADC_Module.h</a>.</p>
+<p>Definition at line <a class="el" href="_a_d_c___module_8h_source.html#l00974">974</a> of file <a class="el" href="_a_d_c___module_8h_source.html">ADC_Module.h</a>.</p>
 
 </div>
 </div>
@@ -1351,7 +1351,7 @@ const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" h
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="class_a_d_c___module.html">ADC_Module</a></li>
-    <li class="footer">Generated on Sun Oct 22 2017 17:38:32 for ADC by
+    <li class="footer">Generated on Sun Oct 29 2017 14:52:52 for ADC by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.11 </li>
   </ul>

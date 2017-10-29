@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['temp_5fsensor',['TEMP_SENSOR',['../_a_d_c___module_8h.html#ac8d2892dc23aba5d30e7013804d3429ba2d8001cb5670d5668694dbf8697ee69f',1,'ADC_Module.h']]]
+  ['other',['OTHER',['../namespace_a_d_c___error.html#ad050c44d1f3422d02e5f9726edeee8f0a03570470bad94692ce93e32700d2e1cb',1,'ADC_Error']]]
 ];

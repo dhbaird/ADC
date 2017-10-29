@@ -1,4 +1,7 @@
 var searchData=
 [
-  ['printerror',['printError',['../class_a_d_c.html#a28bd3475a7afb60420b4746d64f1261a',1,'ADC::printError()'],['../class_a_d_c___module.html#ae34bcdac75a630120799ddb5119191f6',1,'ADC_Module::printError()']]]
+  ['operator_26',['operator&amp;',['../namespace_a_d_c___error.html#ac436412e6b60308bd5bb363d90f7a05e',1,'ADC_Error']]],
+  ['operator_26_3d',['operator&amp;=',['../namespace_a_d_c___error.html#afcbca3f91f365bb21c085ed4537306e3',1,'ADC_Error']]],
+  ['operator_7c',['operator|',['../namespace_a_d_c___error.html#a337067b357a7e18fca400b079b5bfbc0',1,'ADC_Error']]],
+  ['operator_7c_3d',['operator|=',['../namespace_a_d_c___error.html#ab1d7c83ff81f72b1e9690ae24efc2190',1,'ADC_Error']]]
 ];

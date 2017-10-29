@@ -1,5 +1,8 @@
 var searchData=
 [
-  ['high_5fspeed',['HIGH_SPEED',['../_a_d_c___module_8h.html#ac34be55b6924d2fde288f7e176ac62b2a78f3e093707596168b9993c4f6f8ae10',1,'HIGH_SPEED():&#160;ADC_Module.h'],['../_a_d_c___module_8h.html#a3fc99f48d35189e64d2628def313a15da78f3e093707596168b9993c4f6f8ae10',1,'HIGH_SPEED():&#160;ADC_Module.h']]],
-  ['high_5fspeed_5f16bits',['HIGH_SPEED_16BITS',['../_a_d_c___module_8h.html#ac34be55b6924d2fde288f7e176ac62b2ac89070efb9f2a03d57915d92e251f9fd',1,'ADC_Module.h']]]
+  ['calib',['CALIB',['../namespace_a_d_c___error.html#ad050c44d1f3422d02e5f9726edeee8f0ae1f7d44eff22f533115c24a249c57269',1,'ADC_Error']]],
+  ['clear',['CLEAR',['../namespace_a_d_c___error.html#ad050c44d1f3422d02e5f9726edeee8f0a813461e0c58e7ad59a2fd83ca2237fec',1,'ADC_Error']]],
+  ['comparison',['COMPARISON',['../namespace_a_d_c___error.html#ad050c44d1f3422d02e5f9726edeee8f0a4fd4da223d344be375847dcacc013d7f',1,'ADC_Error']]],
+  ['cont',['CONT',['../namespace_a_d_c___error.html#ad050c44d1f3422d02e5f9726edeee8f0a53f6b3ace3aa40916de167636293ac80',1,'ADC_Error']]],
+  ['cont_5fdiff',['CONT_DIFF',['../namespace_a_d_c___error.html#ad050c44d1f3422d02e5f9726edeee8f0ac16bcb11fac967e648e4d534e2c84683',1,'ADC_Error']]]
 ];
