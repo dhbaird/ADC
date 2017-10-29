@@ -533,7 +533,53 @@ public:
     *   \param a_channel2sc1a contains an index that pairs each pin to its SC1A number (used to start a conversion on that pin)
     *   \param a_diff_table is similar to a_channel2sc1a, but for differential pins.
     */
-    ADC_Module(uint8_t ADC_number, const uint8_t* const a_channel2sc1a, const ADC_NLIST* const a_diff_table);
+    constexpr ADC_Module(uint8_t ADC_number, const uint8_t* const a_channel2sc1a, const ADC_NLIST* const a_diff_table):
+        ADC_num(ADC_number)
+        , channel2sc1a(a_channel2sc1a)
+        , diff_table(a_diff_table)
+        , ADC_SC1A(ADC_num? ADC1_SC1A : ADC0_SC1A)
+        , ADC_SC1B(ADC_num? ADC1_SC1B : ADC0_SC1B)
+        , ADC_CFG1(ADC_num? ADC1_CFG1 : ADC0_CFG1)
+        , ADC_CFG2(ADC_num? ADC1_CFG2 : ADC0_CFG2)
+        , ADC_RA(ADC_num? ADC1_RA : ADC0_RA)
+        , ADC_RB(ADC_num? ADC1_RB : ADC0_RB)
+        , ADC_CV1(ADC_num? ADC1_CV1 : ADC0_CV1)
+        , ADC_CV2(ADC_num? ADC1_CV2 : ADC0_CV2)
+        , ADC_SC2(ADC_num? ADC1_SC2 : ADC0_SC2)
+        , ADC_SC3(ADC_num? ADC1_SC3 : ADC0_SC3)
+        , ADC_PGA(ADC_num? ADC1_PGA : ADC0_PGA)
+
+        , ADC_OFS(ADC_num? ADC1_OFS : ADC0_OFS)
+        , ADC_PG(ADC_num? ADC1_PG : ADC0_PG)
+        , ADC_MG(ADC_num? ADC1_MG : ADC0_MG)
+        , ADC_CLPD(ADC_num? ADC1_CLPD : ADC0_CLPD)
+        , ADC_CLPS(ADC_num? ADC1_CLPS : ADC0_CLPS)
+        , ADC_CLP4(ADC_num? ADC1_CLP4 : ADC0_CLP4)
+        , ADC_CLP3(ADC_num? ADC1_CLP3 : ADC0_CLP3)
+        , ADC_CLP2(ADC_num? ADC1_CLP2 : ADC0_CLP2)
+        , ADC_CLP1(ADC_num? ADC1_CLP1 : ADC0_CLP1)
+        , ADC_CLP0(ADC_num? ADC1_CLP0 : ADC0_CLP0)
+        , ADC_CLMD(ADC_num? ADC1_CLMD : ADC0_CLMD)
+        , ADC_CLMS(ADC_num? ADC1_CLMS : ADC0_CLMS)
+        , ADC_CLM4(ADC_num? ADC1_CLM4 : ADC0_CLM4)
+        , ADC_CLM3(ADC_num? ADC1_CLM3 : ADC0_CLM3)
+        , ADC_CLM2(ADC_num? ADC1_CLM2 : ADC0_CLM2)
+        , ADC_CLM1(ADC_num? ADC1_CLM1 : ADC0_CLM1)
+        , ADC_CLM0(ADC_num? ADC1_CLM0 : ADC0_CLM0)
+        , PDB0_CHnC1(ADC_num? PDB0_CH1C1 : PDB0_CH0C1)
+        #if ADC_NUM_ADCS==2
+        // IRQ_ADC0 and IRQ_ADC1 aren't consecutive in Teensy 3.6
+        , IRQ_ADC(ADC_num? IRQ_ADC1 : IRQ_ADC0) // fix by SB, https://github.com/pedvide/ADC/issues/19
+        #else
+        , IRQ_ADC(IRQ_ADC0)
+        #endif
+        {
+
+
+        // call our init
+        analog_init();
+
+    }
 
 
     //! Starts the calibration sequence, waits until it's done and writes the results
@@ -940,10 +986,11 @@ public:
     struct ADC_Config {
         //! ADC registers
         uint32_t savedSC1A, savedSC2, savedSC3, savedCFG1, savedCFG2;
-    } adc_config;
+    };
+    ADC_Config adc_config{0, 0, 0, 0, 0};
 
     //! Was the adc in use before a call?
-    uint8_t adcWasInUse;
+    bool adcWasInUse = false;
 
     //! Save config of the ADC to the ADC_Config struct
     void saveConfig(ADC_Config* config) {
@@ -965,13 +1012,13 @@ public:
 
 
     //! Number of measurements that the ADC is performing
-    uint8_t num_measurements;
+    uint8_t num_measurements = 0;
 
 
     //! This flag indicates that some kind of error took place
     /** Use the defines at the beginning of this file to find out what caused the fail.
     */
-    volatile ADC_ERROR fail_flag;
+    ADC_ERROR fail_flag = ADC_ERROR::CLEAR;
 
     //! Prints the human-readable error, if any.
     void printError() {
@@ -991,32 +1038,32 @@ public:
 private:
 
     // is set to 1 when the calibration procedure is taking place
-    uint8_t calibrating;
+    bool calibrating = false;
 
     // the first calibration will use 32 averages and lowest speed,
     // when this calibration is over the averages and speed will be set to default.
-    uint8_t init_calib;
+    uint8_t init_calib = true;
 
     // resolution
-    uint8_t analog_res_bits;
+    uint8_t analog_res_bits = 0;
 
     // maximum value possible 2^res-1
-    uint32_t analog_max_val;
+    uint32_t analog_max_val = 0;
 
     // num of averages
-    uint8_t analog_num_average;
+    uint8_t analog_num_average = 0;
 
     // reference can be internal or external
-    ADC_REF_SOURCE analog_reference_internal;
+    ADC_REF_SOURCE analog_reference_internal = ADC_REF_SOURCE::REF_NONE;;
 
     // value of the pga
-    uint8_t pga_value;
+    uint8_t pga_value = 1;
 
     // conversion speed
-    ADC_CONVERSION_SPEED conversion_speed;
+    ADC_CONVERSION_SPEED conversion_speed = ADC_CONVERSION_SPEED::VERY_HIGH_SPEED;
 
     // sampling speed
-    ADC_SAMPLING_SPEED sampling_speed;
+    ADC_SAMPLING_SPEED sampling_speed =  ADC_SAMPLING_SPEED::VERY_HIGH_SPEED;
 
     // translate pin number to SC1A nomenclature
     const uint8_t* const channel2sc1a;

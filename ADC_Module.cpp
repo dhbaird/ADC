@@ -42,6 +42,7 @@
 *   Call init
 *   The very long initializer list could be shorter using some kind of struct?
 */
+/*
 ADC_Module::ADC_Module(uint8_t ADC_number, const uint8_t* const a_channel2sc1a, const ADC_NLIST* const a_diff_table) :
         ADC_num(ADC_number)
         , channel2sc1a(a_channel2sc1a)
@@ -88,7 +89,7 @@ ADC_Module::ADC_Module(uint8_t ADC_number, const uint8_t* const a_channel2sc1a, 
     // call our init
     analog_init();
 
-}
+}*/
 
 /* Initialize stuff:
 *  - Clear all fail flags
@@ -113,20 +114,6 @@ void ADC_Module::analog_init() {
         - sampling speed = medium
     initiate to 0 (or 1) so the corresponding functions change it to the correct value
     */
-    analog_res_bits = 0;
-    analog_max_val = 0;
-    analog_num_average = 0;
-    analog_reference_internal = ADC_REF_SOURCE::REF_NONE;
-    pga_value = 1;
-
-    conversion_speed = ADC_CONVERSION_SPEED::VERY_HIGH_SPEED; // set to something different from line 139 so it gets changed there
-    sampling_speed =  ADC_SAMPLING_SPEED::VERY_HIGH_SPEED;
-
-    calibrating = 0;
-
-    fail_flag = ADC_ERROR::CLEAR; // clear all errors
-
-    num_measurements = 0;
 
     // select b channels
     // ADC_CFG2_muxsel = 1;
@@ -140,7 +127,6 @@ void ADC_Module::analog_init() {
 
     // the first calibration will use 32 averages and lowest speed,
     // when this calibration is over the averages and speed will be set to default by wait_for_cal and init_calib will be cleared.
-    init_calib = 1;
     setAveraging(32);
     setConversionSpeed(ADC_CONVERSION_SPEED::LOW_SPEED);
     setSamplingSpeed(ADC_SAMPLING_SPEED::LOW_SPEED);
@@ -154,7 +140,7 @@ void ADC_Module::calibrate() {
 
     __disable_irq();
 
-    calibrating = 1;
+    calibrating = true;
     // ADC_SC3_cal = 0; // stop possible previous calibration
     atomic::clearBitFlag(ADC_SC3, ADC_SC3_CAL);
     // ADC_SC3_calf = 1; // clear possible previous error
@@ -190,7 +176,7 @@ void ADC_Module::wait_for_cal(void) {
         sum = (sum / 2) | 0x8000;
         ADC_MG = sum;
 
-        calibrating = 0;
+        calibrating = false;
     }
     __enable_irq();
 
@@ -207,7 +193,7 @@ void ADC_Module::wait_for_cal(void) {
         // number of averages to 4
         setAveraging(4);
 
-        init_calib = 0; // clear
+        init_calib = false; // clear
     }
 
 }
@@ -881,7 +867,7 @@ int ADC_Module::analogRead(uint8_t pin) {
     // check if we are interrupting a measurement, store setting if so.
     // vars to save the current state of the ADC in case it's in use
     ADC_Config old_config = {0};
-    const uint8_t wasADCInUse = isConverting(); // is the ADC running now?
+    const bool wasADCInUse = isConverting(); // is the ADC running now?
 
     if(wasADCInUse) { // this means we're interrupting a conversion
         // save the current conversion config, we don't want any other interrupts messing up the configs
