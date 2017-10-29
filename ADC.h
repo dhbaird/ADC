@@ -412,12 +412,8 @@ class ADC
         *   \return the value of the pin.
         */
         int analogRead(uint8_t pin, ADC_NUM adc_num = ADC_NUM::ANY) __attribute__((always_inline)) {
-            #if ADC_NUM_ADCS==1
-            return adc0->analogRead(pin); // use ADC0
-            #else
             // dispatch to the right ADC module depending on the policy that we want.
             return dispatch_policy(&ADC_Module::checkPin, &ADC_Module::analogRead, adc_num, pin);
-            #endif // ADC_NUM_ADCS
         }
 
 
@@ -449,11 +445,7 @@ class ADC
         *   If a comparison has been set up and fails, it will return ADC_ERROR_VALUE.
         */
         int analogReadDifferential(uint8_t pinP, uint8_t pinN, ADC_NUM adc_num = ADC_NUM::ANY) __attribute__((always_inline)) {
-            #if ADC_NUM_ADCS==1
-            return adc0->analogReadDifferential(pinP, pinN); // use ADC0
-            #else
             return dispatch_policy(&ADC_Module::checkDifferentialPins, &ADC_Module::analogReadDifferential, adc_num, pinP, pinN);
-            #endif // ADC_NUM_ADCS
         }
 
 
@@ -467,11 +459,7 @@ class ADC
         *   \return true if the pin is valid, false otherwise.
         */
         bool startSingleRead(uint8_t pin, ADC_NUM adc_num = ADC_NUM::ANY) __attribute__((always_inline)) {
-            #if ADC_NUM_ADCS==1
-            return adc0->startSingleRead(pin); // use ADC0
-            #else
             return dispatch_policy(&ADC_Module::checkPin, &ADC_Module::startSingleRead, adc_num, pin);
-            #endif // ADC_NUM_ADCS
         }
 
         //! Start a differential conversion between two pins (pinP - pinN) and enables interrupts.
@@ -483,11 +471,7 @@ class ADC
         *   \return true if the pins are valid, false otherwise.
         */
         bool startSingleDifferential(uint8_t pinP, uint8_t pinN, ADC_NUM adc_num = ADC_NUM::ANY) __attribute__((always_inline)) {
-            #if ADC_NUM_ADCS==1
-            return adc0->startSingleDifferential(pinP, pinN); // use ADC0
-            #else
             return dispatch_policy(&ADC_Module::checkDifferentialPins, &ADC_Module::startSingleDifferential, adc_num, pinP, pinN);
-            #endif // ADC_NUM_ADCS
         }
 
         //! Reads the analog value of a single conversion.
@@ -510,11 +494,7 @@ class ADC
         *   \return true if the pin is valid, false otherwise.
         */
         bool startContinuous(uint8_t pin, ADC_NUM adc_num = ADC_NUM::ANY) __attribute__((always_inline)) {
-            #if ADC_NUM_ADCS==1
-            return adc0->startContinuous(pin); // use ADC0
-            #else
             return dispatch_policy(&ADC_Module::checkPin, &ADC_Module::startContinuous, adc_num, pin);
-            #endif // ADC_NUM_ADCS
         }
 
         //! Starts continuous conversion between the pins (pinP-pinN).
@@ -525,11 +505,7 @@ class ADC
         *   \return true if the pins are valid, false otherwise.
         */
         bool startContinuousDifferential(uint8_t pinP, uint8_t pinN, ADC_NUM adc_num = ADC_NUM::ANY) __attribute__((always_inline)) {
-            #if ADC_NUM_ADCS==1
-            return adc0->startContinuousDifferential(pinP, pinN); // use ADC0
-            #else
             return dispatch_policy(&ADC_Module::checkDifferentialPins, &ADC_Module::startContinuousDifferential, adc_num, pinP, pinN);
-            #endif // ADC_NUM_ADCS
         }
 
         //! Reads the analog value of a continuous conversion.
