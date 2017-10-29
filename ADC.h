@@ -85,8 +85,8 @@ class ADC
                 } else if(adc1Pin) { // ADC1
                     return (adc1->*conversion_fun)(args...);
                 } else { // pin not valid in any ADC
-                    adc0->fail_flag |= ADC_ERROR_WRONG_PIN;
-                    adc1->fail_flag |= ADC_ERROR_WRONG_PIN;
+                    adc0->fail_flag |= ADC_ERROR::WRONG_PIN;
+                    adc1->fail_flag |= ADC_ERROR::WRONG_PIN;
                     return ADC_ERROR_VALUE;   // all others are invalid
                 }
             } else { // Use a specific ADC
@@ -118,8 +118,8 @@ class ADC
                 }
 
                 // Not valid for any ADC
-                adc0->fail_flag |= ADC_ERROR_WRONG_PIN;
-                adc1->fail_flag |= ADC_ERROR_WRONG_PIN;
+                adc0->fail_flag |= ADC_ERROR::WRONG_PIN;
+                adc1->fail_flag |= ADC_ERROR::WRONG_PIN;
                 return ADC_ERROR_VALUE;   // all others are invalid
             } else { // Use a specific ADC
                 return (adc[static_cast<uint8_t>(adc_num)]->*conversion_fun)(args...);

@@ -243,134 +243,111 @@ cycles. ADHSC should be used when the ADCLK exceeds the limit for ADHSC = 0.
 // calibration works best when averages are 32 and speed is less than 4 MHz
 // ADC_CFG1_ADICLK: 0=bus, 1=bus/2, 2=(alternative clk) altclk, 3=(async. clk) adack
 // See below for an explanation of VERY_LOW_SPEED, LOW_SPEED, etc.
-#if F_BUS == 120000000
-    #define ADC_CFG1_7_5MHZ        (ADC_CFG1_ADIV(3) + ADC_CFG1_ADICLK(1))
-    #define ADC_CFG1_15MHZ         (ADC_CFG1_ADIV(2) + ADC_CFG1_ADICLK(1))
-    #define ADC_CFG1_30MHZ         (ADC_CFG1_ADIV(1) + ADC_CFG1_ADICLK(1))
-    #define ADC_CFG1_60MHZ         (ADC_CFG1_ADIV(0) + ADC_CFG1_ADICLK(1)) // too fast
 
-    #define ADC_CFG1_VERY_LOW_SPEED ADC_CFG1_LOW_SPEED
-    #define ADC_CFG1_LOW_SPEED (ADC_CFG1_7_5MHZ)
-    #define ADC_CFG1_MED_SPEED (ADC_CFG1_7_5MHZ)
-    #define ADC_CFG1_HI_SPEED_16_BITS (ADC_CFG1_7_5MHZ)
-    #define ADC_CFG1_HI_SPEED (ADC_CFG1_15MHZ)
-    #define ADC_CFG1_VERY_HIGH_SPEED (ADC_CFG1_15MHZ)
-#elif F_BUS == 108000000
-    #define ADC_CFG1_6_75MHZ        (ADC_CFG1_ADIV(3) + ADC_CFG1_ADICLK(1))
-    #define ADC_CFG1_13_5MHZ        (ADC_CFG1_ADIV(2) + ADC_CFG1_ADICLK(1))
-    #define ADC_CFG1_27MHZ          (ADC_CFG1_ADIV(1) + ADC_CFG1_ADICLK(1))
-    #define ADC_CFG1_54MHZ          (ADC_CFG1_ADIV(0) + ADC_CFG1_ADICLK(1)) // too fast
-
-    #define ADC_CFG1_VERY_LOW_SPEED ADC_CFG1_LOW_SPEED
-    #define ADC_CFG1_LOW_SPEED (ADC_CFG1_6_75MHZ)
-    #define ADC_CFG1_MED_SPEED (ADC_CFG1_6_75MHZ)
-    #define ADC_CFG1_HI_SPEED_16_BITS (ADC_CFG1_6_75MHZ)
-    #define ADC_CFG1_HI_SPEED (ADC_CFG1_13_5MHZ)
-    #define ADC_CFG1_VERY_HIGH_SPEED (ADC_CFG1_27MHZ)
-#elif F_BUS == 60000000
-    #define ADC_CFG1_3_75MHZ      (ADC_CFG1_ADIV(3) + ADC_CFG1_ADICLK(1))
-    #define ADC_CFG1_7_5MHZ       (ADC_CFG1_ADIV(2) + ADC_CFG1_ADICLK(1))
-    #define ADC_CFG1_15MHZ        (ADC_CFG1_ADIV(1) + ADC_CFG1_ADICLK(1))
-
-    #define ADC_CFG1_VERY_LOW_SPEED ADC_CFG1_LOW_SPEED
-    #define ADC_CFG1_LOW_SPEED (ADC_CFG1_3_75MHZ)
-    #define ADC_CFG1_MED_SPEED (ADC_CFG1_7_5MHZ)
-    #define ADC_CFG1_HI_SPEED_16_BITS (ADC_CFG1_7_5MHZ)
-    #define ADC_CFG1_HI_SPEED (ADC_CFG1_15MHZ)
-    #define ADC_CFG1_VERY_HIGH_SPEED ADC_CFG1_HI_SPEED
-
-#elif F_BUS == 56000000 || F_BUS == 54000000 // frequency numbers are good for 56 MHz and slightly smaller for 54 MHz
-    #define ADC_CFG1_3_5MHZ   (ADC_CFG1_ADIV(3) + ADC_CFG1_ADICLK(1))
-    #define ADC_CFG1_7MHZ     (ADC_CFG1_ADIV(2) + ADC_CFG1_ADICLK(1))
-    #define ADC_CFG1_14MHZ    (ADC_CFG1_ADIV(1) + ADC_CFG1_ADICLK(1))
-    #define ADC_CFG1_28MHZ    (ADC_CFG1_ADIV(0) + ADC_CFG1_ADICLK(1))  // too fast
-
-    #define ADC_CFG1_VERY_LOW_SPEED ADC_CFG1_LOW_SPEED
-    #define ADC_CFG1_LOW_SPEED (ADC_CFG1_3_5MHZ)
-    #define ADC_CFG1_MED_SPEED (ADC_CFG1_7MHZ)
-    #define ADC_CFG1_HI_SPEED_16_BITS (ADC_CFG1_7MHZ)
-    #define ADC_CFG1_HI_SPEED (ADC_CFG1_14MHZ)
-    #define ADC_CFG1_VERY_HIGH_SPEED (ADC_CFG1_28MHZ)
-
-#elif F_BUS == 48000000
-    #define ADC_CFG1_3MHZ   (ADC_CFG1_ADIV(3) + ADC_CFG1_ADICLK(1)) // Clock divide select: 3=div8 + Input clock: 1=bus/2
-    #define ADC_CFG1_6MHZ   (ADC_CFG1_ADIV(2) + ADC_CFG1_ADICLK(1)) // Clock divide select: 2=div4 + Input clock: 1=bus/2
-    #define ADC_CFG1_12MHZ  (ADC_CFG1_ADIV(1) + ADC_CFG1_ADICLK(1)) // Clock divide select: 1=div2 Input clock: 1=bus/2
-    #define ADC_CFG1_24MHZ  (ADC_CFG1_ADIV(0) + ADC_CFG1_ADICLK(1)) // this is way too fast, so accuracy is not guaranteed, except for T3.6
-
-    #define ADC_CFG1_VERY_LOW_SPEED ADC_CFG1_LOW_SPEED
-    #define ADC_CFG1_LOW_SPEED (ADC_CFG1_3MHZ)
-    #define ADC_CFG1_MED_SPEED (ADC_CFG1_6MHZ)
-    #define ADC_CFG1_HI_SPEED_16_BITS (ADC_CFG1_12MHZ)
-    #define ADC_CFG1_HI_SPEED (ADC_CFG1_12MHZ)
-    #define ADC_CFG1_VERY_HIGH_SPEED (ADC_CFG1_24MHZ)
-
-#elif F_BUS == 40000000
-    #define ADC_CFG1_2_5MHZ   (ADC_CFG1_ADIV(3) + ADC_CFG1_ADICLK(1))
-    #define ADC_CFG1_5MHZ     (ADC_CFG1_ADIV(2) + ADC_CFG1_ADICLK(1))
-    #define ADC_CFG1_10MHZ    (ADC_CFG1_ADIV(1) + ADC_CFG1_ADICLK(1))
-    #define ADC_CFG1_20MHZ    (ADC_CFG1_ADIV(0) + ADC_CFG1_ADICLK(1)) // too fast, except for T3.5
-
-    #define ADC_CFG1_VERY_LOW_SPEED ADC_CFG1_LOW_SPEED
-    #define ADC_CFG1_LOW_SPEED (ADC_CFG1_2_5MHZ)
-    #define ADC_CFG1_MED_SPEED (ADC_CFG1_5MHZ)
-    #define ADC_CFG1_HI_SPEED_16_BITS (ADC_CFG1_10MHZ)
-    #define ADC_CFG1_HI_SPEED (ADC_CFG1_10MHZ)
-    #define ADC_CFG1_VERY_HIGH_SPEED (ADC_CFG1_20MHZ)
-
-#elif F_BUS == 36000000
-    #define ADC_CFG1_2_25MHZ      (ADC_CFG1_ADIV(3) + ADC_CFG1_ADICLK(1))
-    #define ADC_CFG1_4_5MHZ       (ADC_CFG1_ADIV(2) + ADC_CFG1_ADICLK(1))
-    #define ADC_CFG1_9MHZ         (ADC_CFG1_ADIV(1) + ADC_CFG1_ADICLK(1))
-    #define ADC_CFG1_18MHZ        (ADC_CFG1_ADIV(0) + ADC_CFG1_ADICLK(1))
-
-    #define ADC_CFG1_VERY_LOW_SPEED (ADC_CFG1_2_25MHZ)
-    #define ADC_CFG1_LOW_SPEED (ADC_CFG1_4_5MHZ)
-    #define ADC_CFG1_MED_SPEED (ADC_CFG1_9MHZ)
-    #define ADC_CFG1_HI_SPEED_16_BITS (ADC_CFG1_9MHZ)
-    #define ADC_CFG1_HI_SPEED (ADC_CFG1_18MHZ)
-    #define ADC_CFG1_VERY_HIGH_SPEED ADC_CFG1_HI_SPEED
-
-#elif F_BUS == 24000000
-    #define ADC_CFG1_1_5MHZ   (ADC_CFG1_ADIV(3) + ADC_CFG1_ADICLK(1)) // Clock divide select: 3=div8 + Input clock: 1=bus/2
-    #define ADC_CFG1_3MHZ     (ADC_CFG1_ADIV(3) + ADC_CFG1_ADICLK(0)) // Clock divide select: 3=div8 + Input clock: 0=bus
-    #define ADC_CFG1_6MHZ     (ADC_CFG1_ADIV(2) + ADC_CFG1_ADICLK(0)) // Clock divide select: 2=div4 + Input clock: 0=bus
-    #define ADC_CFG1_12MHZ    (ADC_CFG1_ADIV(1) + ADC_CFG1_ADICLK(0)) // Clock divide select: 1=div2 + Input clock: 0=bus
-    #define ADC_CFG1_24MHZ    (ADC_CFG1_ADIV(0) + ADC_CFG1_ADICLK(0)) // too fast, except for T3.5
-
-    #define ADC_CFG1_VERY_LOW_SPEED (ADC_CFG1_1_5MHZ)
-    #define ADC_CFG1_LOW_SPEED (ADC_CFG1_3MHZ)
-    #define ADC_CFG1_MED_SPEED (ADC_CFG1_6MHZ)
-    #define ADC_CFG1_HI_SPEED_16_BITS (ADC_CFG1_12MHZ)
-    #define ADC_CFG1_HI_SPEED (ADC_CFG1_12MHZ)
-    #define ADC_CFG1_VERY_HIGH_SPEED (ADC_CFG1_24MHZ)
-
-#elif F_BUS == 4000000
-    #define ADC_CFG1_1MHZ   (ADC_CFG1_ADIV(2) + ADC_CFG1_ADICLK(0))
-    #define ADC_CFG1_2MHZ   (ADC_CFG1_ADIV(1) + ADC_CFG1_ADICLK(0))
-    #define ADC_CFG1_4MHZ   (ADC_CFG1_ADIV(0) + ADC_CFG1_ADICLK(0))
-
-    #define ADC_CFG1_VERY_LOW_SPEED (ADC_CFG1_1MHZ)
-    #define ADC_CFG1_LOW_SPEED (ADC_CFG1_2MHZ)
-    #define ADC_CFG1_MED_SPEED (ADC_CFG1_4MHZ)
-    #define ADC_CFG1_HI_SPEED_16_BITS (ADC_CFG1_4MHZ)
-    #define ADC_CFG1_HI_SPEED (ADC_CFG1_4MHZ)
-    #define ADC_CFG1_VERY_HIGH_SPEED ADC_CFG1_HI_SPEED
-
-#elif F_BUS == 2000000
-    #define ADC_CFG1_1MHZ   (ADC_CFG1_ADIV(1) + ADC_CFG1_ADICLK(0))
-    #define ADC_CFG1_2MHZ   (ADC_CFG1_ADIV(0) + ADC_CFG1_ADICLK(0))
-
-    #define ADC_CFG1_VERY_LOW_SPEED (ADC_CFG1_1MHZ)
-    #define ADC_CFG1_LOW_SPEED (ADC_CFG1_2MHZ)
-    #define ADC_CFG1_MED_SPEED (ADC_CFG1_2MHZ)
-    #define ADC_CFG1_HI_SPEED_16_BITS (ADC_CFG1_2MHZ)
-    #define ADC_CFG1_HI_SPEED (ADC_CFG1_2MHZ)
-    #define ADC_CFG1_VERY_HIGH_SPEED ADC_CFG1_HI_SPEED
-
+#define ADC_MHz                (1000000) // not so many zeros
+// Min freq for 8-12 bit mode is 1 MHz
+#define ADC_MIN_FREQ         (1*ADC_MHz)
+// Max freq for 8-12 bit mode is 18 MHz and 24 MHz for Teensy 3.6
+#if defined(ADC_TEENSY_3_6)
+    #define ADC_MAX_FREQ    (24*ADC_MHz)
 #else
-#error "F_BUS must be 108, 60, 56, 54, 48, 40, 36, 24, 4 or 2 MHz"
+    #define ADC_MAX_FREQ    (18*ADC_MHz)
 #endif
+// Min freq for 16 bit mode is 2 MHz
+#define ADC_MIN_FREQ_16BITS  (2*ADC_MHz)
+// Max freq for 16 bit mode is 12 MHz
+#define ADC_MAX_FREQ_16BITS (12*ADC_MHz)
+
+// We can divide F_BUS by 1, 2, 4, 8, or 16:
+/*
+Divide by   ADC_CFG1_ADIV   ADC_CFG1_ADICLK TOTAL   VALUE
+1           0               0               0       0x00
+2           1               0               1       0x20
+4           2               0               2       0x40
+8           3               0               3       0x60
+16          3               1               4       0x61
+(Other combinations are possible)
+*/
+
+// Redefine from kinetis.h to remove (uint32_t) casts that the preprocessor doesn't understand
+// so we can do arithmetic with them when defining ADC_CFG1_MED_SPEED
+#define ADC_LIB_CFG1_ADIV(n)		(((n) & 3) << 5)
+#define ADC_LIB_CFG1_ADICLK(n)		(((n) & 3) << 0)
+
+// ADC_CFG1_VERY_LOW_SPEED is the lowest freq >= 1 MHz
+#if F_BUS/16 >= ADC_MIN_FREQ
+    #define ADC_CFG1_VERY_LOW_SPEED (ADC_LIB_CFG1_ADIV(3) + ADC_LIB_CFG1_ADICLK(1))
+#elif F_BUS/8 >= ADC_MIN_FREQ
+    #define ADC_CFG1_VERY_LOW_SPEED (ADC_LIB_CFG1_ADIV(3) + ADC_LIB_CFG1_ADICLK(0))
+#elif F_BUS/4 >= ADC_MIN_FREQ
+    #define ADC_CFG1_VERY_LOW_SPEED (ADC_LIB_CFG1_ADIV(2) + ADC_LIB_CFG1_ADICLK(0))
+#elif F_BUS/2 >= ADC_MIN_FREQ
+    #define ADC_CFG1_VERY_LOW_SPEED (ADC_LIB_CFG1_ADIV(1) + ADC_LIB_CFG1_ADICLK(0))
+#else
+    #define ADC_CFG1_VERY_LOW_SPEED (ADC_LIB_CFG1_ADIV(0) + ADC_LIB_CFG1_ADICLK(0))
+#endif
+
+// ADC_CFG1_LOW_SPEED is the lowest freq >= 2 MHz
+#if F_BUS/16 >= ADC_MIN_FREQ_16BITS
+    #define ADC_CFG1_LOW_SPEED (ADC_LIB_CFG1_ADIV(3) + ADC_LIB_CFG1_ADICLK(1))
+#elif F_BUS/8 >= ADC_MIN_FREQ_16BITS
+    #define ADC_CFG1_LOW_SPEED (ADC_LIB_CFG1_ADIV(3) + ADC_LIB_CFG1_ADICLK(0))
+#elif F_BUS/4 >= ADC_MIN_FREQ_16BITS
+    #define ADC_CFG1_LOW_SPEED (ADC_LIB_CFG1_ADIV(2) + ADC_LIB_CFG1_ADICLK(0))
+#elif F_BUS/2 >= ADC_MIN_FREQ_16BITS
+    #define ADC_CFG1_LOW_SPEED (ADC_LIB_CFG1_ADIV(1) + ADC_LIB_CFG1_ADICLK(0))
+#else
+    #define ADC_CFG1_LOW_SPEED (ADC_LIB_CFG1_ADIV(0) + ADC_LIB_CFG1_ADICLK(0))
+#endif
+
+// ADC_CFG1_HI_SPEED_16_BITS is the highest freq <= 12 MHz
+#if F_BUS <= ADC_MAX_FREQ_16BITS
+    #define ADC_CFG1_HI_SPEED_16_BITS (ADC_LIB_CFG1_ADIV(0) + ADC_LIB_CFG1_ADICLK(0))
+#elif F_BUS/2 <= ADC_MAX_FREQ_16BITS
+    #define ADC_CFG1_HI_SPEED_16_BITS (ADC_LIB_CFG1_ADIV(1) + ADC_LIB_CFG1_ADICLK(0))
+#elif F_BUS/4 <= ADC_MAX_FREQ_16BITS
+    #define ADC_CFG1_HI_SPEED_16_BITS (ADC_LIB_CFG1_ADIV(2) + ADC_LIB_CFG1_ADICLK(0))
+#elif F_BUS/8 <= ADC_MAX_FREQ_16BITS
+    #define ADC_CFG1_HI_SPEED_16_BITS (ADC_LIB_CFG1_ADIV(3) + ADC_LIB_CFG1_ADICLK(0))
+#else
+    #define ADC_CFG1_HI_SPEED_16_BITS (ADC_LIB_CFG1_ADIV(3) + ADC_LIB_CFG1_ADICLK(1))
+#endif
+
+// For ADC_CFG1_MED_SPEED the idea is to check if there's an unused setting between
+// ADC_CFG1_LOW_SPEED and ADC_CFG1_HI_SPEED_16_BITS
+#if (ADC_CFG1_LOW_SPEED - ADC_CFG1_HI_SPEED_16_BITS > 0x20) // higher values are slower speeds
+    #define ADC_CFG1_MED_SPEED  ((ADC_CFG1_HI_SPEED_16_BITS) + 0x20) // at least one divisor in between
+#else
+    #define ADC_CFG1_MED_SPEED  (ADC_CFG1_HI_SPEED_16_BITS)
+#endif
+
+// ADC_CFG1_HI_SPEED is the highest freq <= 18 MHz (24 for Teensy 3.6)
+#if F_BUS <= ADC_MAX_FREQ
+    #define ADC_CFG1_HI_SPEED (ADC_LIB_CFG1_ADIV(0) + ADC_LIB_CFG1_ADICLK(0))
+#elif F_BUS/2 <= ADC_MAX_FREQ
+    #define ADC_CFG1_HI_SPEED (ADC_LIB_CFG1_ADIV(1) + ADC_LIB_CFG1_ADICLK(0))
+#elif F_BUS/4 <= ADC_MAX_FREQ
+    #define ADC_CFG1_HI_SPEED (ADC_LIB_CFG1_ADIV(2) + ADC_LIB_CFG1_ADICLK(0))
+#elif F_BUS/8 <= ADC_MAX_FREQ
+    #define ADC_CFG1_HI_SPEED (ADC_LIB_CFG1_ADIV(3) + ADC_LIB_CFG1_ADICLK(0))
+#else
+    #define ADC_CFG1_HI_SPEED (ADC_LIB_CFG1_ADIV(3) + ADC_LIB_CFG1_ADICLK(1))
+#endif
+
+// ADC_CFG1_VERY_HIGH_SPEED >= ADC_CFG1_HI_SPEED and may be out of specs, but not more than ADC_VERY_HIGH_SPEED_FACTOR*ADC_MAX_FREQ
+#define ADC_VERY_HIGH_SPEED_FACTOR  (2)
+#if F_BUS <= ADC_VERY_HIGH_SPEED_FACTOR*ADC_MAX_FREQ
+    #define ADC_CFG1_VERY_HIGH_SPEED (ADC_LIB_CFG1_ADIV(0) + ADC_LIB_CFG1_ADICLK(0))
+#elif F_BUS/2 <= ADC_VERY_HIGH_SPEED_FACTOR*ADC_MAX_FREQ
+    #define ADC_CFG1_VERY_HIGH_SPEED (ADC_LIB_CFG1_ADIV(1) + ADC_LIB_CFG1_ADICLK(0))
+#elif F_BUS/4 <= ADC_VERY_HIGH_SPEED_FACTOR*ADC_MAX_FREQ
+    #define ADC_CFG1_VERY_HIGH_SPEED (ADC_LIB_CFG1_ADIV(2) + ADC_LIB_CFG1_ADICLK(0))
+#elif F_BUS/8 <= ADC_VERY_HIGH_SPEED_FACTOR*ADC_MAX_FREQ
+    #define ADC_CFG1_VERY_HIGH_SPEED (ADC_LIB_CFG1_ADIV(3) + ADC_LIB_CFG1_ADICLK(0))
+#else
+    #define ADC_CFG1_VERY_HIGH_SPEED (ADC_LIB_CFG1_ADIV(3) + ADC_LIB_CFG1_ADICLK(1))
+#endif
+
 
 
 // Settings for the power/speed of conversions/sampling
@@ -423,21 +400,95 @@ enum class ADC_SAMPLING_SPEED : uint8_t {
 #define ADC_ERROR_DIFF_VALUE (-70000)
 #define ADC_ERROR_VALUE ADC_ERROR_DIFF_VALUE
 
-// Error flag masks.
-// Possible errors are: other, calibration, wrong pin, analogRead, analogDifferentialRead, continuous, continuousDifferential
-// To globalLy disable an error simply change (1<<x) to (0<<x), revert to enable the error again.
-#define ADC_ERROR_ALL               0x3FF
-#define ADC_ERROR_CLEAR             0x0
-#define ADC_ERROR_OTHER             (1<<0)
-#define ADC_ERROR_CALIB             (1<<1)
-#define ADC_ERROR_WRONG_PIN         (1<<2)
-#define ADC_ERROR_ANALOG_READ       (1<<3)
-#define ADC_ERROR_COMPARISON        (1<<4)
-#define ADC_ERROR_ANALOG_DIFF_READ  (1<<5)
-#define ADC_ERROR_CONT              (1<<6)
-#define ADC_ERROR_CONT_DIFF         (1<<7)
-#define ADC_ERROR_WRONG_ADC         (0<<8)
-#define ADC_ERROR_SYNCH             (1<<9)
+//! Handle ADC errors
+namespace ADC_Error {
+
+    //! ADC errors.
+    /*! Use adc->printError() to print the errors (if any) in a human-readable form.
+    *   Use adc->resetError() to reset them.
+    */
+    enum class ADC_ERROR : uint16_t {
+        OTHER               = 1<<0, /*!< Other error not considered below. */
+        CALIB               = 1<<1, /*!< Calibration error. */
+        WRONG_PIN           = 1<<2, /*!< A pin was selected that cannot be read by this ADC module. */
+        ANALOG_READ         = 1<<3, /*!< Error inside the analogRead method. */
+        ANALOG_DIFF_READ    = 1<<4, /*!< Error inside the analogReadDifferential method. */
+        CONT                = 1<<5, /*!< Continuous single-ended measurement error. */
+        CONT_DIFF           = 1<<6, /*!< Continuous differential measurement error. */
+        COMPARISON          = 1<<7, /*!< Error during the comparison. */
+        WRONG_ADC           = 1<<8, /*!< A non-existent ADC module was selected. */
+        SYNCH               = 1<<9, /*!< Error during a synchronized measurement. */
+
+        CLEAR               = 0,    /*!< No error. */
+    };
+    //! OR operator for ADC_ERRORs.
+    inline constexpr ADC_ERROR operator|(ADC_ERROR lhs, ADC_ERROR rhs) {
+        return static_cast<ADC_ERROR> (static_cast<uint16_t>(lhs) | static_cast<uint16_t>(rhs));
+    }
+    //! AND operator for ADC_ERRORs.
+    inline constexpr ADC_ERROR operator&(ADC_ERROR lhs, ADC_ERROR rhs) {
+        return static_cast<ADC_ERROR> (static_cast<uint16_t>(lhs) & static_cast<uint16_t>(rhs));
+    }
+    //! |= operator for ADC_ERRORs, it changes the left hand side ADC_ERROR.
+    inline ADC_ERROR operator|=(volatile ADC_ERROR& lhs, ADC_ERROR rhs) {
+        return lhs = static_cast<ADC_ERROR> (static_cast<uint16_t>(lhs) | static_cast<uint16_t>(rhs));
+    }
+    //! &= operator for ADC_ERRORs, it changes the left hand side ADC_ERROR.
+    inline ADC_ERROR operator&=(volatile ADC_ERROR& lhs, ADC_ERROR rhs) {
+        return lhs = static_cast<ADC_ERROR> (static_cast<uint16_t>(lhs) & static_cast<uint16_t>(rhs));
+    }
+
+    //! Prints the human-readable error, if any.
+    inline void printError(ADC_ERROR fail_flag, uint8_t ADC_num = 0) {
+        if(fail_flag != ADC_ERROR::CLEAR) {
+            Serial.print("ADC"); Serial.print(ADC_num);
+            Serial.print(" error: ");
+            switch(fail_flag) {
+                case ADC_ERROR::CALIB:
+                    Serial.print("Calibration");
+                    break;
+                case ADC_ERROR::WRONG_PIN:
+                    Serial.print("Wrong pin");
+                    break;
+                case ADC_ERROR::ANALOG_READ:
+                    Serial.print("Analog read");
+                    break;
+                case ADC_ERROR::COMPARISON:
+                    Serial.print("Comparison");
+                    break;
+                case ADC_ERROR::ANALOG_DIFF_READ:
+                    Serial.print("Analog differential read");
+                    break;
+                case ADC_ERROR::CONT:
+                    Serial.print("Continuous read");
+                    break;
+                case ADC_ERROR::CONT_DIFF:
+                    Serial.print("Continuous differential read");
+                    break;
+                case ADC_ERROR::WRONG_ADC:
+                    Serial.print("Wrong ADC");
+                    break;
+                case ADC_ERROR::SYNCH:
+                    Serial.print("Synchronous");
+                    break;
+                case ADC_ERROR::OTHER:
+                case ADC_ERROR::CLEAR: // silence warnings
+                default:
+                    Serial.print("Unknown");
+                    break;
+            }
+            Serial.println(" error.");
+        }
+    }
+
+    //! Resets all errors from the ADC, if any.
+    inline void resetError(volatile ADC_ERROR& fail_flag) {
+        fail_flag = ADC_ERROR::CLEAR;
+    }
+
+}
+using ADC_Error::ADC_ERROR;
+
 
 // debug mode: blink the led light
 #define ADC_debug 0
@@ -918,54 +969,18 @@ public:
 
 
     //! This flag indicates that some kind of error took place
-    /** Use the defines at the beggining of this file to find out what caused the fail.
+    /** Use the defines at the beginning of this file to find out what caused the fail.
     */
-    volatile uint16_t fail_flag;
+    volatile ADC_ERROR fail_flag;
 
     //! Prints the human-readable error, if any.
     void printError() {
-        if(fail_flag != ADC_ERROR_CLEAR) {
-            Serial.print("ADC"); Serial.print(ADC_num);
-            Serial.print(" error: ");
-            switch(fail_flag) {
-                case ADC_ERROR_OTHER:
-                    Serial.print("Unknown");
-                    break;
-                case ADC_ERROR_CALIB:
-                    Serial.print("Calibration");
-                    break;
-                case ADC_ERROR_WRONG_PIN:
-                    Serial.print("Wrong pin");
-                    break;
-                case ADC_ERROR_ANALOG_READ:
-                    Serial.print("Analog read");
-                    break;
-                case ADC_ERROR_COMPARISON:
-                    Serial.print("Comparison");
-                    break;
-                case ADC_ERROR_ANALOG_DIFF_READ:
-                    Serial.print("Analog differential read");
-                    break;
-                case ADC_ERROR_CONT:
-                    Serial.print("Continuous read");
-                    break;
-                case ADC_ERROR_CONT_DIFF:
-                    Serial.print("Continuous differential read");
-                    break;
-                case ADC_ERROR_WRONG_ADC:
-                    Serial.print("Wrong ADC");
-                    break;
-                case ADC_ERROR_SYNCH:
-                    Serial.print("Synchronous");
-                    break;
-            }
-            Serial.println(" error.");
-        }
+        ADC_Error::printError(fail_flag, ADC_num);
     }
 
     //! Resets all errors from the ADC, if any.
     void resetError() {
-        fail_flag = ADC_ERROR_CLEAR;
+        ADC_Error::resetError(fail_flag);
     }
 
 

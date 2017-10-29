@@ -231,11 +231,11 @@ ADC::Sync_result ADC::analogSynchronizedRead(uint8_t pin0, uint8_t pin1) {
 
     // check pins
     if ( !adc0->checkPin(pin0) ) {
-        adc0->fail_flag |= ADC_ERROR_WRONG_PIN;
+        adc0->fail_flag |= ADC_ERROR::WRONG_PIN;
         return res;
     }
     if ( !adc1->checkPin(pin1) ) {
-        adc1->fail_flag |= ADC_ERROR_WRONG_PIN;
+        adc1->fail_flag |= ADC_ERROR::WRONG_PIN;
         return res;
     }
 
@@ -280,12 +280,12 @@ ADC::Sync_result ADC::analogSynchronizedRead(uint8_t pin0, uint8_t pin1) {
     if ( adc0->isComplete() ) { // conversion succeded
         res.result_adc0 = adc0->readSingle();
     } else { // comparison was false
-        adc0->fail_flag |= ADC_ERROR_COMPARISON;
+        adc0->fail_flag |= ADC_ERROR::COMPARISON;
     }
     if ( adc1->isComplete() ) { // conversion succeded
         res.result_adc1 = adc1->readSingle();
     } else { // comparison was false
-        adc1->fail_flag |= ADC_ERROR_COMPARISON;
+        adc1->fail_flag |= ADC_ERROR::COMPARISON;
     }
     __enable_irq();
 
@@ -316,11 +316,11 @@ ADC::Sync_result ADC::analogSynchronizedReadDifferential(uint8_t pin0P, uint8_t 
 
     // check pins
     if(!adc0->checkDifferentialPins(pin0P, pin0N)) {
-        adc0->fail_flag |= ADC_ERROR_WRONG_PIN;
+        adc0->fail_flag |= ADC_ERROR::WRONG_PIN;
         return res;   // all others are invalid
     }
     if(!adc1->checkDifferentialPins(pin1P, pin1N)) {
-        adc1->fail_flag |= ADC_ERROR_WRONG_PIN;
+        adc1->fail_flag |= ADC_ERROR::WRONG_PIN;
         return res;   // all others are invalid
     }
 
@@ -368,7 +368,7 @@ ADC::Sync_result ADC::analogSynchronizedReadDifferential(uint8_t pin0P, uint8_t 
             res.result_adc0 *= 2; // multiply by 2 as if it were really 16 bits, so that getMaxValue gives a correct value.
         }
     } else { // comparison was false
-        adc0->fail_flag |= ADC_ERROR_COMPARISON;
+        adc0->fail_flag |= ADC_ERROR::COMPARISON;
     }
     if (adc1->isComplete()) { // conversion succeded
         res.result_adc1 = adc1->readSingle();
@@ -376,7 +376,7 @@ ADC::Sync_result ADC::analogSynchronizedReadDifferential(uint8_t pin0P, uint8_t 
             res.result_adc1 *= 2; // multiply by 2 as if it were really 16 bits, so that getMaxValue gives a correct value.
         }
     } else { // comparison was false
-        adc1->fail_flag |= ADC_ERROR_COMPARISON;
+        adc1->fail_flag |= ADC_ERROR::COMPARISON;
     }
     __enable_irq();
 
@@ -407,11 +407,11 @@ bool ADC::startSynchronizedSingleRead(uint8_t pin0, uint8_t pin1) {
 
     // check pins
     if ( !adc0->checkPin(pin0) ) {
-        adc0->fail_flag |= ADC_ERROR_WRONG_PIN;
+        adc0->fail_flag |= ADC_ERROR::WRONG_PIN;
         return false;
     }
     if ( !adc1->checkPin(pin1) ) {
-        adc1->fail_flag |= ADC_ERROR_WRONG_PIN;
+        adc1->fail_flag |= ADC_ERROR::WRONG_PIN;
         return false;
     }
 
@@ -458,11 +458,11 @@ bool ADC::startSynchronizedSingleDifferential(uint8_t pin0P, uint8_t pin0N, uint
 
     // check pins
     if(!adc0->checkDifferentialPins(pin0P, pin0N)) {
-        adc0->fail_flag |= ADC_ERROR_WRONG_PIN;
+        adc0->fail_flag |= ADC_ERROR::WRONG_PIN;
         return false;   // all others are invalid
     }
     if(!adc1->checkDifferentialPins(pin1P, pin1N)) {
-        adc1->fail_flag |= ADC_ERROR_WRONG_PIN;
+        adc1->fail_flag |= ADC_ERROR::WRONG_PIN;
         return false;   // all others are invalid
     }
 
@@ -521,11 +521,11 @@ bool ADC::startSynchronizedContinuous(uint8_t pin0, uint8_t pin1) {
 
     // check pins
     if ( !adc0->checkPin(pin0) ) {
-        adc0->fail_flag |= ADC_ERROR_WRONG_PIN;
+        adc0->fail_flag |= ADC_ERROR::WRONG_PIN;
         return false;
     }
     if ( !adc1->checkPin(pin1) ) {
-        adc1->fail_flag |= ADC_ERROR_WRONG_PIN;
+        adc1->fail_flag |= ADC_ERROR::WRONG_PIN;
         return false;
     }
 
@@ -553,11 +553,11 @@ bool ADC::startSynchronizedContinuousDifferential(uint8_t pin0P, uint8_t pin0N, 
 
     // check pins
     if(!adc0->checkDifferentialPins(pin0P, pin0N)) {
-        adc0->fail_flag |= ADC_ERROR_WRONG_PIN;
+        adc0->fail_flag |= ADC_ERROR::WRONG_PIN;
         return false;   // all others are invalid
     }
     if(!adc1->checkDifferentialPins(pin1P, pin1N)) {
-        adc1->fail_flag |= ADC_ERROR_WRONG_PIN;
+        adc1->fail_flag |= ADC_ERROR::WRONG_PIN;
         return false;   // all others are invalid
     }
 
