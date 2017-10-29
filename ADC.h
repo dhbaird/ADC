@@ -46,14 +46,184 @@
 */
 class ADC
 {
-    protected:
-    private:
+    public:
+        #if defined(ADC_TEENSY_3_0)
+        //! Translate pin number to SC1A nomenclature
+        static constexpr const uint8_t channel2sc1aADC0[ADC_MAX_PIN+1]= { // new version, gives directly the sc1a number. 0x1F=31 deactivates the ADC.
+            5, 14, 8, 9, 13, 12, 6, 7, 15, 4, 0, 19, 3, 21, // 0-13, we treat them as A0-A13
+            5, 14, 8, 9, 13, 12, 6, 7, 15, 4, // 14-23 (A0-A9)
+            31, 31, 31, 31, 31, 31, 31, 31, 31, 31, // 24-33
+            0+ADC_SC1A_PIN_DIFF, 19+ADC_SC1A_PIN_DIFF, 3+ADC_SC1A_PIN_DIFF, 21+ADC_SC1A_PIN_DIFF, // 34-37 (A10-A13)
+            26, 22, 23, 27, 29, 30 // 38-43: temp. sensor, VREF_OUT, A14, bandgap, VREFH, VREFL. A14 isn't connected to anything in Teensy 3.0.
+        };
+        #elif defined(ADC_TEENSY_3_1) // the only difference with 3.0 is that A13 is not connected to ADC0 and that T3.1 has PGA.
+        //! Translate pin number to SC1A nomenclature
+        static constexpr const uint8_t channel2sc1aADC0[ADC_MAX_PIN+1]= { // new version, gives directly the sc1a number. 0x1F=31 deactivates the ADC.
+            5, 14, 8, 9, 13, 12, 6, 7, 15, 4, 0, 19, 3, 31, // 0-13, we treat them as A0-A13
+            5, 14, 8, 9, 13, 12, 6, 7, 15, 4, // 14-23 (A0-A9)
+            31, 31, 31, 31, 31, 31, 31, 31, 31, 31, // 24-33
+            0+ADC_SC1A_PIN_DIFF, 19+ADC_SC1A_PIN_DIFF, 3+ADC_SC1A_PIN_DIFF, 31+ADC_SC1A_PIN_DIFF, // 34-37 (A10-A13)
+            26, 22, 23, 27, 29, 30 // 38-43: temp. sensor, VREF_OUT, A14, bandgap, VREFH, VREFL. A14 isn't connected to anything in Teensy 3.0.
+        };
+        #elif defined(ADC_TEENSY_LC)
+        //! Translate pin number to SC1A nomenclature
+        static constexpr const uint8_t channel2sc1aADC0[ADC_MAX_PIN+1]= { // new version, gives directly the sc1a number. 0x1F=31 deactivates the ADC.
+            5, 14, 8, 9, 13, 12, 6, 7, 15, 11, 0, 4+ADC_SC1A_PIN_MUX, 23, 31, // 0-13, we treat them as A0-A12 + A13= doesn't exist
+            5, 14, 8, 9, 13, 12, 6, 7, 15, 11, // 14-23 (A0-A9)
+            0+ADC_SC1A_PIN_DIFF, 4+ADC_SC1A_PIN_MUX+ADC_SC1A_PIN_DIFF, 23, 31, 31, 31, 31, 31, 31, 31, // 24-33 ((A10-A12) + nothing), A11 uses mux a
+            31, 31, 31, 31, // 34-37 nothing
+            26, 27, 31, 27, 29, 30 // 38-43: temp. sensor, , , bandgap, VREFH, VREFL.
+        };
+        #elif defined(ADC_TEENSY_3_5)
+        //! Translate pin number to SC1A nomenclature
+        static constexpr const uint8_t channel2sc1aADC0[ADC_MAX_PIN+1]= { // new version, gives directly the sc1a number. 0x1F=31 deactivates the ADC.
+            5, 14, 8, 9, 13, 12, 6, 7, 15, 4, 3, 31, 31, 31, // 0-13, we treat them as A0-A13
+            5, 14, 8, 9, 13, 12, 6, 7, 15, 4, // 14-23 (A0-A9)
+            26, 27, 29, 30, 31, 31, 31, // 24-30: Temp_Sensor, bandgap, VREFH, VREFL.
+            31, 31, 17, 18,// 31-34 A12(ADC1), A13(ADC1), A14, A15
+            31, 31, 31, 31, 31, 31, 31, 31, 31, // 35-43
+            31, 31, 31, 31, 31, 31, 31, 31, 31, // 44-52
+            31, 31, 31, 31, 31, 31, 31, 31, 31, // 53-61
+            31, 31, 3+ADC_SC1A_PIN_DIFF, 31+ADC_SC1A_PIN_DIFF, 23, 31, 1, 31 // 62-69 64: A10, 65: A11 (NOT CONNECTED), 66: A21, 68: A25 (no diff)
+        };
+        #elif defined(ADC_TEENSY_3_6)
+        //! Translate pin number to SC1A nomenclature
+        static constexpr const uint8_t channel2sc1aADC0[ADC_MAX_PIN+1]= { // new version, gives directly the sc1a number. 0x1F=31 deactivates the ADC.
+            5, 14, 8, 9, 13, 12, 6, 7, 15, 4, 3, 31, 31, 31, // 0-13, we treat them as A0-A13
+            5, 14, 8, 9, 13, 12, 6, 7, 15, 4, // 14-23 (A0-A9)
+            26, 27, 29, 30, 31, 31, 31, // 24-30: Temp_Sensor, bandgap, VREFH, VREFL.
+            31, 31, 17, 18,// 31-34 A12(ADC1), A13(ADC1), A14, A15
+            31, 31, 31, 31, 31, 31, 31, 31, 31, // 35-43
+            31, 31, 31, 31, 31, 31, 31, 31, 31, // 44-52
+            31, 31, 31, 31, 31, 31, 31, 31, 31, // 53-61
+            31, 31, 3+ADC_SC1A_PIN_DIFF, 31+ADC_SC1A_PIN_DIFF, 23, 31 // 62-67 64: A10, 65: A11 (NOT CONNECTED), 66: A21, 67: A22(ADC1)
+        };
+        #endif // defined
+
+
+        #if ADC_NUM_ADCS>1
+        #if defined(ADC_TEENSY_3_1)
+        //! Translate pin number to SC1A nomenclature
+        static constexpr const uint8_t channel2sc1aADC1[ADC_MAX_PIN+1]= { // new version, gives directly the sc1a number. 0x1F=31 deactivates the ADC.
+            31, 31, 8, 9, 31, 31, 31, 31, 31, 31, 3, 31, 0, 19, // 0-13, we treat them as A0-A13
+            31, 31, 8, 9, 31, 31, 31, 31, 31, 31, // 14-23 (A0-A9)
+            31, 31,  // 24,25 are digital only pins
+            5+ADC_SC1A_PIN_MUX, 5, 4, 6, 7, 4+ADC_SC1A_PIN_MUX, 31, 31, // 26-33 26=5a, 27=5b, 28=4b, 29=6b, 30=7b, 31=4a, 32,33 are digital only
+            3+ADC_SC1A_PIN_DIFF, 31+ADC_SC1A_PIN_DIFF, 0+ADC_SC1A_PIN_DIFF, 19+ADC_SC1A_PIN_DIFF, // 34-37 (A10-A13) A11 isn't connected.
+            26, 18, 31, 27, 29, 30 // 38-43: temp. sensor, VREF_OUT, A14 (not connected), bandgap, VREFH, VREFL.
+        };
+        #elif defined(ADC_TEENSY_3_5)
+        //! Translate pin number to SC1A nomenclature
+        static constexpr const uint8_t channel2sc1aADC1[ADC_MAX_PIN+1]= { // new version, gives directly the sc1a number. 0x1F=31 deactivates the ADC.
+            31, 31, 8, 9, 31, 31, 31, 31, 31, 31, 31, 19, 14, 15, // 0-13, we treat them as A0-A13
+            31, 31, 8, 9, 31, 31, 31, 31, 31, 31, // 14-23 (A0-A9)
+            26, 27, 29, 30, 18, 31, 31,  // 24-30: Temp_Sensor, bandgap, VREFH, VREFL, VREF_OUT
+            14, 15, 31, 31, 4, 5, 6, 7, 17, // 31-39 A12-A20
+            31, 31, 31, 31, // 40-43
+            31, 31, 31, 31, 31, 10, 11, 31, 31, // 44-52, 49: A23, 50: A24
+            31, 31, 31, 31, 31, 31, 31, 31, 31, // 53-61
+            31, 31, 0+ADC_SC1A_PIN_DIFF, 19+ADC_SC1A_PIN_DIFF, 31, 23, 31, 1 // 62-69 64: A10, 65: A11, 67: A22, 69: A26 (not diff)
+        };
+        #elif defined(ADC_TEENSY_3_6)
+        //! Translate pin number to SC1A nomenclature
+        static constexpr const uint8_t channel2sc1aADC1[ADC_MAX_PIN+1]= { // new version, gives directly the sc1a number. 0x1F=31 deactivates the ADC.
+            31, 31, 8, 9, 31, 31, 31, 31, 31, 31, 31, 19, 14, 15, // 0-13, we treat them as A0-A13
+            31, 31, 8, 9, 31, 31, 31, 31, 31, 31, // 14-23 (A0-A9)
+            26, 27, 29, 30, 18, 31, 31,  // 24-30: Temp_Sensor, bandgap, VREFH, VREFL, VREF_OUT
+            14, 15, 31, 31, 4, 5, 6, 7, 17, // 31-39 A12-A20
+            31, 31, 31, 23, // 40-43: A10(ADC0), A11(ADC0), A21, A22
+            31, 31, 31, 31, 31, 10, 11, 31, 31, // 44-52, 49: A23, 50: A24
+            31, 31, 31, 31, 31, 31, 31, 31, 31, // 53-61
+            31, 31, 0+ADC_SC1A_PIN_DIFF, 19+ADC_SC1A_PIN_DIFF, 31, 23 // 61-67 64: A10, 65: A11, 66: A21(ADC0), 67: A22
+        };
+        #endif
+        #endif // ADC_NUM_ADCS > 1
+
+        #if defined(ADC_TEENSY_3_0) || defined(ADC_TEENSY_3_1)
+        //! Translate pin number to SC1A nomenclature for differential pins
+        static constexpr const uint8_t sc1a2channelADC0[ADC_MAX_PIN+1]= { // new version, gives directly the pin number
+            34, 0, 0, 36, 23, 14, 20, 21, 16, 17, 0, 0, 19, 18, // 0-13
+            15, 22, 23, 0, 0, 35, 0, 37, // 14-21
+            39, 40, 0, 0, 38, 41, 42, 43, // VREF_OUT, A14, temp. sensor, bandgap, VREFH, VREFL.
+            0 // 31 means disabled, but just in case
+        };
+        #elif defined(ADC_TEENSY_LC)
+        //! Translate pin number to SC1A nomenclature for differential pins
+        static constexpr const uint8_t sc1a2channelADC0[ADC_MAX_PIN+1]= { // new version, gives directly the pin number
+            24, 0, 0, 0, 25, 14, 20, 21, 16, 17, 0, 23, 19, 18, // 0-13
+            15, 22, 23, 0, 0, 0, 0, 0, // 14-21
+            26, 0, 0, 0, 38, 41, 0, 42, 43, // A12, temp. sensor, bandgap, VREFH, VREFL.
+            0 // 31 means disabled, but just in case
+        };
+        #elif defined(ADC_TEENSY_3_5) || defined(ADC_TEENSY_3_6)
+        //! Translate pin number to SC1A nomenclature for differential pins
+        static constexpr const uint8_t sc1a2channelADC0[ADC_MAX_PIN+1]= { // new version, gives directly the pin number
+            0, 68, 0, 64, 23, 14, 20, 21, 16, 17, 0, 0, 19, 18, // 0-13
+            15, 22, 0, 33, 34, 0, 0, 0, // 14-21
+            0, 66, 0, 0, 70, 0, 0, 0, // 22-29
+            0 // 31 means disabled, but just in case
+        };
+        #endif // defined
+
+        #if ADC_NUM_ADCS>1
+        #if defined(ADC_TEENSY_3_1)
+        //! Translate pin number to SC1A nomenclature for differential pins
+        static constexpr const uint8_t sc1a2channelADC1[ADC_MAX_PIN+1]= { // new version, gives directly the pin number
+            36, 0, 0, 34, 28, 26, 29, 30, 16, 17, 0, 0, 0, 0, // 0-13. 5a=26, 5b=27, 4b=28, 4a=31
+            0, 0, 0, 0, 39, 37, 0, 0, // 14-21
+            0, 0, 0, 0, 38, 41, 0, 42, // 22-29. VREF_OUT, A14, temp. sensor, bandgap, VREFH, VREFL.
+            43
+        };
+        #elif defined(ADC_TEENSY_3_5) || defined(ADC_TEENSY_3_6)
+        //! Translate pin number to SC1A nomenclature for differential pins
+        static constexpr const uint8_t sc1a2channelADC1[ADC_MAX_PIN+1]= { // new version, gives directly the pin number
+            0, 69, 0, 0, 35, 36, 37, 38, 0, 0, 49, 50, 0, 0, // 0-13.
+            31, 32, 0, 39, 71, 65, 0, 0, // 14-21
+            0, 67, 0, 0, 0, 0, 0, 0, // 22-29.
+            0
+        };
+        #endif
+        #endif // ADC_NUM_ADCS>1
+
+
+        #if defined(ADC_TEENSY_3_1)
+        //! Translate differential pin number to SC1A nomenclature
+        static constexpr const ADC_Module::ADC_NLIST diff_table_ADC0[ADC_DIFF_PAIRS]= {
+            {A10, 0+ADC_SC1A_PIN_PGA}, {A12, 3}
+        };
+        //! Translate differential pin number to SC1A nomenclature
+        static constexpr const ADC_Module::ADC_NLIST diff_table_ADC1[ADC_DIFF_PAIRS]= {
+            {A10, 3}, {A12, 0+ADC_SC1A_PIN_PGA}
+        };
+        #elif defined(ADC_TEENSY_3_0)
+        //! Translate differential pin number to SC1A nomenclature
+        static constexpr const ADC_Module::ADC_NLIST diff_table_ADC0[ADC_DIFF_PAIRS]= {
+            {A10, 0}, {A12, 3}
+        };
+        #elif defined(ADC_TEENSY_LC)
+        //! Translate differential pin number to SC1A nomenclature
+        static constexpr const ADC_Module::ADC_NLIST diff_table_ADC0[ADC_DIFF_PAIRS]= {
+            {A10, 0}
+        };
+        #elif defined(ADC_TEENSY_3_5) || defined(ADC_TEENSY_3_6)
+        //! Translate differential pin number to SC1A nomenclature
+        static constexpr const ADC_Module::ADC_NLIST diff_table_ADC0[ADC_DIFF_PAIRS]= {
+            {A10, 3}
+        };
+        //! Translate differential pin number to SC1A nomenclature
+        static constexpr const ADC_Module::ADC_NLIST diff_table_ADC1[ADC_DIFF_PAIRS]= {
+            {A10, 0}
+        };
+        #endif
+
 
         // ADCs objects
-        ADC_Module adc0_obj;
+        static ADC_Module adc0_obj;
         #if ADC_NUM_ADCS>1
-        ADC_Module adc1_obj;
+        static ADC_Module adc1_obj;
         #endif
+
+    private:
 
         // Number of ADC objects
         const uint8_t num_ADCs = ADC_NUM_ADCS;
@@ -140,7 +310,18 @@ class ADC
     public:
 
         /** Default constructor */
-        ADC();
+        constexpr ADC() {
+            //ctor
+
+            //digitalWriteFast(LED_BUILTIN, HIGH);
+
+            // make sure the clocks to the ADC are on
+            atomic::setBitFlag(SIM_SCGC6, SIM_SCGC6_ADC0);
+            #if ADC_NUM_ADCS>1
+            atomic::setBitFlag(SIM_SCGC3, SIM_SCGC3_ADC1);
+            #endif
+
+        }
 
         // create both adc objects
 
@@ -664,31 +845,6 @@ class ADC
                 adc[i]->resetError();
             }
         }
-
-
-        //! Translate pin number to SC1A nomenclature
-        // should this be a constexpr?
-        static const uint8_t channel2sc1aADC0[ADC_MAX_PIN+1];
-        #if ADC_NUM_ADCS>1
-        //! Translate pin number to SC1A nomenclature
-        static const uint8_t channel2sc1aADC1[ADC_MAX_PIN+1];
-        #endif
-
-        //! Translate pin number to SC1A nomenclature for differential pins
-        static const uint8_t sc1a2channelADC0[ADC_MAX_PIN+1];
-        #if ADC_NUM_ADCS>1
-        //! Translate pin number to SC1A nomenclature for differential pins
-        static const uint8_t sc1a2channelADC1[ADC_MAX_PIN+1];
-        #endif
-
-
-        //! Translate differential pin number to SC1A nomenclature
-        static const ADC_Module::ADC_NLIST diff_table_ADC0[ADC_DIFF_PAIRS];
-        #if ADC_NUM_ADCS>1
-        //! Translate differential pin number to SC1A nomenclature
-        static const ADC_Module::ADC_NLIST diff_table_ADC1[ADC_DIFF_PAIRS];
-        #endif
-
 
 };
 
