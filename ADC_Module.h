@@ -854,6 +854,10 @@ public:
     */
     void startDifferentialFast(uint8_t pinP, uint8_t pinN);
 
+    //! Get the conversion's result
+    uint16_t getResult() __attribute__((always_inline)) {
+        return (uint16_t)(uint32_t)ADC_RA;
+    }
 
     //////////////// BLOCKING CONVERSION METHODS //////////////////
 

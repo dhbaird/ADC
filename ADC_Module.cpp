@@ -891,8 +891,8 @@ int ADC_Module::analogRead(uint8_t pin) {
     // it's done, check if the comparison (if any) was true
     int32_t result;
     __disable_irq(); // make sure nothing interrupts this part
-    if (isComplete()) { // conversion succeded
-        result = (uint16_t)ADC_RA;
+    if (isComplete()) { // conversion succeeded
+        result = (uint16_t)getResult();
     } else { // comparison was false
         fail_flag |= ADC_ERROR::COMPARISON;
         result = ADC_ERROR_VALUE;
@@ -961,7 +961,7 @@ int ADC_Module::analogReadDifferential(uint8_t pinP, uint8_t pinN) {
     int32_t result;
     __disable_irq(); // make sure nothing interrupts this part
     if (isComplete()) { // conversion succeded
-        result = (int16_t)(int32_t)ADC_RA; // cast to 32 bits
+        result = (int16_t)getResult(); // cast to signed 16 bits
         if(res==16) { // 16 bit differential is actually 15 bit + 1 bit sign
             result *= 2; // multiply by 2 as if it were really 16 bits, so that getMaxValue gives a correct value.
         }
