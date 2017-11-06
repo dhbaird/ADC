@@ -309,21 +309,19 @@ class ADC
 
     public:
 
-        /** Default constructor */
-        constexpr ADC() {
-            //ctor
-
-            //digitalWriteFast(LED_BUILTIN, HIGH);
-
+        //! Constructor
+        ADC() {
             // make sure the clocks to the ADC are on
             atomic::setBitFlag(SIM_SCGC6, SIM_SCGC6_ADC0);
             #if ADC_NUM_ADCS>1
             atomic::setBitFlag(SIM_SCGC3, SIM_SCGC3_ADC1);
             #endif
 
+            adc0->analog_init();
+            #if ADC_NUM_ADCS>1
+            adc1->analog_init();
+            #endif
         }
-
-        // create both adc objects
 
         //! Object to control the ADC0
         ADC_Module *const adc0 = &adc0_obj; // adc object pointer
