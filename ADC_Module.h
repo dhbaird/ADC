@@ -581,6 +581,9 @@ public:
 
     }
 
+    //! Initialize ADC
+    void analog_init();
+
 
     //! Starts the calibration sequence, waits until it's done and writes the results
     /** Usually it's not necessary to call this function directly, but do it if the "environment" changed
@@ -1086,9 +1089,6 @@ private:
         return ADC_SC1A_PIN_INVALID;
     }
 
-
-    //! Initialize ADC
-    void analog_init();
 
     // registers point to the correct ADC module
     typedef volatile uint32_t& reg;
