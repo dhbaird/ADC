@@ -38,10 +38,15 @@
 
 // Explicit template instantiation
 template class ADC_Module<0>;
+#if ADC_NUM_ADCS>1
 template class ADC_Module<1>;
+#endif
 
 constexpr const uint8_t Channel2SC1A<0>::channel2sc1a[];
+#if ADC_NUM_ADCS>1
 constexpr const uint8_t Channel2SC1A<1>::channel2sc1a[];
+#endif
+
 
 
 /* Initialize stuff:

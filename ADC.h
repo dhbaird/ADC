@@ -89,7 +89,11 @@ class ADC
         *   \param adc_num ADC_NUM enum member. Selects the ADC module to use.
         */
         void setReference(ADC_REFERENCE type, ADC_NUM adc_num = ADC_NUM::ADC_0) __attribute__((always_inline)) {
+            #if ADC_NUM_ADCS==1
+            adc0->setReference(type);
+            #else
             adc_num == ADC_NUM::ADC_0 ? adc0->setReference(type) : adc1->setReference(type);
+            #endif
         }
 
 
@@ -104,7 +108,11 @@ class ADC
         *   \param adc_num ADC_NUM enum member. Selects the ADC module to use.
         */
         void setResolution(uint8_t bits, ADC_NUM adc_num = ADC_NUM::ADC_0) __attribute__((always_inline)) {
+            #if ADC_NUM_ADCS==1
+            adc0->setResolution(bits);
+            #else
             adc_num == ADC_NUM::ADC_0 ? adc0->setResolution(bits) : adc1->setResolution(bits);
+            #endif
         }
 
         //! Returns the resolution of the ADC_Module.
@@ -113,7 +121,11 @@ class ADC
         *   \return the resolution of adc_num ADC.
         */
         uint8_t getResolution(ADC_NUM adc_num = ADC_NUM::ADC_0) __attribute__((always_inline)) {
+            #if ADC_NUM_ADCS==1
+            return adc0->getResolution();
+            #else
             return adc_num == ADC_NUM::ADC_0 ? adc0->getResolution() : adc1->getResolution();
+            #endif
         }
 
         //! Returns the maximum value for a measurement: 2^res-1.
@@ -122,7 +134,11 @@ class ADC
         *   \return the maximum value of adc_num ADC.
         */
         uint32_t getMaxValue(ADC_NUM adc_num = ADC_NUM::ADC_0) __attribute__((always_inline)) {
+            #if ADC_NUM_ADCS==1
+            return adc0->getMaxValue();
+            #else
             return adc_num == ADC_NUM::ADC_0 ? adc0->getMaxValue() : adc1->getMaxValue();
+            #endif
         }
 
 
@@ -146,7 +162,11 @@ class ADC
         *   \param adc_num ADC_NUM enum member. Selects the ADC module to use.
         */
         void setConversionSpeed(ADC_CONVERSION_SPEED speed, ADC_NUM adc_num = ADC_NUM::ADC_0) __attribute__((always_inline)) {
+            #if ADC_NUM_ADCS==1
+            adc0->setConversionSpeed(speed);
+            #else
             adc_num == ADC_NUM::ADC_0 ? adc0->setConversionSpeed(speed) : adc1->setConversionSpeed(speed);
+            #endif
         }
 
 
@@ -162,7 +182,11 @@ class ADC
         *   \param adc_num ADC_NUM enum member. Selects the ADC module to use.
         */
         void setSamplingSpeed(ADC_SAMPLING_SPEED speed, ADC_NUM adc_num = ADC_NUM::ADC_0) __attribute__((always_inline)) {
+            #if ADC_NUM_ADCS==1
+            adc0->setSamplingSpeed(speed);
+            #else
             adc_num == ADC_NUM::ADC_0 ? adc0->setSamplingSpeed(speed) : adc1->setSamplingSpeed(speed);
+            #endif
         }
 
 
@@ -172,7 +196,11 @@ class ADC
         *   \param adc_num ADC_NUM enum member. Selects the ADC module to use.
         */
         void setAveraging(uint8_t num, ADC_NUM adc_num = ADC_NUM::ADC_0) __attribute__((always_inline)) {
+            #if ADC_NUM_ADCS==1
+            adc0->setAveraging(num);
+            #else
             adc_num == ADC_NUM::ADC_0 ? adc0->setAveraging(num) : adc1->setAveraging(num);
+            #endif
         }
 
 
@@ -182,7 +210,11 @@ class ADC
         *   \param adc_num ADC_NUM enum member. Selects the ADC module to use.
         */
         void enableInterrupts(ADC_NUM adc_num = ADC_NUM::ADC_0) __attribute__((always_inline)) {
+            #if ADC_NUM_ADCS==1
+            adc0->enableInterrupts();
+            #else
             adc_num == ADC_NUM::ADC_0 ? adc0->enableInterrupts() : adc1->enableInterrupts();
+            #endif
         }
 
         //! Disable interrupts
@@ -190,7 +222,11 @@ class ADC
         *   \param adc_num ADC_NUM enum member. Selects the ADC module to use.
         */
         void disableInterrupts(ADC_NUM adc_num = ADC_NUM::ADC_0) __attribute__((always_inline)) {
+            #if ADC_NUM_ADCS==1
+            adc0->disableInterrupts();
+            #else
             adc_num == ADC_NUM::ADC_0 ? adc0->disableInterrupts() : adc1->disableInterrupts();
+            #endif
         }
 
 
@@ -200,7 +236,11 @@ class ADC
         *   \param adc_num ADC_NUM enum member. Selects the ADC module to use.
         */
         void enableDMA(ADC_NUM adc_num = ADC_NUM::ADC_0) __attribute__((always_inline)) {
+            #if ADC_NUM_ADCS==1
+            adc0->enableDMA();
+            #else
             adc_num == ADC_NUM::ADC_0 ? adc0->enableDMA() : adc1->enableDMA();
+            #endif
         }
 
         //! Disable ADC DMA request
@@ -208,7 +248,11 @@ class ADC
         *   \param adc_num ADC_NUM enum member. Selects the ADC module to use.
         */
         void disableDMA(ADC_NUM adc_num = ADC_NUM::ADC_0) __attribute__((always_inline)) {
+            #if ADC_NUM_ADCS==1
+            adc0->disableDMA();
+            #else
             adc_num == ADC_NUM::ADC_0 ? adc0->disableDMA() : adc1->disableDMA();
+            #endif
         }
 
 
@@ -222,7 +266,11 @@ class ADC
         *   \param adc_num ADC_NUM enum member. Selects the ADC module to use.
         */
         void enableCompare(int16_t compValue, bool greaterThan, ADC_NUM adc_num = ADC_NUM::ADC_0) __attribute__((always_inline)) {
+            #if ADC_NUM_ADCS==1
+            adc0->enableCompare(compValue, greaterThan);
+            #else
             adc_num == ADC_NUM::ADC_0 ? adc0->enableCompare(compValue, greaterThan) : adc1->enableCompare(compValue, greaterThan);
+            #endif
         }
 
         //! Enable the compare function to a range
@@ -238,7 +286,11 @@ class ADC
         *   \param adc_num ADC_NUM enum member. Selects the ADC module to use.
         */
         void enableCompareRange(int16_t lowerLimit, int16_t upperLimit, bool insideRange, bool inclusive, ADC_NUM adc_num = ADC_NUM::ADC_0)  {
+            #if ADC_NUM_ADCS==1
+            adc0->enableCompareRange(lowerLimit, upperLimit, insideRange, inclusive);
+            #else
             adc_num == ADC_NUM::ADC_0 ? adc0->enableCompareRange(lowerLimit, upperLimit, insideRange, inclusive) : adc1->enableCompareRange(lowerLimit, upperLimit, insideRange, inclusive);
+            #endif
         }
 
         //! Disable the compare function
@@ -246,7 +298,11 @@ class ADC
         *   \param adc_num ADC_NUM enum member. Selects the ADC module to use.
         */
         void disableCompare(ADC_NUM adc_num = ADC_NUM::ADC_0) __attribute__((always_inline)) {
+            #if ADC_NUM_ADCS==1
+            adc0->disableCompare();
+            #else
             adc_num == ADC_NUM::ADC_0 ? adc0->disableCompare() : adc1->disableCompare();
+            #endif
         }
 
 
@@ -257,7 +313,11 @@ class ADC
         *   \param adc_num ADC_NUM enum member. Selects the ADC module to use.
         */
         void enablePGA(uint8_t gain, ADC_NUM adc_num = ADC_NUM::ADC_0) __attribute__((always_inline)) {
+            #if ADC_NUM_ADCS==1
+            adc0->enablePGA(gain);
+            #else
             adc_num == ADC_NUM::ADC_0 ? adc0->enablePGA(gain) : adc1->enablePGA(gain);
+            #endif
         }
 
         //! Returns the PGA level
@@ -266,7 +326,11 @@ class ADC
         *   \return PGA level = from 1 to 64
         */
         uint8_t getPGA(ADC_NUM adc_num = ADC_NUM::ADC_0) __attribute__((always_inline)) {
+            #if ADC_NUM_ADCS==1
+            return adc0->getPGA();
+            #else
             return adc_num == ADC_NUM::ADC_0 ? adc0->getPGA() : adc1->getPGA();
+            #endif
         }
 
         //! Disable PGA
@@ -274,7 +338,11 @@ class ADC
         *   \param adc_num ADC_NUM enum member. Selects the ADC module to use.
         */
         void disablePGA(ADC_NUM adc_num = ADC_NUM::ADC_0) __attribute__((always_inline)) {
+            #if ADC_NUM_ADCS==1
+            adc0->disablePGA();
+            #else
             return adc_num == ADC_NUM::ADC_0 ? adc0->disablePGA() : adc1->disablePGA();
+            #endif
         }
 
 
@@ -286,7 +354,11 @@ class ADC
         *   \return true if yes, false if not.
         */
         bool isConverting(ADC_NUM adc_num = ADC_NUM::ADC_0) __attribute__((always_inline)) {
+            #if ADC_NUM_ADCS==1
+            return adc0->isConverting();
+            #else
             return adc_num == ADC_NUM::ADC_0 ? adc0->isConverting() : adc1->isConverting();
+            #endif
         }
 
         //! Is an ADC conversion ready?
@@ -296,7 +368,11 @@ class ADC
         *   \return true if yes, false if not.
         */
         bool isComplete(ADC_NUM adc_num = ADC_NUM::ADC_0) __attribute__((always_inline)) {
+            #if ADC_NUM_ADCS==1
+            return adc0->isComplete();
+            #else
             return adc_num == ADC_NUM::ADC_0 ? adc0->isComplete() : adc1->isComplete();
+            #endif
         }
 
         //! Is the ADC in differential mode?
@@ -305,7 +381,11 @@ class ADC
         *   \return true or false
         */
         bool isDifferential(ADC_NUM adc_num = ADC_NUM::ADC_0) __attribute__((always_inline)) {
+            #if ADC_NUM_ADCS==1
+            return adc0->isDifferential();
+            #else
             return adc_num == ADC_NUM::ADC_0 ? adc0->isDifferential() : adc1->isDifferential();
+            #endif
         }
 
         //! Is the ADC in continuous mode?
@@ -314,7 +394,11 @@ class ADC
         *   \return true or false
         */
         bool isContinuous(ADC_NUM adc_num = ADC_NUM::ADC_0) __attribute__((always_inline)) {
+            #if ADC_NUM_ADCS==1
+            return adc0->isContinuous();
+            #else
             return adc_num == ADC_NUM::ADC_0 ? adc0->isContinuous() : adc1->isContinuous();
+            #endif
         }
 
 
@@ -515,7 +599,11 @@ class ADC
         *   \return the converted value.
         */
         int readSingle(ADC_NUM adc_num = ADC_NUM::ADC_0) __attribute__((always_inline)) {
+            #if ADC_NUM_ADCS==1
+            return adc0->readSingle();
+            #else
             return adc_num == ADC_NUM::ADC_0 ? adc0->readSingle() : adc1->readSingle();
+            #endif
         }
 
 
@@ -609,7 +697,11 @@ class ADC
         *   \return the last converted value.
         */
         int analogReadContinuous(ADC_NUM adc_num = ADC_NUM::ADC_0) __attribute__((always_inline)) {
+            #if ADC_NUM_ADCS==1
+            return adc0->analogReadContinuous();
+            #else
             return adc_num == ADC_NUM::ADC_0 ? adc0->analogReadContinuous() : adc1->analogReadContinuous();
+            #endif
         }
 
         //! Stops continuous conversion
@@ -617,7 +709,11 @@ class ADC
         *   \param adc_num ADC_NUM enum member. Selects the ADC module to use.
         */
         void stopContinuous(ADC_NUM adc_num = ADC_NUM::ADC_0) __attribute__((always_inline)) {
+            #if ADC_NUM_ADCS==1
+            adc0->stopContinuous();
+            #else
             adc_num == ADC_NUM::ADC_0 ? adc0->stopContinuous() : adc1->stopContinuous();
+            #endif
         }
 
 
@@ -747,13 +843,17 @@ class ADC
         //! Prints the human-readable error from all ADC, if any.
         void printError() {
             adc0->printError();
+            #if ADC_NUM_ADCS>1
             adc1->printError();
+            #endif
         }
 
         //! Resets all errors from all ADCs, if any.
         void resetError() {
             adc0->resetError();
+            #if ADC_NUM_ADCS>1
             adc1->resetError();
+            #endif
         }
 
 };
