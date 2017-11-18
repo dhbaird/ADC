@@ -1044,6 +1044,22 @@ public:
     *   \param pin to read.
     */
     void startReadFast(uint8_t pin); // helper method
+    template<uint8_t pin>
+    void startReadFast() {
+        // translate pin number to SC1A number, that also contains MUX a or b info.
+        const uint8_t sc1a_pin = channel2sc1a[pin];
+
+        if(sc1a_pin&ADC_SC1A_PIN_MUX) { // mux a
+            atomic::clearBitFlag(ADC_CFG2(), ADC_CFG2_MUXSEL);
+        } else { // mux b
+            atomic::setBitFlag(ADC_CFG2(), ADC_CFG2_MUXSEL);
+        }
+
+        // select pin for single-ended mode and start conversion, enable interrupts if requested
+        __disable_irq();
+        ADC_SC1A() = (sc1a_pin&ADC_SC1A_CHANNELS) + atomic::getBitFlag(ADC_SC1A(), ADC_SC1_AIEN)*ADC_SC1_AIEN;
+        __enable_irq();
+    }
 
     //! Starts a differential conversion on the pair of pins
     /** It sets the mux correctly, doesn't do any of the checks on the pin and
@@ -1068,6 +1084,70 @@ public:
     *   \return the value of the pin.
     */
     int analogRead(uint8_t pin);
+    template<uint8_t pin>
+    int analogRead() {
+        // check whether the pin is correct
+        if(!checkPin(pin)) {
+            fail_flag |= ADC_ERROR::WRONG_PIN;
+            return ADC_ERROR_VALUE;
+        }
+
+        // increase the counter of measurements
+        num_measurements++;
+
+        //digitalWriteFast(LED_BUILTIN, !digitalReadFast(LED_BUILTIN));
+
+        if (calibrating) wait_for_cal();
+
+        //digitalWriteFast(LED_BUILTIN, !digitalReadFast(LED_BUILTIN));
+
+        // check if we are interrupting a measurement, store setting if so.
+        // vars to save the current state of the ADC in case it's in use
+        ADC_Config old_config = {0};
+        const bool wasADCInUse = isConverting(); // is the ADC running now?
+
+        if(wasADCInUse) { // this means we're interrupting a conversion
+            // save the current conversion config, we don't want any other interrupts messing up the configs
+            __disable_irq();
+            //digitalWriteFast(LED_BUILTIN, !digitalReadFast(LED_BUILTIN) );
+            saveConfig(&old_config);
+            __enable_irq();
+        }
+
+
+        // no continuous mode
+        singleMode();
+
+        startReadFast<pin>(); // start single read
+
+        // wait for the ADC to finish
+        while(isConverting()) {
+            yield();
+        }
+
+        // it's done, check if the comparison (if any) was true
+        int32_t result;
+        __disable_irq(); // make sure nothing interrupts this part
+        if (isComplete()) { // conversion succeeded
+            result = (uint16_t)getResult();
+        } else { // comparison was false
+            fail_flag |= ADC_ERROR::COMPARISON;
+            result = ADC_ERROR_VALUE;
+        }
+        __enable_irq();
+
+        // if we interrupted a conversion, set it again
+        if (wasADCInUse) {
+            //digitalWriteFast(LED_BUILTIN, !digitalReadFast(LED_BUILTIN) );
+            __disable_irq();
+            loadConfig(&old_config);
+            __enable_irq();
+        }
+
+        num_measurements--;
+        return result;
+
+    } // analogRead
 
     //! Returns the analog value of the special internal source, such as the temperature sensor.
     /** It calls analogRead(uint8_t pin) internally, with the correct value for the pin for all boards.
