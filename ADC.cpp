@@ -41,25 +41,10 @@
 */
 
 
-constexpr const uint8_t ADC::channel2sc1aADC0[];
-#if ADC_NUM_ADCS>1
-constexpr const uint8_t ADC::channel2sc1aADC1[];
-#endif
 
-constexpr const uint8_t ADC::sc1a2channelADC0[];
+ADC_Module<0> ADC::adc0_obj{};
 #if ADC_NUM_ADCS>1
-constexpr const uint8_t ADC::sc1a2channelADC1[];
-#endif
-
-constexpr const ADC_Module::ADC_NLIST ADC::diff_table_ADC0[];
-#if ADC_NUM_ADCS>1
-constexpr const ADC_Module::ADC_NLIST ADC::diff_table_ADC1[];
-#endif
-
-
-ADC_Module ADC::adc0_obj{0, ADC::channel2sc1aADC0, ADC::diff_table_ADC0};
-#if ADC_NUM_ADCS>1
-ADC_Module ADC::adc1_obj{1, ADC::channel2sc1aADC1, ADC::diff_table_ADC1};
+ADC_Module<1> ADC::adc1_obj{};
 #endif
 
 //////////////// SYNCHRONIZED BLOCKING METHODS //////////////////
@@ -90,7 +75,7 @@ ADC::Sync_result ADC::analogSynchronizedRead(uint8_t pin0, uint8_t pin1) {
 
     // check if we are interrupting a measurement, store setting if so.
     // vars to save the current state of the ADC in case it's in use
-    ADC_Module::ADC_Config old_adc0_config = {0};
+    ADC_Module<0>::ADC_Config old_adc0_config = {0};
     uint8_t wasADC0InUse = adc0->isConverting(); // is the ADC running now?
     if(wasADC0InUse) { // this means we're interrupting a conversion
         // save the current conversion config, the adc isr will restore the adc
@@ -99,7 +84,7 @@ ADC::Sync_result ADC::analogSynchronizedRead(uint8_t pin0, uint8_t pin1) {
         adc0->saveConfig(&old_adc0_config);
         __enable_irq();
     }
-    ADC_Module::ADC_Config old_adc1_config = {0};
+    ADC_Module<1>::ADC_Config old_adc1_config = {0};
     uint8_t wasADC1InUse = adc1->isConverting(); // is the ADC running now?
     if(wasADC1InUse) { // this means we're interrupting a conversion
         // save the current conversion config, the adc isr will restore the adc
@@ -177,7 +162,7 @@ ADC::Sync_result ADC::analogSynchronizedReadDifferential(uint8_t pin0P, uint8_t 
 
     // check if we are interrupting a measurement, store setting if so.
     // vars to save the current state of the ADC in case it's in use
-    ADC_Module::ADC_Config old_adc0_config = {0};
+    ADC_Module<0>::ADC_Config old_adc0_config = {0};
     uint8_t wasADC0InUse = adc0->isConverting(); // is the ADC running now?
     if(wasADC0InUse) { // this means we're interrupting a conversion
         // save the current conversion config, the adc isr will restore the adc
@@ -186,7 +171,7 @@ ADC::Sync_result ADC::analogSynchronizedReadDifferential(uint8_t pin0P, uint8_t 
         adc0->saveConfig(&old_adc0_config);
         __enable_irq();
     }
-    ADC_Module::ADC_Config old_adc1_config = {0};
+    ADC_Module<1>::ADC_Config old_adc1_config = {0};
     uint8_t wasADC1InUse = adc1->isConverting(); // is the ADC running now?
     if(wasADC1InUse) { // this means we're interrupting a conversion
         // save the current conversion config, the adc isr will restore the adc

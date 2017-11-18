@@ -512,20 +512,211 @@ using ADC_Error::ADC_ERROR;
 #define ADC_SC3_AVGS_MASK_0 (1<<0)
 
 
+template<uint8_t adc_num>
+struct Channel2SC1A {
+};
+template<>
+struct Channel2SC1A<0> {
+    #if defined(ADC_TEENSY_3_0)
+    //! Translate pin number to SC1A nomenclature
+    static constexpr const uint8_t channel2sc1a[ADC_MAX_PIN+1]= { // new version, gives directly the sc1a number. 0x1F=31 deactivates the ADC.
+        5, 14, 8, 9, 13, 12, 6, 7, 15, 4, 0, 19, 3, 21, // 0-13, we treat them as A0-A13
+        5, 14, 8, 9, 13, 12, 6, 7, 15, 4, // 14-23 (A0-A9)
+        31, 31, 31, 31, 31, 31, 31, 31, 31, 31, // 24-33
+        0+ADC_SC1A_PIN_DIFF, 19+ADC_SC1A_PIN_DIFF, 3+ADC_SC1A_PIN_DIFF, 21+ADC_SC1A_PIN_DIFF, // 34-37 (A10-A13)
+        26, 22, 23, 27, 29, 30 // 38-43: temp. sensor, VREF_OUT, A14, bandgap, VREFH, VREFL. A14 isn't connected to anything in Teensy 3.0.
+    };
+    #elif defined(ADC_TEENSY_3_1) // the only difference with 3.0 is that A13 is not connected to ADC0 and that T3.1 has PGA.
+    //! Translate pin number to SC1A nomenclature
+    static constexpr const uint8_t channel2sc1a[ADC_MAX_PIN+1]= { // new version, gives directly the sc1a number. 0x1F=31 deactivates the ADC.
+        5, 14, 8, 9, 13, 12, 6, 7, 15, 4, 0, 19, 3, 31, // 0-13, we treat them as A0-A13
+        5, 14, 8, 9, 13, 12, 6, 7, 15, 4, // 14-23 (A0-A9)
+        31, 31, 31, 31, 31, 31, 31, 31, 31, 31, // 24-33
+        0+ADC_SC1A_PIN_DIFF, 19+ADC_SC1A_PIN_DIFF, 3+ADC_SC1A_PIN_DIFF, 31+ADC_SC1A_PIN_DIFF, // 34-37 (A10-A13)
+        26, 22, 23, 27, 29, 30 // 38-43: temp. sensor, VREF_OUT, A14, bandgap, VREFH, VREFL. A14 isn't connected to anything in Teensy 3.0.
+    };
+    #elif defined(ADC_TEENSY_LC)
+    //! Translate pin number to SC1A nomenclature
+    static constexpr const uint8_t channel2sc1a[ADC_MAX_PIN+1]= { // new version, gives directly the sc1a number. 0x1F=31 deactivates the ADC.
+        5, 14, 8, 9, 13, 12, 6, 7, 15, 11, 0, 4+ADC_SC1A_PIN_MUX, 23, 31, // 0-13, we treat them as A0-A12 + A13= doesn't exist
+        5, 14, 8, 9, 13, 12, 6, 7, 15, 11, // 14-23 (A0-A9)
+        0+ADC_SC1A_PIN_DIFF, 4+ADC_SC1A_PIN_MUX+ADC_SC1A_PIN_DIFF, 23, 31, 31, 31, 31, 31, 31, 31, // 24-33 ((A10-A12) + nothing), A11 uses mux a
+        31, 31, 31, 31, // 34-37 nothing
+        26, 27, 31, 27, 29, 30 // 38-43: temp. sensor, , , bandgap, VREFH, VREFL.
+    };
+    #elif defined(ADC_TEENSY_3_5)
+    //! Translate pin number to SC1A nomenclature
+    static constexpr const uint8_t channel2sc1a[ADC_MAX_PIN+1]= { // new version, gives directly the sc1a number. 0x1F=31 deactivates the ADC.
+        5, 14, 8, 9, 13, 12, 6, 7, 15, 4, 3, 31, 31, 31, // 0-13, we treat them as A0-A13
+        5, 14, 8, 9, 13, 12, 6, 7, 15, 4, // 14-23 (A0-A9)
+        26, 27, 29, 30, 31, 31, 31, // 24-30: Temp_Sensor, bandgap, VREFH, VREFL.
+        31, 31, 17, 18,// 31-34 A12(ADC1), A13(ADC1), A14, A15
+        31, 31, 31, 31, 31, 31, 31, 31, 31, // 35-43
+        31, 31, 31, 31, 31, 31, 31, 31, 31, // 44-52
+        31, 31, 31, 31, 31, 31, 31, 31, 31, // 53-61
+        31, 31, 3+ADC_SC1A_PIN_DIFF, 31+ADC_SC1A_PIN_DIFF, 23, 31, 1, 31 // 62-69 64: A10, 65: A11 (NOT CONNECTED), 66: A21, 68: A25 (no diff)
+    };
+    #elif defined(ADC_TEENSY_3_6)
+    //! Translate pin number to SC1A nomenclature
+    static constexpr const uint8_t channel2sc1a[ADC_MAX_PIN+1]= { // new version, gives directly the sc1a number. 0x1F=31 deactivates the ADC.
+        5, 14, 8, 9, 13, 12, 6, 7, 15, 4, 3, 31, 31, 31, // 0-13, we treat them as A0-A13
+        5, 14, 8, 9, 13, 12, 6, 7, 15, 4, // 14-23 (A0-A9)
+        26, 27, 29, 30, 31, 31, 31, // 24-30: Temp_Sensor, bandgap, VREFH, VREFL.
+        31, 31, 17, 18,// 31-34 A12(ADC1), A13(ADC1), A14, A15
+        31, 31, 31, 31, 31, 31, 31, 31, 31, // 35-43
+        31, 31, 31, 31, 31, 31, 31, 31, 31, // 44-52
+        31, 31, 31, 31, 31, 31, 31, 31, 31, // 53-61
+        31, 31, 3+ADC_SC1A_PIN_DIFF, 31+ADC_SC1A_PIN_DIFF, 23, 31 // 62-67 64: A10, 65: A11 (NOT CONNECTED), 66: A21, 67: A22(ADC1)
+    };
+    #endif // which Teensy
+};
+template<>
+struct Channel2SC1A<1> {
+    #if ADC_NUM_ADCS>1
+    #if defined(ADC_TEENSY_3_1)
+    //! Translate pin number to SC1A nomenclature
+    static constexpr const uint8_t channel2sc1a[ADC_MAX_PIN+1]= { // new version, gives directly the sc1a number. 0x1F=31 deactivates the ADC.
+        31, 31, 8, 9, 31, 31, 31, 31, 31, 31, 3, 31, 0, 19, // 0-13, we treat them as A0-A13
+        31, 31, 8, 9, 31, 31, 31, 31, 31, 31, // 14-23 (A0-A9)
+        31, 31,  // 24,25 are digital only pins
+        5+ADC_SC1A_PIN_MUX, 5, 4, 6, 7, 4+ADC_SC1A_PIN_MUX, 31, 31, // 26-33 26=5a, 27=5b, 28=4b, 29=6b, 30=7b, 31=4a, 32,33 are digital only
+        3+ADC_SC1A_PIN_DIFF, 31+ADC_SC1A_PIN_DIFF, 0+ADC_SC1A_PIN_DIFF, 19+ADC_SC1A_PIN_DIFF, // 34-37 (A10-A13) A11 isn't connected.
+        26, 18, 31, 27, 29, 30 // 38-43: temp. sensor, VREF_OUT, A14 (not connected), bandgap, VREFH, VREFL.
+    };
+    #elif defined(ADC_TEENSY_3_5)
+    //! Translate pin number to SC1A nomenclature
+    static constexpr const uint8_t channel2sc1a[ADC_MAX_PIN+1]= { // new version, gives directly the sc1a number. 0x1F=31 deactivates the ADC.
+        31, 31, 8, 9, 31, 31, 31, 31, 31, 31, 31, 19, 14, 15, // 0-13, we treat them as A0-A13
+        31, 31, 8, 9, 31, 31, 31, 31, 31, 31, // 14-23 (A0-A9)
+        26, 27, 29, 30, 18, 31, 31,  // 24-30: Temp_Sensor, bandgap, VREFH, VREFL, VREF_OUT
+        14, 15, 31, 31, 4, 5, 6, 7, 17, // 31-39 A12-A20
+        31, 31, 31, 31, // 40-43
+        31, 31, 31, 31, 31, 10, 11, 31, 31, // 44-52, 49: A23, 50: A24
+        31, 31, 31, 31, 31, 31, 31, 31, 31, // 53-61
+        31, 31, 0+ADC_SC1A_PIN_DIFF, 19+ADC_SC1A_PIN_DIFF, 31, 23, 31, 1 // 62-69 64: A10, 65: A11, 67: A22, 69: A26 (not diff)
+    };
+    #elif defined(ADC_TEENSY_3_6)
+    //! Translate pin number to SC1A nomenclature
+    static constexpr const uint8_t channel2sc1a[ADC_MAX_PIN+1]= { // new version, gives directly the sc1a number. 0x1F=31 deactivates the ADC.
+        31, 31, 8, 9, 31, 31, 31, 31, 31, 31, 31, 19, 14, 15, // 0-13, we treat them as A0-A13
+        31, 31, 8, 9, 31, 31, 31, 31, 31, 31, // 14-23 (A0-A9)
+        26, 27, 29, 30, 18, 31, 31,  // 24-30: Temp_Sensor, bandgap, VREFH, VREFL, VREF_OUT
+        14, 15, 31, 31, 4, 5, 6, 7, 17, // 31-39 A12-A20
+        31, 31, 31, 23, // 40-43: A10(ADC0), A11(ADC0), A21, A22
+        31, 31, 31, 31, 31, 10, 11, 31, 31, // 44-52, 49: A23, 50: A24
+        31, 31, 31, 31, 31, 31, 31, 31, 31, // 53-61
+        31, 31, 0+ADC_SC1A_PIN_DIFF, 19+ADC_SC1A_PIN_DIFF, 31, 23 // 61-67 64: A10, 65: A11, 66: A21(ADC0), 67: A22
+    };
+    #endif
+    #endif // ADC_NUM_ADCS > 1
+};
+
+
+#if defined(ADC_TEENSY_3_0) || defined(ADC_TEENSY_3_1)
+//! Translate pin number to SC1A nomenclature for differential pins
+static constexpr const uint8_t sc1a2channel_ADC0[ADC_MAX_PIN+1]= { // new version, gives directly the pin number
+    34, 0, 0, 36, 23, 14, 20, 21, 16, 17, 0, 0, 19, 18, // 0-13
+    15, 22, 23, 0, 0, 35, 0, 37, // 14-21
+    39, 40, 0, 0, 38, 41, 42, 43, // VREF_OUT, A14, temp. sensor, bandgap, VREFH, VREFL.
+    0 // 31 means disabled, but just in case
+};
+#elif defined(ADC_TEENSY_LC)
+//! Translate pin number to SC1A nomenclature for differential pins
+static constexpr const uint8_t sc1a2channel_ADC0[ADC_MAX_PIN+1]= { // new version, gives directly the pin number
+    24, 0, 0, 0, 25, 14, 20, 21, 16, 17, 0, 23, 19, 18, // 0-13
+    15, 22, 23, 0, 0, 0, 0, 0, // 14-21
+    26, 0, 0, 0, 38, 41, 0, 42, 43, // A12, temp. sensor, bandgap, VREFH, VREFL.
+    0 // 31 means disabled, but just in case
+};
+#elif defined(ADC_TEENSY_3_5) || defined(ADC_TEENSY_3_6)
+//! Translate pin number to SC1A nomenclature for differential pins
+static constexpr const uint8_t sc1a2channel_ADC0[ADC_MAX_PIN+1]= { // new version, gives directly the pin number
+    0, 68, 0, 64, 23, 14, 20, 21, 16, 17, 0, 0, 19, 18, // 0-13
+    15, 22, 0, 33, 34, 0, 0, 0, // 14-21
+    0, 66, 0, 0, 70, 0, 0, 0, // 22-29
+    0 // 31 means disabled, but just in case
+};
+#endif // defined
+
+#if ADC_NUM_ADCS>1
+#if defined(ADC_TEENSY_3_1)
+//! Translate pin number to SC1A nomenclature for differential pins
+static constexpr const uint8_t sc1a2channel_ADC1[ADC_MAX_PIN+1]= { // new version, gives directly the pin number
+    36, 0, 0, 34, 28, 26, 29, 30, 16, 17, 0, 0, 0, 0, // 0-13. 5a=26, 5b=27, 4b=28, 4a=31
+    0, 0, 0, 0, 39, 37, 0, 0, // 14-21
+    0, 0, 0, 0, 38, 41, 0, 42, // 22-29. VREF_OUT, A14, temp. sensor, bandgap, VREFH, VREFL.
+    43
+};
+#elif defined(ADC_TEENSY_3_5) || defined(ADC_TEENSY_3_6)
+//! Translate pin number to SC1A nomenclature for differential pins
+static constexpr const uint8_t sc1a2channel_ADC1[ADC_MAX_PIN+1]= { // new version, gives directly the pin number
+    0, 69, 0, 0, 35, 36, 37, 38, 0, 0, 49, 50, 0, 0, // 0-13.
+    31, 32, 0, 39, 71, 65, 0, 0, // 14-21
+    0, 67, 0, 0, 0, 0, 0, 0, // 22-29.
+    0
+};
+#endif
+#endif // ADC_NUM_ADCS>1
+
+
+// Dictionary with the differential pins as keys and the SC1A number as values. Internal, do not use.
+struct ADC_NLIST {
+    // ADC Pin and corresponding SC1A value.
+    uint8_t pin;
+    uint8_t sc1a;
+};
+
+template<uint8_t adc_num>
+struct Diff_Table {
+};
+template<>
+struct Diff_Table<0> {
+    #if defined(ADC_TEENSY_3_1)
+    //! Translate differential pin number to SC1A nomenclature
+    static constexpr const ADC_NLIST diff_table[ADC_DIFF_PAIRS]= {
+        {A10, 0+ADC_SC1A_PIN_PGA}, {A12, 3}
+    };
+    #elif defined(ADC_TEENSY_3_0)
+    //! Translate differential pin number to SC1A nomenclature
+    static constexpr const ADC_NLIST diff_table[ADC_DIFF_PAIRS]= {
+        {A10, 0}, {A12, 3}
+    };
+    #elif defined(ADC_TEENSY_LC)
+    //! Translate differential pin number to SC1A nomenclature
+    static constexpr const ADC_NLIST diff_table[ADC_DIFF_PAIRS]= {
+        {A10, 0}
+    };
+    #elif defined(ADC_TEENSY_3_5) || defined(ADC_TEENSY_3_6)
+    //! Translate differential pin number to SC1A nomenclature
+    static constexpr const ADC_NLIST diff_table[ADC_DIFF_PAIRS]= {
+        {A10, 3}
+    };
+    #endif
+};
+template<>
+struct Diff_Table<1> {
+    #if defined(ADC_TEENSY_3_1)
+    //! Translate differential pin number to SC1A nomenclature
+    static constexpr const ADC_NLIST diff_table[ADC_DIFF_PAIRS]= {
+        {A10, 3}, {A12, 0+ADC_SC1A_PIN_PGA}
+    };
+    #elif defined(ADC_TEENSY_3_5) || defined(ADC_TEENSY_3_6)
+    //! Translate differential pin number to SC1A nomenclature
+    static constexpr const ADC_NLIST diff_table[ADC_DIFF_PAIRS]= {
+        {A10, 0}
+    };
+    #endif
+};
+
 
 /** Class ADC_Module: Implements all functions of the Teensy 3.x, LC analog to digital converter
 *
 */
+template<uint8_t ADC_num>
 class ADC_Module {
 
 public:
 
-    // Dictionary with the differential pins as keys and the SC1A number as values. Internal, do not use.
-    struct ADC_NLIST {
-        // ADC Pin and corresponding SC1A value.
-        uint8_t pin;
-        uint8_t sc1a;
-    };
 
     //! Constructor
     /** Pass the ADC number and the Channel number to SC1A number arrays.
@@ -533,53 +724,17 @@ public:
     *   \param a_channel2sc1a contains an index that pairs each pin to its SC1A number (used to start a conversion on that pin)
     *   \param a_diff_table is similar to a_channel2sc1a, but for differential pins.
     */
-    constexpr ADC_Module(uint8_t ADC_number, const uint8_t* const a_channel2sc1a, const ADC_NLIST* const a_diff_table):
-        ADC_num(ADC_number)
-        , channel2sc1a(a_channel2sc1a)
-        , diff_table(a_diff_table)
-        , ADC_SC1A(ADC_num? ADC1_SC1A : ADC0_SC1A)
-        , ADC_SC1B(ADC_num? ADC1_SC1B : ADC0_SC1B)
-        , ADC_CFG1(ADC_num? ADC1_CFG1 : ADC0_CFG1)
-        , ADC_CFG2(ADC_num? ADC1_CFG2 : ADC0_CFG2)
-        , ADC_RA(ADC_num? ADC1_RA : ADC0_RA)
-        , ADC_RB(ADC_num? ADC1_RB : ADC0_RB)
-        , ADC_CV1(ADC_num? ADC1_CV1 : ADC0_CV1)
-        , ADC_CV2(ADC_num? ADC1_CV2 : ADC0_CV2)
-        , ADC_SC2(ADC_num? ADC1_SC2 : ADC0_SC2)
-        , ADC_SC3(ADC_num? ADC1_SC3 : ADC0_SC3)
-        , ADC_PGA(ADC_num? ADC1_PGA : ADC0_PGA)
-
-        , ADC_OFS(ADC_num? ADC1_OFS : ADC0_OFS)
-        , ADC_PG(ADC_num? ADC1_PG : ADC0_PG)
-        , ADC_MG(ADC_num? ADC1_MG : ADC0_MG)
-        , ADC_CLPD(ADC_num? ADC1_CLPD : ADC0_CLPD)
-        , ADC_CLPS(ADC_num? ADC1_CLPS : ADC0_CLPS)
-        , ADC_CLP4(ADC_num? ADC1_CLP4 : ADC0_CLP4)
-        , ADC_CLP3(ADC_num? ADC1_CLP3 : ADC0_CLP3)
-        , ADC_CLP2(ADC_num? ADC1_CLP2 : ADC0_CLP2)
-        , ADC_CLP1(ADC_num? ADC1_CLP1 : ADC0_CLP1)
-        , ADC_CLP0(ADC_num? ADC1_CLP0 : ADC0_CLP0)
-        , ADC_CLMD(ADC_num? ADC1_CLMD : ADC0_CLMD)
-        , ADC_CLMS(ADC_num? ADC1_CLMS : ADC0_CLMS)
-        , ADC_CLM4(ADC_num? ADC1_CLM4 : ADC0_CLM4)
-        , ADC_CLM3(ADC_num? ADC1_CLM3 : ADC0_CLM3)
-        , ADC_CLM2(ADC_num? ADC1_CLM2 : ADC0_CLM2)
-        , ADC_CLM1(ADC_num? ADC1_CLM1 : ADC0_CLM1)
-        , ADC_CLM0(ADC_num? ADC1_CLM0 : ADC0_CLM0)
-        , PDB0_CHnC1(ADC_num? PDB0_CH1C1 : PDB0_CH0C1)
+    constexpr ADC_Module():
         #if ADC_NUM_ADCS==2
         // IRQ_ADC0 and IRQ_ADC1 aren't consecutive in Teensy 3.6
-        , IRQ_ADC(ADC_num? IRQ_ADC1 : IRQ_ADC0) // fix by SB, https://github.com/pedvide/ADC/issues/19
+        IRQ_ADC(ADC_num? IRQ_ADC1 : IRQ_ADC0) // fix by SB, https://github.com/pedvide/ADC/issues/19
         #else
-        , IRQ_ADC(IRQ_ADC0)
+        IRQ_ADC(IRQ_ADC0)
         #endif
-        {
+        {}
 
-
-        // call our init
-        analog_init();
-
-    }
+    static constexpr const uint8_t* const channel2sc1a{Channel2SC1A<ADC_num>::channel2sc1a};
+    static constexpr const ADC_NLIST* const diff_table{Diff_Table<ADC_num>::diff_table};
 
     //! Initialize ADC
     void analog_init();
@@ -721,7 +876,9 @@ public:
     void enableCompareRange(int16_t lowerLimit, int16_t upperLimit, bool insideRange, bool inclusive);
 
     //! Disable the compare function
-    void disableCompare();
+    void disableCompare() const{
+        atomic::clearBitFlag(ADC_SC2(), ADC_SC2_ACFE);
+    }
 
 
     //! Enable and set PGA
@@ -735,38 +892,41 @@ public:
     /**
     *   \return PGA level from 1 to 64
     */
-    uint8_t getPGA();
+    uint8_t getPGA() const{
+        return pga_value;
+    }
+
 
     //! Disable PGA
     void disablePGA();
 
 
     //! Set continuous conversion mode
-    void continuousMode() __attribute__((always_inline)) {
-        atomic::setBitFlag(ADC_SC3, ADC_SC3_ADCO);
+    void continuousMode() const __attribute__((always_inline)){
+        atomic::setBitFlag(ADC_SC3(), ADC_SC3_ADCO);
     }
     //! Set single-shot conversion mode
-    void singleMode() __attribute__((always_inline)) {
-        atomic::clearBitFlag(ADC_SC3, ADC_SC3_ADCO);
+    void singleMode() const __attribute__((always_inline)){
+        atomic::clearBitFlag(ADC_SC3(), ADC_SC3_ADCO);
     }
 
     //! Set single-ended conversion mode
-    void singleEndedMode() __attribute__((always_inline)) {
-        atomic::clearBitFlag(ADC_SC1A, ADC_SC1_DIFF);
+    void singleEndedMode() const __attribute__((always_inline)){
+        atomic::clearBitFlag(ADC_SC1A(), ADC_SC1_DIFF);
     }
     //! Set differential conversion mode
-    void differentialMode() __attribute__((always_inline)) {
-        atomic::setBitFlag(ADC_SC1A, ADC_SC1_DIFF);
+    void differentialMode() const __attribute__((always_inline)){
+        atomic::setBitFlag(ADC_SC1A(), ADC_SC1_DIFF);
     }
 
     //! Use software to trigger the ADC, this is the most common setting
-    void setSoftwareTrigger() __attribute__((always_inline)) {
-        atomic::clearBitFlag(ADC_SC2, ADC_SC2_ADTRG);
+    void setSoftwareTrigger() const __attribute__((always_inline)){
+        atomic::clearBitFlag(ADC_SC2(), ADC_SC2_ADTRG);
     }
 
     //! Use hardware to trigger the ADC
-    void setHardwareTrigger() __attribute__((always_inline)) {
-        atomic::setBitFlag(ADC_SC2, ADC_SC2_ADTRG);
+    void setHardwareTrigger() const __attribute__((always_inline)){
+        atomic::setBitFlag(ADC_SC2(), ADC_SC2_ADTRG);
     }
 
 
@@ -776,10 +936,8 @@ public:
     /**
     *   \return true or false
     */
-    volatile bool isConverting() __attribute__((always_inline)) {
-        //return (ADC_SC2_adact);
-        return atomic::getBitFlag(ADC_SC2, ADC_SC2_ADACT);
-        //return ((ADC_SC2) & ADC_SC2_ADACT) >> 7;
+    volatile bool isConverting() const __attribute__((always_inline)){
+        return atomic::getBitFlag(ADC_SC2(), ADC_SC2_ADACT);
     }
 
     //! Is an ADC conversion ready?
@@ -788,37 +946,32 @@ public:
     *  When a value is read this function returns false until a new value exists,
     *  so it only makes sense to call it before analogReadContinuous() or readSingle()
     */
-    volatile bool isComplete() __attribute__((always_inline)) {
-        //return (ADC_SC1A_coco);
-        return atomic::getBitFlag(ADC_SC1A, ADC_SC1_COCO);
-        //return ((ADC_SC1A) & ADC_SC1_COCO) >> 7;
+    volatile bool isComplete() const __attribute__((always_inline)){
+        return atomic::getBitFlag(ADC_SC1A(), ADC_SC1_COCO);
     }
 
     //! Is the ADC in differential mode?
     /**
     *   \return true or false
     */
-    volatile bool isDifferential() __attribute__((always_inline)) {
-        //return ((ADC_SC1A) & ADC_SC1_DIFF) >> 5;
-        return atomic::getBitFlag(ADC_SC1A, ADC_SC1_DIFF);
+    volatile bool isDifferential() const __attribute__((always_inline)){
+        return atomic::getBitFlag(ADC_SC1A(), ADC_SC1_DIFF);
     }
 
     //! Is the ADC in continuous mode?
     /**
     *   \return true or false
     */
-    volatile bool isContinuous() __attribute__((always_inline)) {
-        //return (ADC_SC3_adco);
-        return atomic::getBitFlag(ADC_SC3, ADC_SC3_ADCO);
-        //return ((ADC_SC3) & ADC_SC3_ADCO) >> 3;
+    volatile bool isContinuous() const __attribute__((always_inline)){
+        return atomic::getBitFlag(ADC_SC3(), ADC_SC3_ADCO);
     }
 
     //! Is the PGA function enabled?
     /**
     *   \return true or false
     */
-    volatile bool isPGAEnabled() __attribute__((always_inline)) {
-        return atomic::getBitFlag(ADC_PGA, ADC_PGA_PGAEN);
+    volatile bool isPGAEnabled() const __attribute__((always_inline)){
+        return atomic::getBitFlag(ADC_PGA(), ADC_PGA_PGAEN);
     }
 
 
@@ -829,7 +982,22 @@ public:
     *   \param pin to check.
     *   \return true if the pin is valid, false otherwise.
     */
-    bool checkPin(uint8_t pin);
+    constexpr bool checkPin(uint8_t pin) {
+        if(pin>ADC_MAX_PIN) {
+            return false;   // all others are invalid
+        }
+
+        // translate pin number to SC1A number, that also contains MUX a or b info.
+        const uint8_t sc1a_pin = channel2sc1a[pin];
+
+        // check for valid pin
+        if( (sc1a_pin&ADC_SC1A_CHANNELS) == ADC_SC1A_PIN_INVALID ) {
+            return false;   // all others are invalid
+        }
+
+        return true;
+    }
+
 
     //! Check whether the pins are a valid analog differential pair of pins
     /** If PGA is enabled it also checks that this ADCx can use PGA on this pins
@@ -837,7 +1005,35 @@ public:
     *   \param pinN negative pin to check.
     *   \return true if the pin is valid, false otherwise.
     */
-    bool checkDifferentialPins(uint8_t pinP, uint8_t pinN);
+    bool checkDifferentialPins(uint8_t pinP, uint8_t pinN) {
+        if(pinP>ADC_MAX_PIN) {
+            return false;   // all others are invalid
+        }
+
+        // translate pinP number to SC1A number, to make sure it's differential
+        uint8_t sc1a_pin = channel2sc1a[pinP];
+
+        if( !(sc1a_pin&ADC_SC1A_PIN_DIFF) ) {
+            return false;   // all others are invalid
+        }
+
+        // get SC1A number, also whether it can do PGA
+        sc1a_pin = getDifferentialPair(pinP);
+
+        // the pair can't be measured with this ADC
+        if( (sc1a_pin&ADC_SC1A_CHANNELS) == ADC_SC1A_PIN_INVALID ) {
+            return false;   // all others are invalid
+        }
+
+        #if ADC_USE_PGA
+        // check if PGA is enabled, and whether the pin has access to it in this ADC module
+        if( isPGAEnabled() && !(sc1a_pin&ADC_SC1A_PIN_PGA) ) {
+            return false;
+        }
+        #endif // ADC_USE_PGA
+
+        return true;
+    }
 
 
     //////////////// HELPER METHODS FOR CONVERSION /////////////////
@@ -858,8 +1054,8 @@ public:
     void startDifferentialFast(uint8_t pinP, uint8_t pinN);
 
     //! Get the conversion's result
-    uint16_t getResult() __attribute__((always_inline)) {
-        return (uint16_t)(uint32_t)ADC_RA;
+    uint16_t getResult() const __attribute__((always_inline)){
+        return (uint16_t)(uint32_t)ADC_RA();
     }
 
     //////////////// BLOCKING CONVERSION METHODS //////////////////
@@ -923,7 +1119,7 @@ public:
     /** Set the conversion with with startSingleRead(pin) or startSingleDifferential(pinP, pinN).
     *   \return the converted value.
     */
-    int readSingle() __attribute__((always_inline)) {
+    int readSingle() const __attribute__((always_inline)){
         return analogReadContinuous();
     }
 
@@ -951,8 +1147,8 @@ public:
     *   If single-ended and 16 bits it's necessary to typecast it to an unsigned type (like uint16_t),
     *   otherwise values larger than 3.3/2 V are interpreted as negative!
     */
-    int analogReadContinuous() __attribute__((always_inline)) {
-        return (int16_t)(int32_t)ADC_RA;
+    int analogReadContinuous() const __attribute__((always_inline)){
+        return getResult();
     }
 
     //! Stops continuous conversion
@@ -1001,20 +1197,20 @@ public:
 
     //! Save config of the ADC to the ADC_Config struct
     void saveConfig(ADC_Config* config) {
-        config->savedSC1A = ADC_SC1A;
-        config->savedCFG1 = ADC_CFG1;
-        config->savedCFG2 = ADC_CFG2;
-        config->savedSC2 = ADC_SC2;
-        config->savedSC3 = ADC_SC3;
+        config->savedSC1A = ADC_SC1A();
+        config->savedCFG1 = ADC_CFG1();
+        config->savedCFG2 = ADC_CFG2();
+        config->savedSC2 = ADC_SC2();
+        config->savedSC3 = ADC_SC3();
     }
 
     //! Load config to the ADC
     void loadConfig(const ADC_Config* config) {
-        ADC_CFG1 = config->savedCFG1;
-        ADC_CFG2 = config->savedCFG2;
-        ADC_SC2 = config->savedSC2;
-        ADC_SC3 = config->savedSC3;
-        ADC_SC1A = config->savedSC1A; // restore last
+        ADC_CFG1() = config->savedCFG1;
+        ADC_CFG2() = config->savedCFG2;
+        ADC_SC2() = config->savedSC2;
+        ADC_SC3() = config->savedSC3;
+        ADC_SC1A() = config->savedSC1A; // restore last
     }
 
 
@@ -1036,10 +1232,6 @@ public:
     void resetError() {
         ADC_Error::resetError(fail_flag);
     }
-
-
-    //! Which adc is this?
-    const uint8_t ADC_num;
 
 
 private:
@@ -1072,15 +1264,9 @@ private:
     // sampling speed
     ADC_SAMPLING_SPEED sampling_speed =  ADC_SAMPLING_SPEED::VERY_HIGH_SPEED;
 
-    // translate pin number to SC1A nomenclature
-    const uint8_t* const channel2sc1a;
-
-    // same for differential pins
-    const ADC_NLIST* const diff_table;
-
 
     //! Get the SC1A value of the differential pair for this pin
-    uint8_t getDifferentialPair(uint8_t pin) {
+    uint8_t getDifferentialPair(uint8_t pin) const{
         for(uint8_t i=0; i<ADC_DIFF_PAIRS; i++) {
             if(diff_table[i].pin == pin) {
                 return diff_table[i].sc1a;
@@ -1092,45 +1278,46 @@ private:
 
     // registers point to the correct ADC module
     typedef volatile uint32_t& reg;
+    // generate constexpr functions to get the right ADCx register
+    #define ADC_GENERATE_REG(name)   constexpr reg ADC_##name() const { return (ADC_num ? ADC1_##name : ADC0_##name); }
 
-    // registers that control the adc module
-    reg ADC_SC1A;
-    reg ADC_SC1B;
+    ADC_GENERATE_REG(SC1A)
+    ADC_GENERATE_REG(SC1B)
 
-    reg ADC_CFG1;
+    ADC_GENERATE_REG(CFG1)
 
-    reg ADC_CFG2;
+    ADC_GENERATE_REG(CFG2);
 
-    reg ADC_RA;
-    reg ADC_RB;
+    ADC_GENERATE_REG(RA);
+    ADC_GENERATE_REG(RB);
 
-    reg ADC_CV1;
-    reg ADC_CV2;
+    ADC_GENERATE_REG(CV1);
+    ADC_GENERATE_REG(CV2);
 
-    reg ADC_SC2;
-    reg ADC_SC3;
+    ADC_GENERATE_REG(SC2);
+    ADC_GENERATE_REG(SC3);
 
-    reg ADC_PGA;
+    ADC_GENERATE_REG(PGA);
 
-    reg ADC_OFS;
-    reg ADC_PG;
-    reg ADC_MG;
-    reg ADC_CLPD;
-    reg ADC_CLPS;
-    reg ADC_CLP4;
-    reg ADC_CLP3;
-    reg ADC_CLP2;
-    reg ADC_CLP1;
-    reg ADC_CLP0;
-    reg ADC_CLMD;
-    reg ADC_CLMS;
-    reg ADC_CLM4;
-    reg ADC_CLM3;
-    reg ADC_CLM2;
-    reg ADC_CLM1;
-    reg ADC_CLM0;
+    ADC_GENERATE_REG(OFS);
+    ADC_GENERATE_REG(PG);
+    ADC_GENERATE_REG(MG);
+    ADC_GENERATE_REG(CLPD);
+    ADC_GENERATE_REG(CLPS);
+    ADC_GENERATE_REG(CLP4);
+    ADC_GENERATE_REG(CLP3);
+    ADC_GENERATE_REG(CLP2);
+    ADC_GENERATE_REG(CLP1);
+    ADC_GENERATE_REG(CLP0);
+    ADC_GENERATE_REG(CLMD);
+    ADC_GENERATE_REG(CLMS);
+    ADC_GENERATE_REG(CLM4);
+    ADC_GENERATE_REG(CLM3);
+    ADC_GENERATE_REG(CLM2);
+    ADC_GENERATE_REG(CLM1);
+    ADC_GENERATE_REG(CLM0);
 
-    reg PDB0_CHnC1; // PDB channel 0 or 1
+    constexpr reg PDB0_CHnC1() const { return (ADC_num ? PDB0_CH0C1 : PDB0_CH1C1); } // PDB channel 0 or 1
 
     const uint8_t IRQ_ADC; // IRQ number will be IRQ_ADC0 or IRQ_ADC1
 

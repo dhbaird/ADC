@@ -46,268 +46,18 @@
 */
 class ADC
 {
-    public:
-        #if defined(ADC_TEENSY_3_0)
-        //! Translate pin number to SC1A nomenclature
-        static constexpr const uint8_t channel2sc1aADC0[ADC_MAX_PIN+1]= { // new version, gives directly the sc1a number. 0x1F=31 deactivates the ADC.
-            5, 14, 8, 9, 13, 12, 6, 7, 15, 4, 0, 19, 3, 21, // 0-13, we treat them as A0-A13
-            5, 14, 8, 9, 13, 12, 6, 7, 15, 4, // 14-23 (A0-A9)
-            31, 31, 31, 31, 31, 31, 31, 31, 31, 31, // 24-33
-            0+ADC_SC1A_PIN_DIFF, 19+ADC_SC1A_PIN_DIFF, 3+ADC_SC1A_PIN_DIFF, 21+ADC_SC1A_PIN_DIFF, // 34-37 (A10-A13)
-            26, 22, 23, 27, 29, 30 // 38-43: temp. sensor, VREF_OUT, A14, bandgap, VREFH, VREFL. A14 isn't connected to anything in Teensy 3.0.
-        };
-        #elif defined(ADC_TEENSY_3_1) // the only difference with 3.0 is that A13 is not connected to ADC0 and that T3.1 has PGA.
-        //! Translate pin number to SC1A nomenclature
-        static constexpr const uint8_t channel2sc1aADC0[ADC_MAX_PIN+1]= { // new version, gives directly the sc1a number. 0x1F=31 deactivates the ADC.
-            5, 14, 8, 9, 13, 12, 6, 7, 15, 4, 0, 19, 3, 31, // 0-13, we treat them as A0-A13
-            5, 14, 8, 9, 13, 12, 6, 7, 15, 4, // 14-23 (A0-A9)
-            31, 31, 31, 31, 31, 31, 31, 31, 31, 31, // 24-33
-            0+ADC_SC1A_PIN_DIFF, 19+ADC_SC1A_PIN_DIFF, 3+ADC_SC1A_PIN_DIFF, 31+ADC_SC1A_PIN_DIFF, // 34-37 (A10-A13)
-            26, 22, 23, 27, 29, 30 // 38-43: temp. sensor, VREF_OUT, A14, bandgap, VREFH, VREFL. A14 isn't connected to anything in Teensy 3.0.
-        };
-        #elif defined(ADC_TEENSY_LC)
-        //! Translate pin number to SC1A nomenclature
-        static constexpr const uint8_t channel2sc1aADC0[ADC_MAX_PIN+1]= { // new version, gives directly the sc1a number. 0x1F=31 deactivates the ADC.
-            5, 14, 8, 9, 13, 12, 6, 7, 15, 11, 0, 4+ADC_SC1A_PIN_MUX, 23, 31, // 0-13, we treat them as A0-A12 + A13= doesn't exist
-            5, 14, 8, 9, 13, 12, 6, 7, 15, 11, // 14-23 (A0-A9)
-            0+ADC_SC1A_PIN_DIFF, 4+ADC_SC1A_PIN_MUX+ADC_SC1A_PIN_DIFF, 23, 31, 31, 31, 31, 31, 31, 31, // 24-33 ((A10-A12) + nothing), A11 uses mux a
-            31, 31, 31, 31, // 34-37 nothing
-            26, 27, 31, 27, 29, 30 // 38-43: temp. sensor, , , bandgap, VREFH, VREFL.
-        };
-        #elif defined(ADC_TEENSY_3_5)
-        //! Translate pin number to SC1A nomenclature
-        static constexpr const uint8_t channel2sc1aADC0[ADC_MAX_PIN+1]= { // new version, gives directly the sc1a number. 0x1F=31 deactivates the ADC.
-            5, 14, 8, 9, 13, 12, 6, 7, 15, 4, 3, 31, 31, 31, // 0-13, we treat them as A0-A13
-            5, 14, 8, 9, 13, 12, 6, 7, 15, 4, // 14-23 (A0-A9)
-            26, 27, 29, 30, 31, 31, 31, // 24-30: Temp_Sensor, bandgap, VREFH, VREFL.
-            31, 31, 17, 18,// 31-34 A12(ADC1), A13(ADC1), A14, A15
-            31, 31, 31, 31, 31, 31, 31, 31, 31, // 35-43
-            31, 31, 31, 31, 31, 31, 31, 31, 31, // 44-52
-            31, 31, 31, 31, 31, 31, 31, 31, 31, // 53-61
-            31, 31, 3+ADC_SC1A_PIN_DIFF, 31+ADC_SC1A_PIN_DIFF, 23, 31, 1, 31 // 62-69 64: A10, 65: A11 (NOT CONNECTED), 66: A21, 68: A25 (no diff)
-        };
-        #elif defined(ADC_TEENSY_3_6)
-        //! Translate pin number to SC1A nomenclature
-        static constexpr const uint8_t channel2sc1aADC0[ADC_MAX_PIN+1]= { // new version, gives directly the sc1a number. 0x1F=31 deactivates the ADC.
-            5, 14, 8, 9, 13, 12, 6, 7, 15, 4, 3, 31, 31, 31, // 0-13, we treat them as A0-A13
-            5, 14, 8, 9, 13, 12, 6, 7, 15, 4, // 14-23 (A0-A9)
-            26, 27, 29, 30, 31, 31, 31, // 24-30: Temp_Sensor, bandgap, VREFH, VREFL.
-            31, 31, 17, 18,// 31-34 A12(ADC1), A13(ADC1), A14, A15
-            31, 31, 31, 31, 31, 31, 31, 31, 31, // 35-43
-            31, 31, 31, 31, 31, 31, 31, 31, 31, // 44-52
-            31, 31, 31, 31, 31, 31, 31, 31, 31, // 53-61
-            31, 31, 3+ADC_SC1A_PIN_DIFF, 31+ADC_SC1A_PIN_DIFF, 23, 31 // 62-67 64: A10, 65: A11 (NOT CONNECTED), 66: A21, 67: A22(ADC1)
-        };
-        #endif // defined
-
-
-        #if ADC_NUM_ADCS>1
-        #if defined(ADC_TEENSY_3_1)
-        //! Translate pin number to SC1A nomenclature
-        static constexpr const uint8_t channel2sc1aADC1[ADC_MAX_PIN+1]= { // new version, gives directly the sc1a number. 0x1F=31 deactivates the ADC.
-            31, 31, 8, 9, 31, 31, 31, 31, 31, 31, 3, 31, 0, 19, // 0-13, we treat them as A0-A13
-            31, 31, 8, 9, 31, 31, 31, 31, 31, 31, // 14-23 (A0-A9)
-            31, 31,  // 24,25 are digital only pins
-            5+ADC_SC1A_PIN_MUX, 5, 4, 6, 7, 4+ADC_SC1A_PIN_MUX, 31, 31, // 26-33 26=5a, 27=5b, 28=4b, 29=6b, 30=7b, 31=4a, 32,33 are digital only
-            3+ADC_SC1A_PIN_DIFF, 31+ADC_SC1A_PIN_DIFF, 0+ADC_SC1A_PIN_DIFF, 19+ADC_SC1A_PIN_DIFF, // 34-37 (A10-A13) A11 isn't connected.
-            26, 18, 31, 27, 29, 30 // 38-43: temp. sensor, VREF_OUT, A14 (not connected), bandgap, VREFH, VREFL.
-        };
-        #elif defined(ADC_TEENSY_3_5)
-        //! Translate pin number to SC1A nomenclature
-        static constexpr const uint8_t channel2sc1aADC1[ADC_MAX_PIN+1]= { // new version, gives directly the sc1a number. 0x1F=31 deactivates the ADC.
-            31, 31, 8, 9, 31, 31, 31, 31, 31, 31, 31, 19, 14, 15, // 0-13, we treat them as A0-A13
-            31, 31, 8, 9, 31, 31, 31, 31, 31, 31, // 14-23 (A0-A9)
-            26, 27, 29, 30, 18, 31, 31,  // 24-30: Temp_Sensor, bandgap, VREFH, VREFL, VREF_OUT
-            14, 15, 31, 31, 4, 5, 6, 7, 17, // 31-39 A12-A20
-            31, 31, 31, 31, // 40-43
-            31, 31, 31, 31, 31, 10, 11, 31, 31, // 44-52, 49: A23, 50: A24
-            31, 31, 31, 31, 31, 31, 31, 31, 31, // 53-61
-            31, 31, 0+ADC_SC1A_PIN_DIFF, 19+ADC_SC1A_PIN_DIFF, 31, 23, 31, 1 // 62-69 64: A10, 65: A11, 67: A22, 69: A26 (not diff)
-        };
-        #elif defined(ADC_TEENSY_3_6)
-        //! Translate pin number to SC1A nomenclature
-        static constexpr const uint8_t channel2sc1aADC1[ADC_MAX_PIN+1]= { // new version, gives directly the sc1a number. 0x1F=31 deactivates the ADC.
-            31, 31, 8, 9, 31, 31, 31, 31, 31, 31, 31, 19, 14, 15, // 0-13, we treat them as A0-A13
-            31, 31, 8, 9, 31, 31, 31, 31, 31, 31, // 14-23 (A0-A9)
-            26, 27, 29, 30, 18, 31, 31,  // 24-30: Temp_Sensor, bandgap, VREFH, VREFL, VREF_OUT
-            14, 15, 31, 31, 4, 5, 6, 7, 17, // 31-39 A12-A20
-            31, 31, 31, 23, // 40-43: A10(ADC0), A11(ADC0), A21, A22
-            31, 31, 31, 31, 31, 10, 11, 31, 31, // 44-52, 49: A23, 50: A24
-            31, 31, 31, 31, 31, 31, 31, 31, 31, // 53-61
-            31, 31, 0+ADC_SC1A_PIN_DIFF, 19+ADC_SC1A_PIN_DIFF, 31, 23 // 61-67 64: A10, 65: A11, 66: A21(ADC0), 67: A22
-        };
-        #endif
-        #endif // ADC_NUM_ADCS > 1
-
-        #if defined(ADC_TEENSY_3_0) || defined(ADC_TEENSY_3_1)
-        //! Translate pin number to SC1A nomenclature for differential pins
-        static constexpr const uint8_t sc1a2channelADC0[ADC_MAX_PIN+1]= { // new version, gives directly the pin number
-            34, 0, 0, 36, 23, 14, 20, 21, 16, 17, 0, 0, 19, 18, // 0-13
-            15, 22, 23, 0, 0, 35, 0, 37, // 14-21
-            39, 40, 0, 0, 38, 41, 42, 43, // VREF_OUT, A14, temp. sensor, bandgap, VREFH, VREFL.
-            0 // 31 means disabled, but just in case
-        };
-        #elif defined(ADC_TEENSY_LC)
-        //! Translate pin number to SC1A nomenclature for differential pins
-        static constexpr const uint8_t sc1a2channelADC0[ADC_MAX_PIN+1]= { // new version, gives directly the pin number
-            24, 0, 0, 0, 25, 14, 20, 21, 16, 17, 0, 23, 19, 18, // 0-13
-            15, 22, 23, 0, 0, 0, 0, 0, // 14-21
-            26, 0, 0, 0, 38, 41, 0, 42, 43, // A12, temp. sensor, bandgap, VREFH, VREFL.
-            0 // 31 means disabled, but just in case
-        };
-        #elif defined(ADC_TEENSY_3_5) || defined(ADC_TEENSY_3_6)
-        //! Translate pin number to SC1A nomenclature for differential pins
-        static constexpr const uint8_t sc1a2channelADC0[ADC_MAX_PIN+1]= { // new version, gives directly the pin number
-            0, 68, 0, 64, 23, 14, 20, 21, 16, 17, 0, 0, 19, 18, // 0-13
-            15, 22, 0, 33, 34, 0, 0, 0, // 14-21
-            0, 66, 0, 0, 70, 0, 0, 0, // 22-29
-            0 // 31 means disabled, but just in case
-        };
-        #endif // defined
-
-        #if ADC_NUM_ADCS>1
-        #if defined(ADC_TEENSY_3_1)
-        //! Translate pin number to SC1A nomenclature for differential pins
-        static constexpr const uint8_t sc1a2channelADC1[ADC_MAX_PIN+1]= { // new version, gives directly the pin number
-            36, 0, 0, 34, 28, 26, 29, 30, 16, 17, 0, 0, 0, 0, // 0-13. 5a=26, 5b=27, 4b=28, 4a=31
-            0, 0, 0, 0, 39, 37, 0, 0, // 14-21
-            0, 0, 0, 0, 38, 41, 0, 42, // 22-29. VREF_OUT, A14, temp. sensor, bandgap, VREFH, VREFL.
-            43
-        };
-        #elif defined(ADC_TEENSY_3_5) || defined(ADC_TEENSY_3_6)
-        //! Translate pin number to SC1A nomenclature for differential pins
-        static constexpr const uint8_t sc1a2channelADC1[ADC_MAX_PIN+1]= { // new version, gives directly the pin number
-            0, 69, 0, 0, 35, 36, 37, 38, 0, 0, 49, 50, 0, 0, // 0-13.
-            31, 32, 0, 39, 71, 65, 0, 0, // 14-21
-            0, 67, 0, 0, 0, 0, 0, 0, // 22-29.
-            0
-        };
-        #endif
-        #endif // ADC_NUM_ADCS>1
-
-
-        #if defined(ADC_TEENSY_3_1)
-        //! Translate differential pin number to SC1A nomenclature
-        static constexpr const ADC_Module::ADC_NLIST diff_table_ADC0[ADC_DIFF_PAIRS]= {
-            {A10, 0+ADC_SC1A_PIN_PGA}, {A12, 3}
-        };
-        //! Translate differential pin number to SC1A nomenclature
-        static constexpr const ADC_Module::ADC_NLIST diff_table_ADC1[ADC_DIFF_PAIRS]= {
-            {A10, 3}, {A12, 0+ADC_SC1A_PIN_PGA}
-        };
-        #elif defined(ADC_TEENSY_3_0)
-        //! Translate differential pin number to SC1A nomenclature
-        static constexpr const ADC_Module::ADC_NLIST diff_table_ADC0[ADC_DIFF_PAIRS]= {
-            {A10, 0}, {A12, 3}
-        };
-        #elif defined(ADC_TEENSY_LC)
-        //! Translate differential pin number to SC1A nomenclature
-        static constexpr const ADC_Module::ADC_NLIST diff_table_ADC0[ADC_DIFF_PAIRS]= {
-            {A10, 0}
-        };
-        #elif defined(ADC_TEENSY_3_5) || defined(ADC_TEENSY_3_6)
-        //! Translate differential pin number to SC1A nomenclature
-        static constexpr const ADC_Module::ADC_NLIST diff_table_ADC0[ADC_DIFF_PAIRS]= {
-            {A10, 3}
-        };
-        //! Translate differential pin number to SC1A nomenclature
-        static constexpr const ADC_Module::ADC_NLIST diff_table_ADC1[ADC_DIFF_PAIRS]= {
-            {A10, 0}
-        };
-        #endif
-
-
-        // ADCs objects
-        static ADC_Module adc0_obj;
-        #if ADC_NUM_ADCS>1
-        static ADC_Module adc1_obj;
-        #endif
-
     private:
 
         // Number of ADC objects
         const uint8_t num_ADCs = ADC_NUM_ADCS;
 
-        // Workload-based dispatch policy:
-        // Dispatch conversion to the selected ADC. If no specific ADC is selected (ADC_NUM::ANY):
-        // Check which ADC can handle the pin, if both:
-        // Use the ADC with lesser workload
-        // If only one ADC can measure pin, use it.
-        template<typename ret_type, typename... Args>
-        ret_type workload_dispatch_policy(bool (ADC_Module::*check_fun)(Args... args),
-                                          ret_type (ADC_Module::*conversion_fun)(Args... args), ADC_NUM adc_num, Args... args) {
-            #if ADC_NUM_ADCS==1
-            return (adc0->*conversion_fun)(args...); // use ADC0
-            #else
-            if(adc_num==ADC_NUM::ANY) { // use no ADC in particular
-                // check which ADC can read the pin
-                bool adc0Pin = (adc0->*check_fun)(args...);
-                bool adc1Pin = (adc1->*check_fun)(args...);
-
-                if(adc0Pin && adc1Pin)  { // Both ADCs
-                    if( (adc0->num_measurements) > (adc1->num_measurements)) { // use the ADC with less workload
-                        return (adc1->*conversion_fun)(args...);
-                    } else {
-                        return (adc0->*conversion_fun)(args...);
-                    }
-                } else if(adc0Pin) { // ADC0
-                    return (adc0->*conversion_fun)(args...);
-                } else if(adc1Pin) { // ADC1
-                    return (adc1->*conversion_fun)(args...);
-                } else { // pin not valid in any ADC
-                    adc0->fail_flag |= ADC_ERROR::WRONG_PIN;
-                    adc1->fail_flag |= ADC_ERROR::WRONG_PIN;
-                    return ADC_ERROR_VALUE;   // all others are invalid
-                }
-            } else { // Use a specific ADC
-                return (adc[static_cast<uint8_t>(adc_num)]->*conversion_fun)(args...);
-            }
-            #endif // ADC_NUM_ADCS
-        }
-
-        // Simple dispatch policy:
-        // Dispatch conversion to the selected ADC. If no specific ADC is selected (ADC_NUM::ANY):
-        // Check if ADC0 can handle it, if so, use it.
-        // If not, check ADC1, if so, use it.
-        template<typename ret_type, typename... Args>
-        ret_type simple_dispatch_policy(bool (ADC_Module::*check_fun)(Args... args),
-                                        ret_type (ADC_Module::*conversion_fun)(Args... args), ADC_NUM adc_num, Args... args) {
-            #if ADC_NUM_ADCS==1
-            return (adc0->*conversion_fun)(args...); // use ADC0
-            #else
-            if(adc_num==ADC_NUM::ANY) { // use no ADC in particular
-                // check which ADC can read the pin
-                bool adc0Pin = (adc0->*check_fun)(args...);
-                if(adc0Pin) { // ADC0
-                    return (adc0->*conversion_fun)(args...);
-                }
-
-                bool adc1Pin = (adc1->*check_fun)(args...);
-                if(adc1Pin) { // ADC1
-                    return (adc1->*conversion_fun)(args...);
-                }
-
-                // Not valid for any ADC
-                adc0->fail_flag |= ADC_ERROR::WRONG_PIN;
-                adc1->fail_flag |= ADC_ERROR::WRONG_PIN;
-                return ADC_ERROR_VALUE;   // all others are invalid
-            } else { // Use a specific ADC
-                return (adc[static_cast<uint8_t>(adc_num)]->*conversion_fun)(args...);
-            }
-            #endif // ADC_NUM_ADCS
-        }
-
-        // Change the return function to the policy that you want: workload_dispatch_policy or simple_dispatch_policy.
-        template<typename ret_type, typename... Args>
-        __attribute__((always_inline)) ret_type dispatch_policy(bool (ADC_Module::*check_fun)(Args... args),
-                                 ret_type (ADC_Module::*conversion_fun)(Args... args),
-                                 ADC_NUM adc_num, Args... args) {
-            return workload_dispatch_policy(check_fun, conversion_fun, adc_num, args...);
-            //return simple_dispatch_policy(check_fun, conversion_fun, adc_num, args...);
-        }
-
-
     public:
+
+        // ADCs objects
+        static ADC_Module<0> adc0_obj;
+        #if ADC_NUM_ADCS>1
+        static ADC_Module<1> adc1_obj;
+        #endif
 
         //! Constructor
         ADC() {
@@ -324,18 +74,10 @@ class ADC
         }
 
         //! Object to control the ADC0
-        ADC_Module *const adc0 = &adc0_obj; // adc object pointer
+        ADC_Module<0> *const adc0 = &adc0_obj; // adc object pointer
         #if ADC_NUM_ADCS>1
         //! Object to control the ADC1
-        ADC_Module *const adc1 = &adc1_obj; // adc object pointer
-        #endif
-
-        #if ADC_NUM_ADCS==1
-        //! Array of all ADC modules
-        ADC_Module *const adc[ADC_NUM_ADCS] = {adc0};
-        #else
-        //! Array of all ADC modules
-        ADC_Module *const adc[ADC_NUM_ADCS] = {adc0, adc1};
+        ADC_Module<1> *const adc1 = &adc1_obj; // adc object pointer
         #endif
 
 
@@ -347,8 +89,7 @@ class ADC
         *   \param adc_num ADC_NUM enum member. Selects the ADC module to use.
         */
         void setReference(ADC_REFERENCE type, ADC_NUM adc_num = ADC_NUM::ADC_0) __attribute__((always_inline)) {
-            adc[static_cast<uint8_t>(adc_num)]->setReference(type);
-            return;
+            adc_num == ADC_NUM::ADC_0 ? adc0->setReference(type) : adc1->setReference(type);
         }
 
 
@@ -363,8 +104,7 @@ class ADC
         *   \param adc_num ADC_NUM enum member. Selects the ADC module to use.
         */
         void setResolution(uint8_t bits, ADC_NUM adc_num = ADC_NUM::ADC_0) __attribute__((always_inline)) {
-            adc[static_cast<uint8_t>(adc_num)]->setResolution(bits);
-            return;
+            adc_num == ADC_NUM::ADC_0 ? adc0->setResolution(bits) : adc1->setResolution(bits);
         }
 
         //! Returns the resolution of the ADC_Module.
@@ -373,7 +113,7 @@ class ADC
         *   \return the resolution of adc_num ADC.
         */
         uint8_t getResolution(ADC_NUM adc_num = ADC_NUM::ADC_0) __attribute__((always_inline)) {
-            return adc[static_cast<uint8_t>(adc_num)]->getResolution();
+            return adc_num == ADC_NUM::ADC_0 ? adc0->getResolution() : adc1->getResolution();
         }
 
         //! Returns the maximum value for a measurement: 2^res-1.
@@ -382,7 +122,7 @@ class ADC
         *   \return the maximum value of adc_num ADC.
         */
         uint32_t getMaxValue(ADC_NUM adc_num = ADC_NUM::ADC_0) __attribute__((always_inline)) {
-            return adc[static_cast<uint8_t>(adc_num)]->getMaxValue();
+            return adc_num == ADC_NUM::ADC_0 ? adc0->getMaxValue() : adc1->getMaxValue();
         }
 
 
@@ -406,7 +146,8 @@ class ADC
         *   \param adc_num ADC_NUM enum member. Selects the ADC module to use.
         */
         void setConversionSpeed(ADC_CONVERSION_SPEED speed, ADC_NUM adc_num = ADC_NUM::ADC_0) __attribute__((always_inline)) {
-            adc[static_cast<uint8_t>(adc_num)]->setConversionSpeed(speed);}
+            adc_num == ADC_NUM::ADC_0 ? adc0->setConversionSpeed(speed) : adc1->setConversionSpeed(speed);
+        }
 
 
         //! Sets the sampling speed
@@ -421,7 +162,7 @@ class ADC
         *   \param adc_num ADC_NUM enum member. Selects the ADC module to use.
         */
         void setSamplingSpeed(ADC_SAMPLING_SPEED speed, ADC_NUM adc_num = ADC_NUM::ADC_0) __attribute__((always_inline)) {
-            adc[static_cast<uint8_t>(adc_num)]->setSamplingSpeed(speed);
+            adc_num == ADC_NUM::ADC_0 ? adc0->setSamplingSpeed(speed) : adc1->setSamplingSpeed(speed);
         }
 
 
@@ -431,7 +172,7 @@ class ADC
         *   \param adc_num ADC_NUM enum member. Selects the ADC module to use.
         */
         void setAveraging(uint8_t num, ADC_NUM adc_num = ADC_NUM::ADC_0) __attribute__((always_inline)) {
-            adc[static_cast<uint8_t>(adc_num)]->setAveraging(num);
+            adc_num == ADC_NUM::ADC_0 ? adc0->setAveraging(num) : adc1->setAveraging(num);
         }
 
 
@@ -441,7 +182,7 @@ class ADC
         *   \param adc_num ADC_NUM enum member. Selects the ADC module to use.
         */
         void enableInterrupts(ADC_NUM adc_num = ADC_NUM::ADC_0) __attribute__((always_inline)) {
-            adc[static_cast<uint8_t>(adc_num)]->enableInterrupts();
+            adc_num == ADC_NUM::ADC_0 ? adc0->enableInterrupts() : adc1->enableInterrupts();
         }
 
         //! Disable interrupts
@@ -449,7 +190,7 @@ class ADC
         *   \param adc_num ADC_NUM enum member. Selects the ADC module to use.
         */
         void disableInterrupts(ADC_NUM adc_num = ADC_NUM::ADC_0) __attribute__((always_inline)) {
-            adc[static_cast<uint8_t>(adc_num)]->disableInterrupts();
+            adc_num == ADC_NUM::ADC_0 ? adc0->disableInterrupts() : adc1->disableInterrupts();
         }
 
 
@@ -459,7 +200,7 @@ class ADC
         *   \param adc_num ADC_NUM enum member. Selects the ADC module to use.
         */
         void enableDMA(ADC_NUM adc_num = ADC_NUM::ADC_0) __attribute__((always_inline)) {
-            adc[static_cast<uint8_t>(adc_num)]->enableDMA();
+            adc_num == ADC_NUM::ADC_0 ? adc0->enableDMA() : adc1->enableDMA();
         }
 
         //! Disable ADC DMA request
@@ -467,7 +208,7 @@ class ADC
         *   \param adc_num ADC_NUM enum member. Selects the ADC module to use.
         */
         void disableDMA(ADC_NUM adc_num = ADC_NUM::ADC_0) __attribute__((always_inline)) {
-            adc[static_cast<uint8_t>(adc_num)]->disableDMA();
+            adc_num == ADC_NUM::ADC_0 ? adc0->disableDMA() : adc1->disableDMA();
         }
 
 
@@ -481,7 +222,7 @@ class ADC
         *   \param adc_num ADC_NUM enum member. Selects the ADC module to use.
         */
         void enableCompare(int16_t compValue, bool greaterThan, ADC_NUM adc_num = ADC_NUM::ADC_0) __attribute__((always_inline)) {
-            adc[static_cast<uint8_t>(adc_num)]->enableCompare(compValue, greaterThan);
+            adc_num == ADC_NUM::ADC_0 ? adc0->enableCompare(compValue, greaterThan) : adc1->enableCompare(compValue, greaterThan);
         }
 
         //! Enable the compare function to a range
@@ -497,7 +238,7 @@ class ADC
         *   \param adc_num ADC_NUM enum member. Selects the ADC module to use.
         */
         void enableCompareRange(int16_t lowerLimit, int16_t upperLimit, bool insideRange, bool inclusive, ADC_NUM adc_num = ADC_NUM::ADC_0)  {
-            adc[static_cast<uint8_t>(adc_num)]->enableCompareRange(lowerLimit, upperLimit, insideRange, inclusive);
+            adc_num == ADC_NUM::ADC_0 ? adc0->enableCompareRange(lowerLimit, upperLimit, insideRange, inclusive) : adc1->enableCompareRange(lowerLimit, upperLimit, insideRange, inclusive);
         }
 
         //! Disable the compare function
@@ -505,7 +246,7 @@ class ADC
         *   \param adc_num ADC_NUM enum member. Selects the ADC module to use.
         */
         void disableCompare(ADC_NUM adc_num = ADC_NUM::ADC_0) __attribute__((always_inline)) {
-            adc[static_cast<uint8_t>(adc_num)]->disableCompare();
+            adc_num == ADC_NUM::ADC_0 ? adc0->disableCompare() : adc1->disableCompare();
         }
 
 
@@ -516,7 +257,7 @@ class ADC
         *   \param adc_num ADC_NUM enum member. Selects the ADC module to use.
         */
         void enablePGA(uint8_t gain, ADC_NUM adc_num = ADC_NUM::ADC_0) __attribute__((always_inline)) {
-            adc[static_cast<uint8_t>(adc_num)]->enablePGA(gain);
+            adc_num == ADC_NUM::ADC_0 ? adc0->enablePGA(gain) : adc1->enablePGA(gain);
         }
 
         //! Returns the PGA level
@@ -525,7 +266,7 @@ class ADC
         *   \return PGA level = from 1 to 64
         */
         uint8_t getPGA(ADC_NUM adc_num = ADC_NUM::ADC_0) __attribute__((always_inline)) {
-            return adc[static_cast<uint8_t>(adc_num)]->getPGA();
+            return adc_num == ADC_NUM::ADC_0 ? adc0->getPGA() : adc1->getPGA();
         }
 
         //! Disable PGA
@@ -533,7 +274,7 @@ class ADC
         *   \param adc_num ADC_NUM enum member. Selects the ADC module to use.
         */
         void disablePGA(ADC_NUM adc_num = ADC_NUM::ADC_0) __attribute__((always_inline)) {
-            adc[static_cast<uint8_t>(adc_num)]->disablePGA();
+            return adc_num == ADC_NUM::ADC_0 ? adc0->disablePGA() : adc1->disablePGA();
         }
 
 
@@ -545,7 +286,7 @@ class ADC
         *   \return true if yes, false if not.
         */
         bool isConverting(ADC_NUM adc_num = ADC_NUM::ADC_0) __attribute__((always_inline)) {
-            return adc[static_cast<uint8_t>(adc_num)]->isConverting();
+            return adc_num == ADC_NUM::ADC_0 ? adc0->isConverting() : adc1->isConverting();
         }
 
         //! Is an ADC conversion ready?
@@ -555,7 +296,7 @@ class ADC
         *   \return true if yes, false if not.
         */
         bool isComplete(ADC_NUM adc_num = ADC_NUM::ADC_0) __attribute__((always_inline)) {
-            return adc[static_cast<uint8_t>(adc_num)]->isComplete();
+            return adc_num == ADC_NUM::ADC_0 ? adc0->isComplete() : adc1->isComplete();
         }
 
         //! Is the ADC in differential mode?
@@ -564,7 +305,7 @@ class ADC
         *   \return true or false
         */
         bool isDifferential(ADC_NUM adc_num = ADC_NUM::ADC_0) __attribute__((always_inline)) {
-            return adc[static_cast<uint8_t>(adc_num)]->isDifferential();
+            return adc_num == ADC_NUM::ADC_0 ? adc0->isDifferential() : adc1->isDifferential();
         }
 
         //! Is the ADC in continuous mode?
@@ -573,7 +314,7 @@ class ADC
         *   \return true or false
         */
         bool isContinuous(ADC_NUM adc_num = ADC_NUM::ADC_0) __attribute__((always_inline)) {
-            return adc[static_cast<uint8_t>(adc_num)]->isContinuous();
+            return adc_num == ADC_NUM::ADC_0 ? adc0->isContinuous() : adc1->isContinuous();
         }
 
 
@@ -590,9 +331,37 @@ class ADC
         *   \param adc_num ADC_NUM enum member. Selects the ADC module to use.
         *   \return the value of the pin.
         */
-        int analogRead(uint8_t pin, ADC_NUM adc_num = ADC_NUM::ANY) __attribute__((always_inline)) {
-            // dispatch to the right ADC module depending on the policy that we want.
-            return dispatch_policy(&ADC_Module::checkPin, &ADC_Module::analogRead, adc_num, pin);
+        int analogRead(uint8_t pin, ADC_NUM adc_num = ADC_NUM::ANY) {
+            #if ADC_NUM_ADCS==1
+            return adc0->analogRead(pin); // use ADC0
+            #elif ADC_NUM_ADCS==2
+            if(adc_num == ADC_NUM::ANY) { // use no ADC in particular
+                // check which ADC can read the pin
+                const bool adc0Pin = adc0->checkPin(pin);
+                const bool adc1Pin = adc1->checkPin(pin);
+
+                if(adc0Pin && adc1Pin)  { // Both ADCs
+                    if( (adc0->num_measurements) > (adc1->num_measurements)) { // use the ADC with less workload
+                        return adc1->analogRead(pin);
+                    } else {
+                        return adc0->analogRead(pin);
+                    }
+                } else if(adc0Pin) { // ADC0
+                    return adc0->analogRead(pin);
+                } else if(adc1Pin) { // ADC1
+                    return adc1->analogRead(pin);
+                } else { // pin not valid in any ADC
+                    adc0->fail_flag |= ADC_ERROR::WRONG_PIN;
+                    adc1->fail_flag |= ADC_ERROR::WRONG_PIN;
+                    return ADC_ERROR_VALUE;   // all others are invalid
+                }
+            }
+            else {
+                return adc_num == ADC_NUM::ADC_0 ? adc0->analogRead(pin) : adc1->analogRead(pin);
+            }
+            adc0->fail_flag |= ADC_ERROR::OTHER;
+            return ADC_ERROR_VALUE;
+            #endif
         }
 
 
@@ -623,8 +392,37 @@ class ADC
         *   \return the differential value of the pins, invalid pins return ADC_ERROR_VALUE.
         *   If a comparison has been set up and fails, it will return ADC_ERROR_VALUE.
         */
-        int analogReadDifferential(uint8_t pinP, uint8_t pinN, ADC_NUM adc_num = ADC_NUM::ANY) __attribute__((always_inline)) {
-            return dispatch_policy(&ADC_Module::checkDifferentialPins, &ADC_Module::analogReadDifferential, adc_num, pinP, pinN);
+        int analogReadDifferential(uint8_t pinP, uint8_t pinN, ADC_NUM adc_num = ADC_NUM::ANY) {
+            #if ADC_NUM_ADCS==1
+            return adc0->analogReadDifferential(pinP, pinN); // use ADC0
+            #elif ADC_NUM_ADCS==2
+            if(adc_num == ADC_NUM::ANY) { // use no ADC in particular
+                // check which ADC can read the pinP, pinN
+                const bool adc0Pin = adc0->checkDifferentialPins(pinP, pinN);
+                const bool adc1Pin = adc1->checkDifferentialPins(pinP, pinN);
+
+                if(adc0Pin && adc1Pin)  { // Both ADCs
+                    if( (adc0->num_measurements) > (adc1->num_measurements)) { // use the ADC with less workload
+                        return adc1->analogReadDifferential(pinP, pinN);
+                    } else {
+                        return adc0->analogReadDifferential(pinP, pinN);
+                    }
+                } else if(adc0Pin) { // ADC0
+                    return adc0->analogReadDifferential(pinP, pinN);
+                } else if(adc1Pin) { // ADC1
+                    return adc1->analogReadDifferential(pinP, pinN);
+                } else { // pin not valid in any ADC
+                    adc0->fail_flag |= ADC_ERROR::WRONG_PIN;
+                    adc1->fail_flag |= ADC_ERROR::WRONG_PIN;
+                    return ADC_ERROR_VALUE;   // all others are invalid
+                }
+            }
+            else {
+                return adc_num == ADC_NUM::ADC_0 ? adc0->analogReadDifferential(pinP, pinN) : adc1->analogReadDifferential(pinP, pinN);
+            }
+            adc0->fail_flag |= ADC_ERROR::OTHER;
+            return ADC_ERROR_VALUE;
+            #endif
         }
 
 
@@ -637,8 +435,37 @@ class ADC
         *   \param adc_num ADC_NUM enum member. Selects the ADC module to use.
         *   \return true if the pin is valid, false otherwise.
         */
-        bool startSingleRead(uint8_t pin, ADC_NUM adc_num = ADC_NUM::ANY) __attribute__((always_inline)) {
-            return dispatch_policy(&ADC_Module::checkPin, &ADC_Module::startSingleRead, adc_num, pin);
+        bool startSingleRead(uint8_t pin, ADC_NUM adc_num = ADC_NUM::ANY) {
+            #if ADC_NUM_ADCS==1
+            return adc0->startSingleRead(pin); // use ADC0
+            #elif ADC_NUM_ADCS==2
+            if(adc_num == ADC_NUM::ANY) { // use no ADC in particular
+                // check which ADC can read the pin
+                const bool adc0Pin = adc0->checkPin(pin);
+                const bool adc1Pin = adc1->checkPin(pin);
+
+                if(adc0Pin && adc1Pin)  { // Both ADCs
+                    if( (adc0->num_measurements) > (adc1->num_measurements)) { // use the ADC with less workload
+                        return adc1->startSingleRead(pin);
+                    } else {
+                        return adc0->startSingleRead(pin);
+                    }
+                } else if(adc0Pin) { // ADC0
+                    return adc0->startSingleRead(pin);
+                } else if(adc1Pin) { // ADC1
+                    return adc1->startSingleRead(pin);
+                } else { // pin not valid in any ADC
+                    adc0->fail_flag |= ADC_ERROR::WRONG_PIN;
+                    adc1->fail_flag |= ADC_ERROR::WRONG_PIN;
+                    return ADC_ERROR_VALUE;   // all others are invalid
+                }
+            }
+            else {
+                return adc_num == ADC_NUM::ADC_0 ? adc0->startSingleRead(pin) : adc1->startSingleRead(pin);
+            }
+            adc0->fail_flag |= ADC_ERROR::OTHER;
+            return false;
+            #endif
         }
 
         //! Start a differential conversion between two pins (pinP - pinN) and enables interrupts.
@@ -649,8 +476,37 @@ class ADC
         *   \param adc_num ADC_NUM enum member. Selects the ADC module to use.
         *   \return true if the pins are valid, false otherwise.
         */
-        bool startSingleDifferential(uint8_t pinP, uint8_t pinN, ADC_NUM adc_num = ADC_NUM::ANY) __attribute__((always_inline)) {
-            return dispatch_policy(&ADC_Module::checkDifferentialPins, &ADC_Module::startSingleDifferential, adc_num, pinP, pinN);
+        bool startSingleDifferential(uint8_t pinP, uint8_t pinN, ADC_NUM adc_num = ADC_NUM::ANY) {
+            #if ADC_NUM_ADCS==1
+            return adc0->startSingleDifferential(pinP, pinN); // use ADC0
+            #elif ADC_NUM_ADCS==2
+            if(adc_num == ADC_NUM::ANY) { // use no ADC in particular
+                // check which ADC can read the pinP, pinN
+                const bool adc0Pin = adc0->checkDifferentialPins(pinP, pinN);
+                const bool adc1Pin = adc1->checkDifferentialPins(pinP, pinN);
+
+                if(adc0Pin && adc1Pin)  { // Both ADCs
+                    if( (adc0->num_measurements) > (adc1->num_measurements)) { // use the ADC with less workload
+                        return adc1->startSingleDifferential(pinP, pinN);
+                    } else {
+                        return adc0->startSingleDifferential(pinP, pinN);
+                    }
+                } else if(adc0Pin) { // ADC0
+                    return adc0->startSingleDifferential(pinP, pinN);
+                } else if(adc1Pin) { // ADC1
+                    return adc1->startSingleDifferential(pinP, pinN);
+                } else { // pin not valid in any ADC
+                    adc0->fail_flag |= ADC_ERROR::WRONG_PIN;
+                    adc1->fail_flag |= ADC_ERROR::WRONG_PIN;
+                    return ADC_ERROR_VALUE;   // all others are invalid
+                }
+            }
+            else {
+                return adc_num == ADC_NUM::ADC_0 ? adc0->startSingleDifferential(pinP, pinN) : adc1->startSingleDifferential(pinP, pinN);
+            }
+            adc0->fail_flag |= ADC_ERROR::OTHER;
+            return ADC_ERROR_VALUE;
+            #endif
         }
 
         //! Reads the analog value of a single conversion.
@@ -659,7 +515,7 @@ class ADC
         *   \return the converted value.
         */
         int readSingle(ADC_NUM adc_num = ADC_NUM::ADC_0) __attribute__((always_inline)) {
-            return adc[static_cast<uint8_t>(adc_num)]->readSingle();
+            return adc_num == ADC_NUM::ADC_0 ? adc0->readSingle() : adc1->readSingle();
         }
 
 
@@ -672,8 +528,37 @@ class ADC
         *   \param adc_num ADC_NUM enum member. Selects the ADC module to use.
         *   \return true if the pin is valid, false otherwise.
         */
-        bool startContinuous(uint8_t pin, ADC_NUM adc_num = ADC_NUM::ANY) __attribute__((always_inline)) {
-            return dispatch_policy(&ADC_Module::checkPin, &ADC_Module::startContinuous, adc_num, pin);
+        bool startContinuous(uint8_t pin, ADC_NUM adc_num = ADC_NUM::ANY) {
+            #if ADC_NUM_ADCS==1
+            return adc0->startContinuous(pin); // use ADC0
+            #elif ADC_NUM_ADCS==2
+            if(adc_num == ADC_NUM::ANY) { // use no ADC in particular
+                // check which ADC can read the pin
+                const bool adc0Pin = adc0->checkPin(pin);
+                const bool adc1Pin = adc1->checkPin(pin);
+
+                if(adc0Pin && adc1Pin)  { // Both ADCs
+                    if( (adc0->num_measurements) > (adc1->num_measurements)) { // use the ADC with less workload
+                        return adc1->startContinuous(pin);
+                    } else {
+                        return adc0->startContinuous(pin);
+                    }
+                } else if(adc0Pin) { // ADC0
+                    return adc0->startContinuous(pin);
+                } else if(adc1Pin) { // ADC1
+                    return adc1->startContinuous(pin);
+                } else { // pin not valid in any ADC
+                    adc0->fail_flag |= ADC_ERROR::WRONG_PIN;
+                    adc1->fail_flag |= ADC_ERROR::WRONG_PIN;
+                    return ADC_ERROR_VALUE;   // all others are invalid
+                }
+            }
+            else {
+                return adc_num == ADC_NUM::ADC_0 ? adc0->startContinuous(pin) : adc1->startContinuous(pin);
+            }
+            adc0->fail_flag |= ADC_ERROR::OTHER;
+            return false;
+            #endif
         }
 
         //! Starts continuous conversion between the pins (pinP-pinN).
@@ -683,8 +568,37 @@ class ADC
         *   \param adc_num ADC_NUM enum member. Selects the ADC module to use.
         *   \return true if the pins are valid, false otherwise.
         */
-        bool startContinuousDifferential(uint8_t pinP, uint8_t pinN, ADC_NUM adc_num = ADC_NUM::ANY) __attribute__((always_inline)) {
-            return dispatch_policy(&ADC_Module::checkDifferentialPins, &ADC_Module::startContinuousDifferential, adc_num, pinP, pinN);
+        bool startContinuousDifferential(uint8_t pinP, uint8_t pinN, ADC_NUM adc_num = ADC_NUM::ANY) {
+            #if ADC_NUM_ADCS==1
+            return adc0->startContinuousDifferential(pinP, pinN); // use ADC0
+            #elif ADC_NUM_ADCS==2
+            if(adc_num == ADC_NUM::ANY) { // use no ADC in particular
+                // check which ADC can read the pinP, pinN
+                const bool adc0Pin = adc0->checkDifferentialPins(pinP, pinN);
+                const bool adc1Pin = adc1->checkDifferentialPins(pinP, pinN);
+
+                if(adc0Pin && adc1Pin)  { // Both ADCs
+                    if( (adc0->num_measurements) > (adc1->num_measurements)) { // use the ADC with less workload
+                        return adc1->startContinuousDifferential(pinP, pinN);
+                    } else {
+                        return adc0->startContinuousDifferential(pinP, pinN);
+                    }
+                } else if(adc0Pin) { // ADC0
+                    return adc0->startContinuousDifferential(pinP, pinN);
+                } else if(adc1Pin) { // ADC1
+                    return adc1->startContinuousDifferential(pinP, pinN);
+                } else { // pin not valid in any ADC
+                    adc0->fail_flag |= ADC_ERROR::WRONG_PIN;
+                    adc1->fail_flag |= ADC_ERROR::WRONG_PIN;
+                    return ADC_ERROR_VALUE;   // all others are invalid
+                }
+            }
+            else {
+                return adc_num == ADC_NUM::ADC_0 ? adc0->startContinuousDifferential(pinP, pinN) : adc1->startContinuousDifferential(pinP, pinN);
+            }
+            adc0->fail_flag |= ADC_ERROR::OTHER;
+            return ADC_ERROR_VALUE;
+            #endif
         }
 
         //! Reads the analog value of a continuous conversion.
@@ -695,7 +609,7 @@ class ADC
         *   \return the last converted value.
         */
         int analogReadContinuous(ADC_NUM adc_num = ADC_NUM::ADC_0) __attribute__((always_inline)) {
-            return adc[static_cast<uint8_t>(adc_num)]->analogReadContinuous();
+            return adc_num == ADC_NUM::ADC_0 ? adc0->analogReadContinuous() : adc1->analogReadContinuous();
         }
 
         //! Stops continuous conversion
@@ -703,7 +617,7 @@ class ADC
         *   \param adc_num ADC_NUM enum member. Selects the ADC module to use.
         */
         void stopContinuous(ADC_NUM adc_num = ADC_NUM::ADC_0) __attribute__((always_inline)) {
-            adc[static_cast<uint8_t>(adc_num)]->stopContinuous();
+            adc_num == ADC_NUM::ADC_0 ? adc0->stopContinuous() : adc1->stopContinuous();
         }
 
 
@@ -832,16 +746,14 @@ class ADC
         //////////// ERROR PRINTING /////
         //! Prints the human-readable error from all ADC, if any.
         void printError() {
-            for(int i=0; i< ADC_NUM_ADCS; i++) {
-                adc[i]->printError();
-            }
+            adc0->printError();
+            adc1->printError();
         }
 
         //! Resets all errors from all ADCs, if any.
         void resetError() {
-            for(int i=0; i< ADC_NUM_ADCS; i++) {
-                adc[i]->resetError();
-            }
+            adc0->resetError();
+            adc1->resetError();
         }
 
 };
