@@ -1108,20 +1108,40 @@ public:
     *   \return the value of the pin.
     */
     int analogRead(uint8_t pin);
-    //template<uint8_t pin>
-    int analogReadFast(uint8_t pin) {
+    template<uint8_t pin>
+    int analogRead() {
         // check whether the pin is correct
         if(!checkPin(pin)) {
             fail_flag |= ADC_ERROR::WRONG_PIN;
             return ADC_ERROR_VALUE;
         }
 
+        // increase the counter of measurements
+        num_measurements++;
+
+        //digitalWriteFast(LED_BUILTIN, !digitalReadFast(LED_BUILTIN));
+
         if (calibrating) wait_for_cal();
+
+        //digitalWriteFast(LED_BUILTIN, !digitalReadFast(LED_BUILTIN));
+
+        // check if we are interrupting a measurement, store setting if so.
+        // vars to save the current state of the ADC in case it's in use
+        ADC_Config old_config = {0};
+        const bool wasADCInUse = isConverting(); // is the ADC running now?
+
+        if(wasADCInUse) { // this means we're interrupting a conversion
+            // save the current conversion config, we don't want any other interrupts messing up the configs
+            __disable_irq();
+            //digitalWriteFast(LED_BUILTIN, !digitalReadFast(LED_BUILTIN) );
+            saveConfig(&old_config);
+            __enable_irq();
+        }
 
         // no continuous mode
         singleMode();
 
-        startReadFast(pin); // start single read
+        startReadFast<pin>(); // start single read
 
         // wait for the ADC to finish
         while(isConverting()) {
@@ -1139,6 +1159,15 @@ public:
         }
         __enable_irq();
 
+        // if we interrupted a conversion, set it again
+        if (wasADCInUse) {
+            //digitalWriteFast(LED_BUILTIN, !digitalReadFast(LED_BUILTIN) );
+            __disable_irq();
+            loadConfig(&old_config);
+            __enable_irq();
+        }
+
+        num_measurements--;
         return result;
     } // analogRead
 
