@@ -512,9 +512,17 @@ using ADC_Error::ADC_ERROR;
 #define ADC_SC3_AVGS_MASK_0 (1<<0)
 
 
+// translate pin number to SC1A nomenclature and viceversa
+// we need to create this static const arrays so that we can assign the "normal arrays" to the correct one
+// depending on which ADC module we will be.
+/* channel2sc1aADCx converts a pin number to their value for the SC1A register, for the ADC0 and ADC1
+*  numbers with +ADC_SC1A_PIN_MUX (128) means those pins use mux a, the rest use mux b.
+*  numbers with +ADC_SC1A_PIN_DIFF (64) means it's also a differential pin (treated also in the channel2sc1a_diff_ADCx)
+*  For diff_table_ADCx, +ADC_SC1A_PIN_PGA means the pin can use PGA on that ADC
+*/
+
 template<uint8_t adc_num>
-struct Channel2SC1A {
-};
+struct Channel2SC1A {};
 template<>
 struct Channel2SC1A<0> {
     #if defined(ADC_TEENSY_3_0)
@@ -570,9 +578,10 @@ struct Channel2SC1A<0> {
     };
     #endif // which Teensy
 };
+#if ADC_NUM_ADCS>1
 template<>
 struct Channel2SC1A<1> {
-    #if ADC_NUM_ADCS>1
+
     #if defined(ADC_TEENSY_3_1)
     //! Translate pin number to SC1A nomenclature
     static constexpr const uint8_t channel2sc1a[ADC_MAX_PIN+1]= { // new version, gives directly the sc1a number. 0x1F=31 deactivates the ADC.
@@ -608,8 +617,9 @@ struct Channel2SC1A<1> {
         31, 31, 0+ADC_SC1A_PIN_DIFF, 19+ADC_SC1A_PIN_DIFF, 31, 23 // 61-67 64: A10, 65: A11, 66: A21(ADC0), 67: A22
     };
     #endif
-    #endif // ADC_NUM_ADCS > 1
+
 };
+#endif // ADC_NUM_ADCS > 1
 
 
 #if defined(ADC_TEENSY_3_0) || defined(ADC_TEENSY_3_1)
@@ -667,8 +677,7 @@ struct ADC_NLIST {
 };
 
 template<uint8_t adc_num>
-struct Diff_Table {
-};
+struct Diff_Table {};
 template<>
 struct Diff_Table<0> {
     #if defined(ADC_TEENSY_3_1)
@@ -693,6 +702,7 @@ struct Diff_Table<0> {
     };
     #endif
 };
+#if ADC_NUM_ADCS>1
 template<>
 struct Diff_Table<1> {
     #if defined(ADC_TEENSY_3_1)
@@ -707,6 +717,7 @@ struct Diff_Table<1> {
     };
     #endif
 };
+#endif
 
 
 /** Class ADC_Module: Implements all functions of the Teensy 3.x, LC analog to digital converter
@@ -780,13 +791,13 @@ public:
     /**
     *   \return the resolution of the ADC_Module.
     */
-    uint8_t getResolution();
+    uint8_t getResolution() const;
 
     //! Returns the maximum value for a measurement: 2^res-1.
     /**
     *   \return the maximum value for a measurement: 2^res-1.
     */
-    uint32_t getMaxValue();
+    uint32_t getMaxValue() const;
 
 
     //! Sets the conversion speed (changes the ADC clock, ADCK)
@@ -836,20 +847,32 @@ public:
     /** An IRQ_ADCx Interrupt will be raised when the conversion is completed
     *  (including hardware averages and if the comparison (if any) is true).
     */
-    void enableInterrupts();
+    void enableInterrupts(){
+        atomic::setBitFlag(ADC_SC1A(), ADC_SC1_AIEN);
+        NVIC_ENABLE_IRQ(IRQ_ADC);
+        interrupt_enabled = true;
+    }
 
     //! Disable interrupts
-    void disableInterrupts();
+    void disableInterrupts(){
+        atomic::clearBitFlag(ADC_SC1A(), ADC_SC1_AIEN);
+        NVIC_DISABLE_IRQ(IRQ_ADC);
+        interrupt_enabled = false;
+    }
 
 
     //! Enable DMA request
     /** An ADC DMA request will be raised when the conversion is completed
     *  (including hardware averages and if the comparison (if any) is true).
     */
-    void enableDMA();
+    void enableDMA() const{
+        atomic::setBitFlag(ADC_SC2(), ADC_SC2_DMAEN);
+    }
 
     //! Disable ADC DMA request
-    void disableDMA();
+    void disableDMA() const{
+        atomic::clearBitFlag(ADC_SC2(), ADC_SC2_DMAEN);
+    }
 
 
     //! Enable the compare function to a single value
@@ -1044,6 +1067,7 @@ public:
     *   \param pin to read.
     */
     void startReadFast(uint8_t pin); // helper method
+    // function template
     template<uint8_t pin>
     void startReadFast() {
         // translate pin number to SC1A number, that also contains MUX a or b info.
@@ -1057,7 +1081,7 @@ public:
 
         // select pin for single-ended mode and start conversion, enable interrupts if requested
         __disable_irq();
-        ADC_SC1A() = (sc1a_pin&ADC_SC1A_CHANNELS) + atomic::getBitFlag(ADC_SC1A(), ADC_SC1_AIEN)*ADC_SC1_AIEN;
+        ADC_SC1A() = (sc1a_pin&ADC_SC1A_CHANNELS) + (uint8_t)interrupt_enabled*ADC_SC1_AIEN;
         __enable_irq();
     }
 
@@ -1084,41 +1108,20 @@ public:
     *   \return the value of the pin.
     */
     int analogRead(uint8_t pin);
-    template<uint8_t pin>
-    int analogRead() {
+    //template<uint8_t pin>
+    int analogReadFast(uint8_t pin) {
         // check whether the pin is correct
         if(!checkPin(pin)) {
             fail_flag |= ADC_ERROR::WRONG_PIN;
             return ADC_ERROR_VALUE;
         }
 
-        // increase the counter of measurements
-        num_measurements++;
-
-        //digitalWriteFast(LED_BUILTIN, !digitalReadFast(LED_BUILTIN));
-
         if (calibrating) wait_for_cal();
-
-        //digitalWriteFast(LED_BUILTIN, !digitalReadFast(LED_BUILTIN));
-
-        // check if we are interrupting a measurement, store setting if so.
-        // vars to save the current state of the ADC in case it's in use
-        ADC_Config old_config = {0};
-        const bool wasADCInUse = isConverting(); // is the ADC running now?
-
-        if(wasADCInUse) { // this means we're interrupting a conversion
-            // save the current conversion config, we don't want any other interrupts messing up the configs
-            __disable_irq();
-            //digitalWriteFast(LED_BUILTIN, !digitalReadFast(LED_BUILTIN) );
-            saveConfig(&old_config);
-            __enable_irq();
-        }
-
 
         // no continuous mode
         singleMode();
 
-        startReadFast<pin>(); // start single read
+        startReadFast(pin); // start single read
 
         // wait for the ADC to finish
         while(isConverting()) {
@@ -1136,17 +1139,7 @@ public:
         }
         __enable_irq();
 
-        // if we interrupted a conversion, set it again
-        if (wasADCInUse) {
-            //digitalWriteFast(LED_BUILTIN, !digitalReadFast(LED_BUILTIN) );
-            __disable_irq();
-            loadConfig(&old_config);
-            __enable_irq();
-        }
-
-        num_measurements--;
         return result;
-
     } // analogRead
 
     //! Returns the analog value of the special internal source, such as the temperature sensor.
@@ -1322,6 +1315,8 @@ private:
     // the first calibration will use 32 averages and lowest speed,
     // when this calibration is over the averages and speed will be set to default.
     uint8_t init_calib = true;
+
+    bool interrupt_enabled = false;
 
     // resolution
     uint8_t analog_res_bits = 0;

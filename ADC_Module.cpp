@@ -165,9 +165,7 @@ void ADC_Module<ADC_num>::wait_for_cal(void) {
 */
 template<uint8_t ADC_num>
 void ADC_Module<ADC_num>::recalibrate() {
-
     calibrate();
-
     wait_for_cal();
 }
 
@@ -285,7 +283,7 @@ void ADC_Module<ADC_num>::setResolution(uint8_t bits) {
 *
 */
 template<uint8_t ADC_num>
-uint8_t ADC_Module<ADC_num>::getResolution() {
+uint8_t ADC_Module<ADC_num>::getResolution() const{
     return analog_res_bits;
 }
 
@@ -293,7 +291,7 @@ uint8_t ADC_Module<ADC_num>::getResolution() {
 *
 */
 template<uint8_t ADC_num>
-uint32_t ADC_Module<ADC_num>::getMaxValue() {
+uint32_t ADC_Module<ADC_num>::getMaxValue() const{
     return analog_max_val;
 }
 
@@ -310,7 +308,6 @@ uint32_t ADC_Module<ADC_num>::getMaxValue() {
 */
 template<uint8_t ADC_num>
 void ADC_Module<ADC_num>::setConversionSpeed(ADC_CONVERSION_SPEED speed) {
-
     if(speed==conversion_speed) { // no change
         return;
     }
@@ -346,57 +343,42 @@ void ADC_Module<ADC_num>::setConversionSpeed(ADC_CONVERSION_SPEED speed) {
         return;
     }
 
-
     // normal bus clock used
-
-    // *ADC_CFG2_adacken = 0; // disable the internal asynchronous clock
     atomic::clearBitFlag(ADC_CFG2(), ADC_CFG2_ADACKEN);
 
     uint32_t ADC_CFG1_speed; // store the clock and divisor
 
     if(speed == ADC_CONVERSION_SPEED::VERY_LOW_SPEED) {
-        // *ADC_CFG2_adhsc = 0; // no high-speed config
-        // *ADC_CFG1_adlpc  = 1; // use low power conf.
         atomic::clearBitFlag(ADC_CFG2(), ADC_CFG2_ADHSC);
         atomic::setBitFlag(ADC_CFG1(), ADC_CFG1_ADLPC);
 
         ADC_CFG1_speed = ADC_CFG1_VERY_LOW_SPEED;
 
     } else if(speed == ADC_CONVERSION_SPEED::LOW_SPEED) {
-        // *ADC_CFG2_adhsc = 0; // no high-speed config
-        // *ADC_CFG1_adlpc  = 1; // use low power conf.
         atomic::clearBitFlag(ADC_CFG1(), ADC_CFG2_ADHSC);
         atomic::setBitFlag(ADC_CFG1(), ADC_CFG1_ADLPC);
 
         ADC_CFG1_speed = ADC_CFG1_LOW_SPEED;
 
     } else if(speed == ADC_CONVERSION_SPEED::MED_SPEED) {
-        // *ADC_CFG2_adhsc = 0; // no high-speed config
-        // *ADC_CFG1_adlpc  = 0; // no low power conf.
         atomic::clearBitFlag(ADC_CFG1(), ADC_CFG2_ADHSC);
         atomic::clearBitFlag(ADC_CFG1(), ADC_CFG1_ADLPC);
 
         ADC_CFG1_speed = ADC_CFG1_MED_SPEED;
 
     } else if(speed == ADC_CONVERSION_SPEED::HIGH_SPEED_16BITS) {
-        // *ADC_CFG2_adhsc = 1; // high-speed config: add 2 ADCK
-        // *ADC_CFG1_adlpc  = 0; // no low power conf.
         atomic::setBitFlag(ADC_CFG1(), ADC_CFG2_ADHSC);
         atomic::clearBitFlag(ADC_CFG1(), ADC_CFG1_ADLPC);
 
         ADC_CFG1_speed = ADC_CFG1_HI_SPEED_16_BITS;
 
     } else if(speed == ADC_CONVERSION_SPEED::HIGH_SPEED) {
-        // *ADC_CFG2_adhsc = 1; // high-speed config: add 2 ADCK
-        // *ADC_CFG1_adlpc  = 0; // no low power conf.
         atomic::setBitFlag(ADC_CFG1(), ADC_CFG2_ADHSC);
         atomic::clearBitFlag(ADC_CFG1(), ADC_CFG1_ADLPC);
 
         ADC_CFG1_speed = ADC_CFG1_HI_SPEED;
 
     } else if(speed == ADC_CONVERSION_SPEED::VERY_HIGH_SPEED) { // this speed is most likely out of specs, so accuracy can be bad
-        // *ADC_CFG2_adhsc = 1; // high-speed config: add 2 ADCK
-        // *ADC_CFG1_adlpc  = 0; // no low power conf.
         atomic::setBitFlag(ADC_CFG1(), ADC_CFG2_ADHSC);
         atomic::clearBitFlag(ADC_CFG1(), ADC_CFG1_ADLPC);
 
@@ -408,15 +390,11 @@ void ADC_Module<ADC_num>::setConversionSpeed(ADC_CONVERSION_SPEED speed) {
     }
 
     // clock source is bus or bus/2
-    // *ADC_CFG1_adiclk1 = !!(ADC_CFG1_speed & ADC_CFG1_ADICLK_MASK_1); // !!x converts the number x to either 0 or 1.
-    // *ADC_CFG1_adiclk0 = !!(ADC_CFG1_speed & ADC_CFG1_ADICLK_MASK_0);
     atomic::changeBitFlag(ADC_CFG1(), ADC_CFG1_ADICLK_MASK_1, !!(ADC_CFG1_speed & ADC_CFG1_ADICLK_MASK_1));
     atomic::changeBitFlag(ADC_CFG1(), ADC_CFG1_ADICLK_MASK_0, !!(ADC_CFG1_speed & ADC_CFG1_ADICLK_MASK_0));
 
     // divisor for the clock source: 1, 2, 4 or 8.
     // so total speed can be: bus, bus/2, bus/4, bus/8 or bus/16.
-    // *ADC_CFG1_adiv1 = !!(ADC_CFG1_speed & ADC_CFG1_ADIV_MASK_1);
-    // ADC_CFG1_adiv0 = !!(ADC_CFG1_speed & ADC_CFG1_ADIV_MASK_0);
     atomic::changeBitFlag(ADC_CFG1(), ADC_CFG1_ADIV_MASK_1, !!(ADC_CFG1_speed & ADC_CFG1_ADIV_MASK_1));
     atomic::changeBitFlag(ADC_CFG1(), ADC_CFG1_ADIV_MASK_0, !!(ADC_CFG1_speed & ADC_CFG1_ADIV_MASK_0));
 
@@ -532,54 +510,6 @@ void ADC_Module<ADC_num>::setAveraging(uint8_t num) {
         }
     }
     analog_num_average = num;
-}
-
-
-/* Enable interrupts: An ADC Interrupt will be raised when the conversion is completed
-*  (including hardware averages and if the comparison (if any) is true).
-*/
-template<uint8_t ADC_num>
-void ADC_Module<ADC_num>::enableInterrupts() {
-    if (calibrating) wait_for_cal();
-
-    // ADC_SC1A_aien = 1;
-    atomic::setBitFlag(ADC_SC1A(), ADC_SC1_AIEN);
-
-    NVIC_ENABLE_IRQ(IRQ_ADC);
-}
-
-/* Disable interrupts
-*
-*/
-template<uint8_t ADC_num>
-void ADC_Module<ADC_num>::disableInterrupts() {
-    // ADC_SC1A_aien = 0;
-    atomic::clearBitFlag(ADC_SC1A(), ADC_SC1_AIEN);
-
-    NVIC_DISABLE_IRQ(IRQ_ADC);
-}
-
-
-/* Enable DMA request: An ADC DMA request will be raised when the conversion is completed
-*  (including hardware averages and if the comparison (if any) is true).
-*/
-template<uint8_t ADC_num>
-void ADC_Module<ADC_num>::enableDMA() {
-
-    if (calibrating) wait_for_cal();
-
-    // ADC_SC2_dma = 1;
-    atomic::setBitFlag(ADC_SC2(), ADC_SC2_DMAEN);
-}
-
-/* Disable ADC DMA request
-*
-*/
-template<uint8_t ADC_num>
-void ADC_Module<ADC_num>::disableDMA() {
-
-    // ADC_SC2_dma = 0;
-    atomic::clearBitFlag(ADC_SC2(), ADC_SC2_DMAEN);
 }
 
 
@@ -711,7 +641,7 @@ void ADC_Module<ADC_num>::startReadFast(uint8_t pin) {
 
     // select pin for single-ended mode and start conversion, enable interrupts if requested
     __disable_irq();
-    ADC_SC1A() = (sc1a_pin&ADC_SC1A_CHANNELS) + atomic::getBitFlag(ADC_SC1A(), ADC_SC1_AIEN)*ADC_SC1_AIEN;
+    ADC_SC1A() = (sc1a_pin&ADC_SC1A_CHANNELS) + (uint8_t)interrupt_enabled*ADC_SC1_AIEN;
     __enable_irq();
 
 }
@@ -733,7 +663,7 @@ void ADC_Module<ADC_num>::startDifferentialFast(uint8_t pinP, uint8_t pinN) {
     #endif // ADC_USE_PGA
 
     __disable_irq();
-    ADC_SC1A() = ADC_SC1_DIFF + (sc1a_pin&ADC_SC1A_CHANNELS) + atomic::getBitFlag(ADC_SC1A(), ADC_SC1_AIEN)*ADC_SC1_AIEN;
+    ADC_SC1A() = ADC_SC1_DIFF + (sc1a_pin&ADC_SC1A_CHANNELS) + (uint8_t)interrupt_enabled*ADC_SC1_AIEN;
     __enable_irq();
 
 }
