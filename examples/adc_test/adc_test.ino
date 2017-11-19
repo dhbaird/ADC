@@ -54,7 +54,7 @@ int value = 0;
 
 // test the analog pins that also have a digital function
 bool test_pullup_down(bool pullup) {
-    uint8_t mode = pullup ? INPUT_PULLUP : INPUT_PULLDOWN;
+    const uint8_t mode = pullup ? INPUT_PULLUP : INPUT_PULLDOWN;
 
     const int max_val = adc->getMaxValue(ADC_NUM::ADC_0);
 
@@ -62,6 +62,7 @@ bool test_pullup_down(bool pullup) {
 
     for (int i=0;i<DIG_PINS;i++) {
         pinMode(adc_pins_dig[i], mode);
+        delay(10); // settle time
         value = adc->analogRead(adc_pins_dig[i]);
         bool fail_condition = pullup ? (value < 0.95*max_val) : (value > 0.05*max_val);
         if (fail_condition) {
