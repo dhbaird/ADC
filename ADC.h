@@ -47,6 +47,11 @@
 class ADC
 {
     public:
+        /* channel2sc1aADCx converts a pin number to their value for the SC1A register, for the ADC0 and ADC1
+        *  numbers with +ADC_SC1A_PIN_MUX (128) means those pins use mux a, the rest use mux b.
+        *  numbers with +ADC_SC1A_PIN_DIFF (64) means it's also a differential pin (treated also in the channel2sc1a_diff_ADCx)
+        *  For diff_table_ADCx, +ADC_SC1A_PIN_PGA means the pin can use PGA on that ADC
+        */
         #if defined(ADC_TEENSY_3_0)
         //! Translate pin number to SC1A nomenclature
         static constexpr const uint8_t channel2sc1aADC0[ADC_MAX_PIN+1]= { // new version, gives directly the sc1a number. 0x1F=31 deactivates the ADC.
@@ -228,6 +233,7 @@ class ADC
         // Number of ADC objects
         const uint8_t num_ADCs = ADC_NUM_ADCS;
 
+        #if ADC_NUM_ADCS>1
         // Workload-based dispatch policy:
         // Dispatch conversion to the selected ADC. If no specific ADC is selected (ADC_NUM::ANY):
         // Check which ADC can handle the pin, if both:
@@ -236,9 +242,6 @@ class ADC
         template<typename ret_type, typename... Args>
         ret_type workload_dispatch_policy(bool (ADC_Module::*check_fun)(Args... args),
                                           ret_type (ADC_Module::*conversion_fun)(Args... args), ADC_NUM adc_num, Args... args) {
-            #if ADC_NUM_ADCS==1
-            return (adc0->*conversion_fun)(args...); // use ADC0
-            #else
             if(adc_num==ADC_NUM::ANY) { // use no ADC in particular
                 // check which ADC can read the pin
                 bool adc0Pin = (adc0->*check_fun)(args...);
@@ -262,7 +265,6 @@ class ADC
             } else { // Use a specific ADC
                 return (adc[static_cast<uint8_t>(adc_num)]->*conversion_fun)(args...);
             }
-            #endif // ADC_NUM_ADCS
         }
 
         // Simple dispatch policy:
@@ -272,9 +274,6 @@ class ADC
         template<typename ret_type, typename... Args>
         ret_type simple_dispatch_policy(bool (ADC_Module::*check_fun)(Args... args),
                                         ret_type (ADC_Module::*conversion_fun)(Args... args), ADC_NUM adc_num, Args... args) {
-            #if ADC_NUM_ADCS==1
-            return (adc0->*conversion_fun)(args...); // use ADC0
-            #else
             if(adc_num==ADC_NUM::ANY) { // use no ADC in particular
                 // check which ADC can read the pin
                 bool adc0Pin = (adc0->*check_fun)(args...);
@@ -294,7 +293,6 @@ class ADC
             } else { // Use a specific ADC
                 return (adc[static_cast<uint8_t>(adc_num)]->*conversion_fun)(args...);
             }
-            #endif // ADC_NUM_ADCS
         }
 
         // Change the return function to the policy that you want: workload_dispatch_policy or simple_dispatch_policy.
@@ -305,16 +303,23 @@ class ADC
             return workload_dispatch_policy(check_fun, conversion_fun, adc_num, args...);
             //return simple_dispatch_policy(check_fun, conversion_fun, adc_num, args...);
         }
+        #endif // ADC_NUM_ADCS
 
 
     public:
 
         //! Constructor
         ADC() {
+            digitalWriteFast(LED_BUILTIN, HIGH);
+
             // make sure the clocks to the ADC are on
-            atomic::setBitFlag(SIM_SCGC6, SIM_SCGC6_ADC0);
+            if (!(SIM_SCGC6 & SIM_SCGC6_ADC0)) { // if ADC0 clock wasn't on
+                atomic::setBitFlag(SIM_SCGC6, SIM_SCGC6_ADC0);
+            }
             #if ADC_NUM_ADCS>1
-            atomic::setBitFlag(SIM_SCGC3, SIM_SCGC3_ADC1);
+            if (!(SIM_SCGC3 & SIM_SCGC3_ADC1)) { // if ADC1 clock wasn't on
+                atomic::setBitFlag(SIM_SCGC3, SIM_SCGC3_ADC1);
+            }
             #endif
 
             adc0->analog_init();
@@ -591,8 +596,12 @@ class ADC
         *   \return the value of the pin.
         */
         int analogRead(uint8_t pin, ADC_NUM adc_num = ADC_NUM::ANY) __attribute__((always_inline)) {
+            #if ADC_NUM_ADCS==1
+            return adc0->analogRead(pin); // use ADC0
+            #else
             // dispatch to the right ADC module depending on the policy that we want.
             return dispatch_policy(&ADC_Module::checkPin, &ADC_Module::analogRead, adc_num, pin);
+            #endif
         }
 
 
@@ -624,7 +633,12 @@ class ADC
         *   If a comparison has been set up and fails, it will return ADC_ERROR_VALUE.
         */
         int analogReadDifferential(uint8_t pinP, uint8_t pinN, ADC_NUM adc_num = ADC_NUM::ANY) __attribute__((always_inline)) {
+            #if ADC_NUM_ADCS==1
+            return adc0->analogReadDifferential(pinP, pinN); // use ADC0
+            #else
+            // dispatch to the right ADC module depending on the policy that we want.
             return dispatch_policy(&ADC_Module::checkDifferentialPins, &ADC_Module::analogReadDifferential, adc_num, pinP, pinN);
+            #endif
         }
 
 
@@ -638,7 +652,12 @@ class ADC
         *   \return true if the pin is valid, false otherwise.
         */
         bool startSingleRead(uint8_t pin, ADC_NUM adc_num = ADC_NUM::ANY) __attribute__((always_inline)) {
+            #if ADC_NUM_ADCS==1
+            return adc0->startSingleRead(pin); // use ADC0
+            #else
+            // dispatch to the right ADC module depending on the policy that we want.
             return dispatch_policy(&ADC_Module::checkPin, &ADC_Module::startSingleRead, adc_num, pin);
+            #endif
         }
 
         //! Start a differential conversion between two pins (pinP - pinN) and enables interrupts.
@@ -650,7 +669,12 @@ class ADC
         *   \return true if the pins are valid, false otherwise.
         */
         bool startSingleDifferential(uint8_t pinP, uint8_t pinN, ADC_NUM adc_num = ADC_NUM::ANY) __attribute__((always_inline)) {
+            #if ADC_NUM_ADCS==1
+            return adc0->startSingleDifferential(pinP, pinN); // use ADC0
+            #else
+            // dispatch to the right ADC module depending on the policy that we want.
             return dispatch_policy(&ADC_Module::checkDifferentialPins, &ADC_Module::startSingleDifferential, adc_num, pinP, pinN);
+            #endif
         }
 
         //! Reads the analog value of a single conversion.
@@ -673,7 +697,12 @@ class ADC
         *   \return true if the pin is valid, false otherwise.
         */
         bool startContinuous(uint8_t pin, ADC_NUM adc_num = ADC_NUM::ANY) __attribute__((always_inline)) {
+            #if ADC_NUM_ADCS==1
+            return adc0->startContinuous(pin); // use ADC0
+            #else
+            // dispatch to the right ADC module depending on the policy that we want.
             return dispatch_policy(&ADC_Module::checkPin, &ADC_Module::startContinuous, adc_num, pin);
+            #endif
         }
 
         //! Starts continuous conversion between the pins (pinP-pinN).
@@ -684,7 +713,12 @@ class ADC
         *   \return true if the pins are valid, false otherwise.
         */
         bool startContinuousDifferential(uint8_t pinP, uint8_t pinN, ADC_NUM adc_num = ADC_NUM::ANY) __attribute__((always_inline)) {
+            #if ADC_NUM_ADCS==1
+            return adc0->startContinuousDifferential(pinP, pinN); // use ADC0
+            #else
+            // dispatch to the right ADC module depending on the policy that we want.
             return dispatch_policy(&ADC_Module::checkDifferentialPins, &ADC_Module::startContinuousDifferential, adc_num, pinP, pinN);
+            #endif
         }
 
         //! Reads the analog value of a continuous conversion.
@@ -832,16 +866,18 @@ class ADC
         //////////// ERROR PRINTING /////
         //! Prints the human-readable error from all ADC, if any.
         void printError() {
-            for(int i=0; i< ADC_NUM_ADCS; i++) {
-                adc[i]->printError();
-            }
+            adc0->printError();
+            #if ADC_NUM_ADCS>1
+            adc1->printError();
+            #endif
         }
 
         //! Resets all errors from all ADCs, if any.
         void resetError() {
-            for(int i=0; i< ADC_NUM_ADCS; i++) {
-                adc[i]->resetError();
-            }
+            adc0->resetError();
+            #if ADC_NUM_ADCS>1
+            adc1->resetError();
+            #endif
         }
 
 };

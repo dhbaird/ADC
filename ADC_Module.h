@@ -129,7 +129,6 @@ enum class ADC_NUM : int8_t {
         #define ADC_USE_INTERNAL_VREF (1)
 #endif
 
-
 // Select the voltage reference sources for ADC. This is an internal setting, do not use
 enum class ADC_REF_SOURCE : uint8_t {REF_DEFAULT = 0, REF_ALT = 1, REF_NONE = 2}; // internal, do not use
 #if defined(ADC_TEENSY_3_0) || defined(ADC_TEENSY_3_1) || defined(ADC_TEENSY_3_5) || defined(ADC_TEENSY_3_6)
@@ -514,10 +513,11 @@ public:
     *   \param a_channel2sc1a contains an index that pairs each pin to its SC1A number (used to start a conversion on that pin)
     *   \param a_diff_table is similar to a_channel2sc1a, but for differential pins.
     */
-    constexpr ADC_Module(uint8_t ADC_number, const uint8_t* const a_channel2sc1a, const ADC_NLIST* const a_diff_table):
+    ADC_Module(uint8_t ADC_number, const uint8_t* const a_channel2sc1a, const ADC_NLIST* const a_diff_table):
         ADC_num(ADC_number)
         , channel2sc1a(a_channel2sc1a)
         , diff_table(a_diff_table)
+        #if ADC_NUM_ADCS>1
         , ADC_SC1A(ADC_num? ADC1_SC1A : ADC0_SC1A)
         , ADC_SC1B(ADC_num? ADC1_SC1B : ADC0_SC1B)
         , ADC_CFG1(ADC_num? ADC1_CFG1 : ADC0_CFG1)
@@ -548,19 +548,41 @@ public:
         , ADC_CLM1(ADC_num? ADC1_CLM1 : ADC0_CLM1)
         , ADC_CLM0(ADC_num? ADC1_CLM0 : ADC0_CLM0)
         , PDB0_CHnC1(ADC_num? PDB0_CH1C1 : PDB0_CH0C1)
-        #if ADC_NUM_ADCS==2
-        // IRQ_ADC0 and IRQ_ADC1 aren't consecutive in Teensy 3.6
-        , IRQ_ADC(ADC_num? IRQ_ADC1 : IRQ_ADC0) // fix by SB, https://github.com/pedvide/ADC/issues/19
+        , IRQ_ADC(ADC_num? IRQ_ADC1 : IRQ_ADC0)
         #else
+        , ADC_SC1A(ADC0_SC1A)
+        , ADC_SC1B(ADC0_SC1B)
+        , ADC_CFG1(ADC0_CFG1)
+        , ADC_CFG2(ADC0_CFG2)
+        , ADC_RA(ADC0_RA)
+        , ADC_RB(ADC0_RB)
+        , ADC_CV1(ADC0_CV1)
+        , ADC_CV2(ADC0_CV2)
+        , ADC_SC2(ADC0_SC2)
+        , ADC_SC3(ADC0_SC3)
+        , ADC_PGA(ADC0_PGA)
+
+        , ADC_OFS(ADC0_OFS)
+        , ADC_PG(ADC0_PG)
+        , ADC_MG(ADC0_MG)
+        , ADC_CLPD(ADC0_CLPD)
+        , ADC_CLPS(ADC0_CLPS)
+        , ADC_CLP4(ADC0_CLP4)
+        , ADC_CLP3(ADC0_CLP3)
+        , ADC_CLP2(ADC0_CLP2)
+        , ADC_CLP1(ADC0_CLP1)
+        , ADC_CLP0(ADC0_CLP0)
+        , ADC_CLMD(ADC0_CLMD)
+        , ADC_CLMS(ADC0_CLMS)
+        , ADC_CLM4(ADC0_CLM4)
+        , ADC_CLM3(ADC0_CLM3)
+        , ADC_CLM2(ADC0_CLM2)
+        , ADC_CLM1(ADC0_CLM1)
+        , ADC_CLM0(ADC0_CLM0)
+        , PDB0_CHnC1(PDB0_CH0C1)
         , IRQ_ADC(IRQ_ADC0)
-        #endif
-        {
-
-
-        // call our init
-        analog_init();
-
-    }
+        #endif // ADC_NUM_ADCS>1
+    {}
 
     //! Initialize ADC
     void analog_init();

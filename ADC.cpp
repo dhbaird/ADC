@@ -32,15 +32,6 @@
 
 
 // translate pin number to SC1A nomenclature and viceversa
-// we need to create this static const arrays so that we can assign the "normal arrays" to the correct one
-// depending on which ADC module we will be.
-/* channel2sc1aADCx converts a pin number to their value for the SC1A register, for the ADC0 and ADC1
-*  numbers with +ADC_SC1A_PIN_MUX (128) means those pins use mux a, the rest use mux b.
-*  numbers with +ADC_SC1A_PIN_DIFF (64) means it's also a differential pin (treated also in the channel2sc1a_diff_ADCx)
-*  For diff_table_ADCx, +ADC_SC1A_PIN_PGA means the pin can use PGA on that ADC
-*/
-
-
 constexpr const uint8_t ADC::channel2sc1aADC0[];
 #if ADC_NUM_ADCS>1
 constexpr const uint8_t ADC::channel2sc1aADC1[];
@@ -443,4 +434,4 @@ void ADC::stopSynchronizedContinuous() {
     adc1->stopContinuous();
 }
 
-#endif
+#endif  // ADC_NUM_ADCS>1
