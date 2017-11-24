@@ -381,6 +381,18 @@ enum class ADC_SAMPLING_SPEED : uint8_t {
 };
 
 
+/*! ADC Resolution in bits
+*/
+enum class ADC_RESOLUTION : uint8_t {
+    _8  =  8, /*!< 8 bits for single-ended and 9 bits for differential measurements. */
+    _9  =  8,
+    _10 = 10, /*!< 10 bits for single-ended and 11 bits for differential measurements. */
+    _11 = 10,
+    _12 = 12, /*!< 12 bits for single-ended and 13 bits for differential measurements. */
+    _13 = 12,
+    _16 = 16, /*!< 16 bits for single-ended and 16 bits for differential measurements. */
+};
+
 
 /*! ADC averages
 */
@@ -574,7 +586,7 @@ public:
     *
     *  Whenever you change the resolution, change also the comparison values (if you use them).
     */
-    void setResolution(uint8_t bits);
+    void setResolution(ADC_RESOLUTION bits);
 
     //! Returns the resolution of the ADC_Module.
     /**
@@ -1015,7 +1027,7 @@ private:
     uint8_t init_calib = true;
 
     // resolution
-    uint8_t analog_res_bits = 0;
+    ADC_RESOLUTION analog_res_bits = ADC_RESOLUTION::_8;
 
     // maximum value possible 2^res-1
     uint32_t analog_max_val = 0;
