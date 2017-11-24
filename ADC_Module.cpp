@@ -64,7 +64,7 @@ void ADC_Module::analog_init() {
 
     // select b channels
     // ADC_CFG2_muxsel = 1;
-    atomic::setBitFlag(ADC_CFG2, ADC_CFG2_MUXSEL);
+    atomic::setBitFlag(ADC_CFG2(), ADC_CFG2_MUXSEL);
 
     // set reference to vcc
     setReference(ADC_REFERENCE::REF_3V3);
@@ -89,11 +89,11 @@ void ADC_Module::calibrate() {
 
     calibrating = true;
     // ADC_SC3_cal = 0; // stop possible previous calibration
-    atomic::clearBitFlag(ADC_SC3, ADC_SC3_CAL);
+    atomic::clearBitFlag(ADC_SC3(), ADC_SC3_CAL);
     // ADC_SC3_calf = 1; // clear possible previous error
-    atomic::setBitFlag(ADC_SC3, ADC_SC3_CALF);
+    atomic::setBitFlag(ADC_SC3(), ADC_SC3_CALF);
     // ADC_SC3_cal = 1; // start calibration
-    atomic::setBitFlag(ADC_SC3, ADC_SC3_CAL);
+    atomic::setBitFlag(ADC_SC3(), ADC_SC3_CAL);
 
     __enable_irq();
 }
@@ -105,23 +105,23 @@ void ADC_Module::calibrate() {
 void ADC_Module::wait_for_cal(void) {
     uint16_t sum;
 
-    while(atomic::getBitFlag(ADC_SC3, ADC_SC3_CAL)) { // Bit ADC_SC3_CAL in register ADC0_SC3 cleared when calib. finishes.
+    while(atomic::getBitFlag(ADC_SC3(), ADC_SC3_CAL)) { // Bit ADC_SC3_CAL in register ADC0_SC3 cleared when calib. finishes.
         yield();
     }
 
-    if(atomic::getBitFlag(ADC_SC3, ADC_SC3_CALF)) { // calibration failed
+    if(atomic::getBitFlag(ADC_SC3(), ADC_SC3_CALF)) { // calibration failed
         fail_flag |= ADC_ERROR::CALIB; // the user should know and recalibrate manually
     }
 
     __disable_irq();
     if (calibrating) {
-        sum = ADC_CLPS + ADC_CLP4 + ADC_CLP3 + ADC_CLP2 + ADC_CLP1 + ADC_CLP0;
+        sum = ADC_CLPS() + ADC_CLP4() + ADC_CLP3() + ADC_CLP2() + ADC_CLP1() + ADC_CLP0();
         sum = (sum / 2) | 0x8000;
-        ADC_PG = sum;
+        ADC_PG() = sum;
 
-        sum = ADC_CLMS + ADC_CLM4 + ADC_CLM3 + ADC_CLM2 + ADC_CLM1 + ADC_CLM0;
+        sum = ADC_CLMS() + ADC_CLM4() + ADC_CLM3() + ADC_CLM2() + ADC_CLM1() + ADC_CLM0();
         sum = (sum / 2) | 0x8000;
-        ADC_MG = sum;
+        ADC_MG() = sum;
 
         calibrating = false;
     }
@@ -181,7 +181,7 @@ void ADC_Module::setReference(ADC_REFERENCE type) {
         analog_reference_internal = ADC_REF_SOURCE::REF_ALT;
 
         // *ADC_SC2_ref = 1; // uses bitband: atomic
-        atomic::setBitFlag(ADC_SC2, ADC_SC2_REFSEL(1));
+        atomic::setBitFlag(ADC_SC2(), ADC_SC2_REFSEL(1));
 
     } else if(ref_type == ADC_REF_SOURCE::REF_DEFAULT) { // ext ref for all Teensys, vcc also for Teensy 3.x
         // vcc or external reference requested
@@ -193,7 +193,7 @@ void ADC_Module::setReference(ADC_REFERENCE type) {
         analog_reference_internal = ADC_REF_SOURCE::REF_DEFAULT;
 
         // *ADC_SC2_ref = 0; // uses bitband: atomic
-        atomic::clearBitFlag(ADC_SC2, ADC_SC2_REFSEL(1));
+        atomic::clearBitFlag(ADC_SC2(), ADC_SC2_REFSEL(1));
     }
 
     calibrate();
@@ -235,22 +235,22 @@ void ADC_Module::setResolution(uint8_t bits) {
     if ( (config == 8) || (config == 9) )  {
         // *ADC_CFG1_mode1 = 0;
         // *ADC_CFG1_mode0 = 0;
-        atomic::clearBitFlag(ADC_CFG1, ADC_CFG1_MODE(3));
+        atomic::clearBitFlag(ADC_CFG1(), ADC_CFG1_MODE(3));
         analog_max_val = 255; // diff mode 9 bits has 1 bit for sign, so max value is the same as single 8 bits
     } else if ( (config == 10 )|| (config == 11) ) {
         // *ADC_CFG1_mode1 = 1;
         // *ADC_CFG1_mode0 = 0;
-        atomic::changeBitFlag(ADC_CFG1, ADC_CFG1_MODE(3), ADC_CFG1_MODE(2));
+        atomic::changeBitFlag(ADC_CFG1(), ADC_CFG1_MODE(3), ADC_CFG1_MODE(2));
         analog_max_val = 1023;
     } else if ( (config == 12 )|| (config == 13) ) {
         // *ADC_CFG1_mode1 = 0;
         // *ADC_CFG1_mode0 = 1;
-        atomic::changeBitFlag(ADC_CFG1, ADC_CFG1_MODE(3), ADC_CFG1_MODE(1));
+        atomic::changeBitFlag(ADC_CFG1(), ADC_CFG1_MODE(3), ADC_CFG1_MODE(1));
         analog_max_val = 4095;
     } else {
         // *ADC_CFG1_mode1 = 1;
         // *ADC_CFG1_mode0 = 1;
-        atomic::setBitFlag(ADC_CFG1, ADC_CFG1_MODE(3));
+        atomic::setBitFlag(ADC_CFG1(), ADC_CFG1_MODE(3));
         analog_max_val = 65535;
     }
 
@@ -298,23 +298,23 @@ void ADC_Module::setConversionSpeed(ADC_CONVERSION_SPEED speed) {
         (speed == ADC_CONVERSION_SPEED::ADACK_4_0) ||
         (speed == ADC_CONVERSION_SPEED::ADACK_5_2) ||
         (speed == ADC_CONVERSION_SPEED::ADACK_6_2)) {
-        atomic::setBitFlag(ADC_CFG2, ADC_CFG2_ADACKEN); // enable ADACK (takes max 5us to be ready)
-        atomic::setBitFlag(ADC_CFG1, ADC_CFG1_ADICLK(3)); // select ADACK as clock source
+        atomic::setBitFlag(ADC_CFG2(), ADC_CFG2_ADACKEN); // enable ADACK (takes max 5us to be ready)
+        atomic::setBitFlag(ADC_CFG1(), ADC_CFG1_ADICLK(3)); // select ADACK as clock source
 
-        atomic::clearBitFlag(ADC_CFG1, ADC_CFG1_ADIV(3)); // select no dividers
+        atomic::clearBitFlag(ADC_CFG1(), ADC_CFG1_ADIV(3)); // select no dividers
 
         if(speed == ADC_CONVERSION_SPEED::ADACK_2_4) {
-            atomic::clearBitFlag(ADC_CFG2, ADC_CFG2_ADHSC);
-            atomic::setBitFlag(ADC_CFG1, ADC_CFG1_ADLPC);
+            atomic::clearBitFlag(ADC_CFG2(), ADC_CFG2_ADHSC);
+            atomic::setBitFlag(ADC_CFG1(), ADC_CFG1_ADLPC);
         } else if(speed == ADC_CONVERSION_SPEED::ADACK_4_0) {
-            atomic::setBitFlag(ADC_CFG2, ADC_CFG2_ADHSC);
-            atomic::setBitFlag(ADC_CFG1, ADC_CFG1_ADLPC);
+            atomic::setBitFlag(ADC_CFG2(), ADC_CFG2_ADHSC);
+            atomic::setBitFlag(ADC_CFG1(), ADC_CFG1_ADLPC);
         } else if(speed == ADC_CONVERSION_SPEED::ADACK_5_2) {
-            atomic::clearBitFlag(ADC_CFG2, ADC_CFG2_ADHSC);
-            atomic::clearBitFlag(ADC_CFG1, ADC_CFG1_ADLPC);
+            atomic::clearBitFlag(ADC_CFG2(), ADC_CFG2_ADHSC);
+            atomic::clearBitFlag(ADC_CFG1(), ADC_CFG1_ADLPC);
         } else if(speed == ADC_CONVERSION_SPEED::ADACK_6_2) {
-            atomic::setBitFlag(ADC_CFG2, ADC_CFG2_ADHSC);
-            atomic::clearBitFlag(ADC_CFG1, ADC_CFG1_ADLPC);
+            atomic::setBitFlag(ADC_CFG2(), ADC_CFG2_ADHSC);
+            atomic::clearBitFlag(ADC_CFG1(), ADC_CFG1_ADLPC);
         }
         conversion_speed = speed;
         return;
@@ -324,55 +324,55 @@ void ADC_Module::setConversionSpeed(ADC_CONVERSION_SPEED speed) {
     // normal bus clock used
 
     // *ADC_CFG2_adacken = 0; // disable the internal asynchronous clock
-    atomic::clearBitFlag(ADC_CFG2, ADC_CFG2_ADACKEN);
+    atomic::clearBitFlag(ADC_CFG2(), ADC_CFG2_ADACKEN);
 
     uint32_t ADC_CFG1_speed; // store the clock and divisor
 
     if(speed == ADC_CONVERSION_SPEED::VERY_LOW_SPEED) {
         // *ADC_CFG2_adhsc = 0; // no high-speed config
         // *ADC_CFG1_adlpc  = 1; // use low power conf.
-        atomic::clearBitFlag(ADC_CFG2, ADC_CFG2_ADHSC);
-        atomic::setBitFlag(ADC_CFG1, ADC_CFG1_ADLPC);
+        atomic::clearBitFlag(ADC_CFG2(), ADC_CFG2_ADHSC);
+        atomic::setBitFlag(ADC_CFG1(), ADC_CFG1_ADLPC);
 
         ADC_CFG1_speed = ADC_CFG1_VERY_LOW_SPEED;
 
     } else if(speed == ADC_CONVERSION_SPEED::LOW_SPEED) {
         // *ADC_CFG2_adhsc = 0; // no high-speed config
         // *ADC_CFG1_adlpc  = 1; // use low power conf.
-        atomic::clearBitFlag(ADC_CFG2, ADC_CFG2_ADHSC);
-        atomic::setBitFlag(ADC_CFG1, ADC_CFG1_ADLPC);
+        atomic::clearBitFlag(ADC_CFG2(), ADC_CFG2_ADHSC);
+        atomic::setBitFlag(ADC_CFG1(), ADC_CFG1_ADLPC);
 
         ADC_CFG1_speed = ADC_CFG1_LOW_SPEED;
 
     } else if(speed == ADC_CONVERSION_SPEED::MED_SPEED) {
         // *ADC_CFG2_adhsc = 0; // no high-speed config
         // *ADC_CFG1_adlpc  = 0; // no low power conf.
-        atomic::clearBitFlag(ADC_CFG2, ADC_CFG2_ADHSC);
-        atomic::clearBitFlag(ADC_CFG1, ADC_CFG1_ADLPC);
+        atomic::clearBitFlag(ADC_CFG2(), ADC_CFG2_ADHSC);
+        atomic::clearBitFlag(ADC_CFG1(), ADC_CFG1_ADLPC);
 
         ADC_CFG1_speed = ADC_CFG1_MED_SPEED;
 
     } else if(speed == ADC_CONVERSION_SPEED::HIGH_SPEED_16BITS) {
         // *ADC_CFG2_adhsc = 1; // high-speed config: add 2 ADCK
         // *ADC_CFG1_adlpc  = 0; // no low power conf.
-        atomic::setBitFlag(ADC_CFG2, ADC_CFG2_ADHSC);
-        atomic::clearBitFlag(ADC_CFG1, ADC_CFG1_ADLPC);
+        atomic::setBitFlag(ADC_CFG2(), ADC_CFG2_ADHSC);
+        atomic::clearBitFlag(ADC_CFG1(), ADC_CFG1_ADLPC);
 
         ADC_CFG1_speed = ADC_CFG1_HI_SPEED_16_BITS;
 
     } else if(speed == ADC_CONVERSION_SPEED::HIGH_SPEED) {
         // *ADC_CFG2_adhsc = 1; // high-speed config: add 2 ADCK
         // *ADC_CFG1_adlpc  = 0; // no low power conf.
-        atomic::setBitFlag(ADC_CFG2, ADC_CFG2_ADHSC);
-        atomic::clearBitFlag(ADC_CFG1, ADC_CFG1_ADLPC);
+        atomic::setBitFlag(ADC_CFG2(), ADC_CFG2_ADHSC);
+        atomic::clearBitFlag(ADC_CFG1(), ADC_CFG1_ADLPC);
 
         ADC_CFG1_speed = ADC_CFG1_HI_SPEED;
 
     } else if(speed == ADC_CONVERSION_SPEED::VERY_HIGH_SPEED) { // this speed is most likely out of specs, so accuracy can be bad
         // *ADC_CFG2_adhsc = 1; // high-speed config: add 2 ADCK
         // *ADC_CFG1_adlpc  = 0; // no low power conf.
-        atomic::setBitFlag(ADC_CFG2, ADC_CFG2_ADHSC);
-        atomic::clearBitFlag(ADC_CFG1, ADC_CFG1_ADLPC);
+        atomic::setBitFlag(ADC_CFG2(), ADC_CFG2_ADHSC);
+        atomic::clearBitFlag(ADC_CFG1(), ADC_CFG1_ADLPC);
 
         ADC_CFG1_speed = ADC_CFG1_VERY_HIGH_SPEED;
 
@@ -382,11 +382,11 @@ void ADC_Module::setConversionSpeed(ADC_CONVERSION_SPEED speed) {
     }
 
     // clock source is bus or bus/2
-    atomic::changeBitFlag(ADC_CFG1, ADC_CFG1_ADICLK(3), ADC_CFG1_speed & ADC_CFG1_ADICLK(3));
+    atomic::changeBitFlag(ADC_CFG1(), ADC_CFG1_ADICLK(3), ADC_CFG1_speed & ADC_CFG1_ADICLK(3));
 
     // divisor for the clock source: 1, 2, 4 or 8.
     // so total speed can be: bus, bus/2, bus/4, bus/8 or bus/16.
-    atomic::changeBitFlag(ADC_CFG1, ADC_CFG1_ADIV(3), ADC_CFG1_speed & ADC_CFG1_ADIV(3));
+    atomic::changeBitFlag(ADC_CFG1(), ADC_CFG1_ADIV(3), ADC_CFG1_speed & ADC_CFG1_ADIV(3));
 
     conversion_speed = speed;
 
@@ -416,33 +416,33 @@ void ADC_Module::setSamplingSpeed(ADC_SAMPLING_SPEED speed) {
         // ADC_CFG1_adlsmp = 1; // long sampling time enable
         // ADC_CFG2_adlsts1 = 0; // maximum sampling time (+24 ADCK)
         // ADC_CFG2_adlsts0 = 0;
-        atomic::setBitFlag(ADC_CFG1, ADC_CFG1_ADLSMP);
-        atomic::clearBitFlag(ADC_CFG2, ADC_CFG2_ADLSTS(3));
+        atomic::setBitFlag(ADC_CFG1(), ADC_CFG1_ADLSMP);
+        atomic::clearBitFlag(ADC_CFG2(), ADC_CFG2_ADLSTS(3));
 
     } else if(speed == ADC_SAMPLING_SPEED::LOW_SPEED) {
         // ADC_CFG1_adlsmp = 1; // long sampling time enable
         // ADC_CFG2_adlsts1 = 0;// high sampling time (+16 ADCK)
         // ADC_CFG2_adlsts0 = 1;
-        atomic::setBitFlag(ADC_CFG1, ADC_CFG1_ADLSMP);
-        atomic::changeBitFlag(ADC_CFG2, ADC_CFG2_ADLSTS(3), ADC_CFG2_ADLSTS(1));
+        atomic::setBitFlag(ADC_CFG1(), ADC_CFG1_ADLSMP);
+        atomic::changeBitFlag(ADC_CFG2(), ADC_CFG2_ADLSTS(3), ADC_CFG2_ADLSTS(1));
 
     } else if(speed == ADC_SAMPLING_SPEED::MED_SPEED) {
         // ADC_CFG1_adlsmp = 1; // long sampling time enable
         // ADC_CFG2_adlsts1 = 1;// medium sampling time (+10 ADCK)
         // ADC_CFG2_adlsts0 = 0;
-        atomic::setBitFlag(ADC_CFG1, ADC_CFG1_ADLSMP);
-        atomic::changeBitFlag(ADC_CFG2, ADC_CFG2_ADLSTS(3), ADC_CFG2_ADLSTS(2));
+        atomic::setBitFlag(ADC_CFG1(), ADC_CFG1_ADLSMP);
+        atomic::changeBitFlag(ADC_CFG2(), ADC_CFG2_ADLSTS(3), ADC_CFG2_ADLSTS(2));
 
     } else if( speed == ADC_SAMPLING_SPEED::HIGH_SPEED ) {
         // ADC_CFG1_adlsmp = 1; // long sampling time enable
         // ADC_CFG2_adlsts1 = 1;// low sampling time (+6 ADCK)
         // ADC_CFG2_adlsts0 = 1;
-        atomic::setBitFlag(ADC_CFG1, ADC_CFG1_ADLSMP);
-        atomic::setBitFlag(ADC_CFG2, ADC_CFG2_ADLSTS(3));
+        atomic::setBitFlag(ADC_CFG1(), ADC_CFG1_ADLSMP);
+        atomic::setBitFlag(ADC_CFG2(), ADC_CFG2_ADLSTS(3));
 
     } else if(speed == ADC_SAMPLING_SPEED::VERY_HIGH_SPEED) {
         // ADC_CFG1_adlsmp = 0; // shortest sampling time
-        atomic::clearBitFlag(ADC_CFG1, ADC_CFG1_ADLSMP);
+        atomic::clearBitFlag(ADC_CFG1(), ADC_CFG1_ADLSMP);
 
     } else { // incorrect speeds have no effect.
         return;
@@ -460,33 +460,24 @@ void ADC_Module::setAveraging(uint8_t num) {
 
     if (calibrating) wait_for_cal();
 
-    if (num <= 1) {
+    if (num < 4) {
         num = 0;
-        // ADC_SC3_avge = 0;
-        atomic::clearBitFlag(ADC_SC3, ADC_SC3_AVGE);
+        atomic::clearBitFlag(ADC_SC3(), ADC_SC3_AVGE);
+        atomic::clearBitFlag(ADC_SC3(), ADC_SC3_AVGS(3));
     } else {
-        // ADC_SC3_avge = 1;
-        atomic::setBitFlag(ADC_SC3, ADC_SC3_AVGE);
-        if (num <= 4) {
+        atomic::setBitFlag(ADC_SC3(), ADC_SC3_AVGE);
+        if (num < 8) {
             num = 4;
-            // ADC_SC3_avgs0 = 0;
-            // ADC_SC3_avgs1 = 0;
-            atomic::clearBitFlag(ADC_SC3, ADC_SC3_AVGS(3));
-        } else if (num <= 8) {
+            atomic::clearBitFlag(ADC_SC3(), ADC_SC3_AVGS(3));
+        } else if (num < 16) {
             num = 8;
-            // ADC_SC3_avgs0 = 1;
-            // ADC_SC3_avgs1 = 0;
-            atomic::changeBitFlag(ADC_SC3, ADC_SC3_AVGS(3), ADC_SC3_AVGS(1));
-        } else if (num <= 16) {
+            atomic::changeBitFlag(ADC_SC3(), ADC_SC3_AVGS(3), ADC_SC3_AVGS(1));
+        } else if (num < 32) {
             num = 16;
-            // ADC_SC3_avgs0 = 0;
-            // ADC_SC3_avgs1 = 1;
-            atomic::changeBitFlag(ADC_SC3, ADC_SC3_AVGS(3), ADC_SC3_AVGS(2));
+            atomic::changeBitFlag(ADC_SC3(), ADC_SC3_AVGS(3), ADC_SC3_AVGS(2));
         } else {
             num = 32;
-            // ADC_SC3_avgs0 = 1;
-            // ADC_SC3_avgs1 = 1;
-            atomic::setBitFlag(ADC_SC3, ADC_SC3_AVGS(3));
+            atomic::setBitFlag(ADC_SC3(), ADC_SC3_AVGS(3));
         }
     }
     analog_num_average = num;
@@ -500,7 +491,7 @@ void ADC_Module::enableInterrupts() {
     if (calibrating) wait_for_cal();
 
     // ADC_SC1A_aien = 1;
-    atomic::setBitFlag(ADC_SC1A, ADC_SC1_AIEN);
+    atomic::setBitFlag(ADC_SC1A(), ADC_SC1_AIEN);
 
     NVIC_ENABLE_IRQ(IRQ_ADC);
 }
@@ -510,7 +501,7 @@ void ADC_Module::enableInterrupts() {
 */
 void ADC_Module::disableInterrupts() {
     // ADC_SC1A_aien = 0;
-    atomic::clearBitFlag(ADC_SC1A, ADC_SC1_AIEN);
+    atomic::clearBitFlag(ADC_SC1A(), ADC_SC1_AIEN);
 
     NVIC_DISABLE_IRQ(IRQ_ADC);
 }
@@ -524,7 +515,7 @@ void ADC_Module::enableDMA() {
     if (calibrating) wait_for_cal();
 
     // ADC_SC2_dma = 1;
-    atomic::setBitFlag(ADC_SC2, ADC_SC2_DMAEN);
+    atomic::setBitFlag(ADC_SC2(), ADC_SC2_DMAEN);
 }
 
 /* Disable ADC DMA request
@@ -533,7 +524,7 @@ void ADC_Module::enableDMA() {
 void ADC_Module::disableDMA() {
 
     // ADC_SC2_dma = 0;
-    atomic::clearBitFlag(ADC_SC2, ADC_SC2_DMAEN);
+    atomic::clearBitFlag(ADC_SC2(), ADC_SC2_DMAEN);
 }
 
 
@@ -548,10 +539,10 @@ void ADC_Module::enableCompare(int16_t compValue, bool greaterThan) {
 
     // ADC_SC2_cfe = 1; // enable compare
     // ADC_SC2_cfgt = (int32_t)greaterThan; // greater or less than?
-    atomic::setBitFlag(ADC_SC2, ADC_SC2_ACFE);
-    atomic::changeBitFlag(ADC_SC2, ADC_SC2_ACFGT, ADC_SC2_ACFGT*greaterThan);
+    atomic::setBitFlag(ADC_SC2(), ADC_SC2_ACFE);
+    atomic::changeBitFlag(ADC_SC2(), ADC_SC2_ACFGT, ADC_SC2_ACFGT*(uint8_t)greaterThan);
 
-    ADC_CV1 = (int16_t)compValue; // comp value
+    ADC_CV1() = (int16_t)compValue; // comp value
 }
 
 /* Enable the compare function: A conversion will be completed only when the ADC value
@@ -566,33 +557,33 @@ void ADC_Module::enableCompareRange(int16_t lowerLimit, int16_t upperLimit, bool
 
     // ADC_SC2_cfe = 1; // enable compare
     // ADC_SC2_cren = 1; // enable compare range
-    atomic::setBitFlag(ADC_SC2, ADC_SC2_ACFE);
-    atomic::setBitFlag(ADC_SC2, ADC_SC2_ACREN);
+    atomic::setBitFlag(ADC_SC2(), ADC_SC2_ACFE);
+    atomic::setBitFlag(ADC_SC2(), ADC_SC2_ACREN);
 
     if(insideRange && inclusive) { // True if value is inside the range, including the limits. CV1 <= CV2 and ACFGT=1
         // ADC_SC2_cfgt = 1;
-        atomic::setBitFlag(ADC_SC2, ADC_SC2_ACFGT);
+        atomic::setBitFlag(ADC_SC2(), ADC_SC2_ACFGT);
 
-        ADC_CV1 = (int16_t)lowerLimit;
-        ADC_CV2 = (int16_t)upperLimit;
+        ADC_CV1() = (int16_t)lowerLimit;
+        ADC_CV2() = (int16_t)upperLimit;
     } else if(insideRange && !inclusive) {// True if value is inside the range, excluding the limits. CV1 > CV2 and ACFGT=0
         // ADC_SC2_cfgt = 0;
-        atomic::clearBitFlag(ADC_SC2, ADC_SC2_ACFGT);
+        atomic::clearBitFlag(ADC_SC2(), ADC_SC2_ACFGT);
 
-        ADC_CV2 = (int16_t)lowerLimit;
-        ADC_CV1 = (int16_t)upperLimit;
+        ADC_CV2() = (int16_t)lowerLimit;
+        ADC_CV1() = (int16_t)upperLimit;
     } else if(!insideRange && inclusive) { // True if value is outside of range or is equal to either limit. CV1 > CV2 and ACFGT=1
         // ADC_SC2_cfgt = 1;
-        atomic::setBitFlag(ADC_SC2, ADC_SC2_ACFGT);
+        atomic::setBitFlag(ADC_SC2(), ADC_SC2_ACFGT);
 
-        ADC_CV2 = (int16_t)lowerLimit;
-        ADC_CV1 = (int16_t)upperLimit;
+        ADC_CV2() = (int16_t)lowerLimit;
+        ADC_CV1() = (int16_t)upperLimit;
     } else if(!insideRange && !inclusive) { // True if value is outside of range and not equal to either limit. CV1 > CV2 and ACFGT=0
         // ADC_SC2_cfgt = 0;
-        atomic::clearBitFlag(ADC_SC2, ADC_SC2_ACFGT);
+        atomic::clearBitFlag(ADC_SC2(), ADC_SC2_ACFGT);
 
-        ADC_CV1 = (int16_t)lowerLimit;
-        ADC_CV2 = (int16_t)upperLimit;
+        ADC_CV1() = (int16_t)lowerLimit;
+        ADC_CV2() = (int16_t)upperLimit;
     }
 }
 
@@ -602,7 +593,7 @@ void ADC_Module::enableCompareRange(int16_t lowerLimit, int16_t upperLimit, bool
 void ADC_Module::disableCompare() {
 
     // ADC_SC2_cfe = 0;
-    atomic::clearBitFlag(ADC_SC2, ADC_SC2_ACFE);
+    atomic::clearBitFlag(ADC_SC2(), ADC_SC2_ACFE);
 }
 
 /* Enables the PGA and sets the gain
@@ -632,7 +623,7 @@ void ADC_Module::enablePGA(uint8_t gain) {
         setting = 6;
     }
 
-    ADC_PGA = ADC_PGA_PGAEN | ADC_PGA_PGAG(setting);
+    ADC_PGA() = ADC_PGA_PGAEN | ADC_PGA_PGAG(setting);
     pga_value=1<<setting;
 #endif
 }
@@ -648,7 +639,7 @@ uint8_t ADC_Module::getPGA() {
 void ADC_Module::disablePGA() {
 #if ADC_USE_PGA
     // ADC_PGA_pgaen = 0;
-    atomic::clearBitFlag(ADC_PGA, ADC_PGA_PGAEN);
+    atomic::clearBitFlag(ADC_PGA(), ADC_PGA_PGAEN);
 #endif
     pga_value = 1;
 }
@@ -717,14 +708,14 @@ void ADC_Module::startReadFast(uint8_t pin) {
     const uint8_t sc1a_pin = channel2sc1a[pin];
 
     if(sc1a_pin&ADC_SC1A_PIN_MUX) { // mux a
-        atomic::clearBitFlag(ADC_CFG2, ADC_CFG2_MUXSEL);
+        atomic::clearBitFlag(ADC_CFG2(), ADC_CFG2_MUXSEL);
     } else { // mux b
-        atomic::setBitFlag(ADC_CFG2, ADC_CFG2_MUXSEL);
+        atomic::setBitFlag(ADC_CFG2(), ADC_CFG2_MUXSEL);
     }
 
     // select pin for single-ended mode and start conversion, enable interrupts if requested
     __disable_irq();
-    ADC_SC1A = (sc1a_pin&ADC_SC1A_CHANNELS) + atomic::getBitFlag(ADC_SC1A, ADC_SC1_AIEN)*ADC_SC1_AIEN;
+    ADC_SC1A() = (sc1a_pin&ADC_SC1A_CHANNELS) + atomic::getBitFlag(ADC_SC1A(), ADC_SC1_AIEN)*ADC_SC1_AIEN;
     __enable_irq();
 
 }
@@ -745,7 +736,7 @@ void ADC_Module::startDifferentialFast(uint8_t pinP, uint8_t pinN) {
     #endif // ADC_USE_PGA
 
     __disable_irq();
-    ADC_SC1A = ADC_SC1_DIFF + (sc1a_pin&ADC_SC1A_CHANNELS) + atomic::getBitFlag(ADC_SC1A, ADC_SC1_AIEN)*ADC_SC1_AIEN;
+    ADC_SC1A() = ADC_SC1_DIFF + (sc1a_pin&ADC_SC1A_CHANNELS) + atomic::getBitFlag(ADC_SC1A(), ADC_SC1_AIEN)*ADC_SC1_AIEN;
     __enable_irq();
 
 }
@@ -1077,7 +1068,7 @@ bool ADC_Module::startContinuousDifferential(uint8_t pinP, uint8_t pinN) {
 void ADC_Module::stopContinuous() {
 
     // set channel select to all 1's (31) to stop it.
-    ADC_SC1A = ADC_SC1A_PIN_INVALID + atomic::getBitFlag(ADC_SC1A, ADC_SC1_AIEN)*ADC_SC1_AIEN;
+    ADC_SC1A() = ADC_SC1A_PIN_INVALID + atomic::getBitFlag(ADC_SC1A(), ADC_SC1_AIEN)*ADC_SC1_AIEN;
 
     // decrease the counter of measurements (unless it's 0)
     if(!num_measurements) {
@@ -1193,7 +1184,7 @@ void ADC_Module::startPDB(uint32_t freq) {
 
     PDB0_SC = ADC_PDB_CONFIG | PDB_SC_PRESCALER(prescaler) | PDB_SC_MULT(mult) | PDB_SC_SWTRIG; // start the counter!
 
-    PDB0_CHnC1 = PDB_CHnC1_TOS_1 | PDB_CHnC1_EN_1; // enable pretrigger 0 (SC1A)
+    PDB0_CHnC1() = PDB_CHnC1_TOS_1 | PDB_CHnC1_EN_1; // enable pretrigger 0 (SC1A)
 
     NVIC_ENABLE_IRQ(IRQ_PDB);
 
