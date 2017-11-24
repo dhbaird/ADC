@@ -406,6 +406,7 @@ void ADC_Module::setSamplingSpeed(ADC_SAMPLING_SPEED speed) {
         atomic::clearBitFlag(ADC_CFG1(), ADC_CFG1_ADLSMP); // shortest sampling time
         break;
 
+    }
     sampling_speed =  speed;
 }
 
