@@ -367,7 +367,7 @@ class ADC
         *  Whenever you change the resolution, change also the comparison values (if you use them).
         *   \param adc_num ADC_NUM enum member. Selects the ADC module to use.
         */
-        void setResolution(uint8_t bits, ADC_NUM adc_num = ADC_NUM::ADC_0) __attribute__((always_inline)) {
+        void setResolution(ADC_RESOLUTION bits, ADC_NUM adc_num = ADC_NUM::ADC_0) __attribute__((always_inline)) {
             adc[static_cast<uint8_t>(adc_num)]->setResolution(bits);
             return;
         }

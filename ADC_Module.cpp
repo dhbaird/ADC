@@ -70,7 +70,7 @@ void ADC_Module::analog_init() {
     setReference(ADC_REFERENCE::REF_3V3);
 
     // set resolution to 10
-    setResolution(10);
+    setResolution(ADC_RESOLUTION::_10);
 
     // the first calibration will use 32 averages and lowest speed,
     // when this calibration is over the averages and speed will be set to default by wait_for_cal and init_calib will be cleared.
@@ -208,63 +208,42 @@ void ADC_Module::setReference(ADC_REFERENCE type) {
 *
 *  It doesn't recalibrate
 */
-void ADC_Module::setResolution(uint8_t bits) {
-
-    if(analog_res_bits==bits) {
+void ADC_Module::setResolution(ADC_RESOLUTION resolution) {
+    if(analog_res_bits==resolution) {
         return;
     }
 
-    uint8_t config;
-
     if (calibrating) wait_for_cal();
 
-    if (bits <= 9) {
-        config = 8;
-    } else if (bits <= 11) {
-        config = 10;
-    } else if (bits <= 13) {
-        config = 12;
-    } else if (bits > 13) {
-        config = 16;
-    } else {
-        config = 8; // default to 8 bits
-    }
-
-    // conversion resolution
     // single-ended 8 bits is the same as differential 9 bits, etc.
-    if ( (config == 8) || (config == 9) )  {
-        // *ADC_CFG1_mode1 = 0;
-        // *ADC_CFG1_mode0 = 0;
-        atomic::clearBitFlag(ADC_CFG1(), ADC_CFG1_MODE(3));
-        analog_max_val = 255; // diff mode 9 bits has 1 bit for sign, so max value is the same as single 8 bits
-    } else if ( (config == 10 )|| (config == 11) ) {
-        // *ADC_CFG1_mode1 = 1;
-        // *ADC_CFG1_mode0 = 0;
-        atomic::changeBitFlag(ADC_CFG1(), ADC_CFG1_MODE(3), ADC_CFG1_MODE(2));
-        analog_max_val = 1023;
-    } else if ( (config == 12 )|| (config == 13) ) {
-        // *ADC_CFG1_mode1 = 0;
-        // *ADC_CFG1_mode0 = 1;
-        atomic::changeBitFlag(ADC_CFG1(), ADC_CFG1_MODE(3), ADC_CFG1_MODE(1));
-        analog_max_val = 4095;
-    } else {
-        // *ADC_CFG1_mode1 = 1;
-        // *ADC_CFG1_mode0 = 1;
-        atomic::setBitFlag(ADC_CFG1(), ADC_CFG1_MODE(3));
-        analog_max_val = 65535;
+    switch(resolution) {
+        case ADC_RESOLUTION::_8:
+            atomic::clearBitFlag(ADC_CFG1(), ADC_CFG1_MODE(3));
+            analog_max_val = 255; // diff mode 9 bits has 1 bit for sign, so max value is the same as single 8 bits
+            break;
+        case ADC_RESOLUTION::_10:
+            atomic::changeBitFlag(ADC_CFG1(), ADC_CFG1_MODE(3), ADC_CFG1_MODE(2));
+            analog_max_val = 1023;
+            break;
+        case ADC_RESOLUTION::_12:
+            atomic::changeBitFlag(ADC_CFG1(), ADC_CFG1_MODE(3), ADC_CFG1_MODE(1));
+            analog_max_val = 4095;
+            break;
+        case ADC_RESOLUTION::_16:
+            atomic::setBitFlag(ADC_CFG1(), ADC_CFG1_MODE(3));
+            analog_max_val = 65535;
+            break;
     }
 
-    analog_res_bits = config;
-
+    analog_res_bits = resolution;
     // no recalibration is needed when changing the resolution, p. 619
-
 }
 
 /* Returns the resolution of the ADC
 *
 */
 uint8_t ADC_Module::getResolution() {
-    return analog_res_bits;
+    return static_cast<uint8_t>(analog_res_bits);
 }
 
 /* Returns the maximum value for a measurement, that is: 2^resolution-1
