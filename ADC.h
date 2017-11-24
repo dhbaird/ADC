@@ -435,7 +435,7 @@ class ADC
         * \param num can be 0, 4, 8, 16 or 32.
         *   \param adc_num ADC_NUM enum member. Selects the ADC module to use.
         */
-        void setAveraging(uint8_t num, ADC_NUM adc_num = ADC_NUM::ADC_0) __attribute__((always_inline)) {
+        void setAveraging(ADC_AVERAGES num, ADC_NUM adc_num = ADC_NUM::ADC_0) __attribute__((always_inline)) {
             adc[static_cast<uint8_t>(adc_num)]->setAveraging(num);
         }
 

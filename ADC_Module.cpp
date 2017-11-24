@@ -74,7 +74,7 @@ void ADC_Module::analog_init() {
 
     // the first calibration will use 32 averages and lowest speed,
     // when this calibration is over the averages and speed will be set to default by wait_for_cal and init_calib will be cleared.
-    setAveraging(32);
+    setAveraging(ADC_AVERAGES::_32);
     setConversionSpeed(ADC_CONVERSION_SPEED::LOW_SPEED);
     setSamplingSpeed(ADC_SAMPLING_SPEED::LOW_SPEED);
 
@@ -138,7 +138,7 @@ void ADC_Module::wait_for_cal(void) {
         setSamplingSpeed(ADC_SAMPLING_SPEED::MED_SPEED);
 
         // number of averages to 4
-        setAveraging(4);
+        setAveraging(ADC_AVERAGES::_4);
 
         init_calib = false; // clear
     }
@@ -413,31 +413,32 @@ void ADC_Module::setSamplingSpeed(ADC_SAMPLING_SPEED speed) {
 /* Set the number of averages: 0, 4, 8, 16 or 32.
 *
 */
-void ADC_Module::setAveraging(uint8_t num) {
-
+void ADC_Module::setAveraging(ADC_AVERAGES averages) {
     if (calibrating) wait_for_cal();
 
-    if (num < 4) {
-        num = 0;
+    switch(averages) {
+    case ADC_AVERAGES::_0:
         atomic::clearBitFlag(ADC_SC3(), ADC_SC3_AVGE);
         atomic::clearBitFlag(ADC_SC3(), ADC_SC3_AVGS(3));
-    } else {
+        break;
+    case ADC_AVERAGES::_4:
         atomic::setBitFlag(ADC_SC3(), ADC_SC3_AVGE);
-        if (num < 8) {
-            num = 4;
-            atomic::clearBitFlag(ADC_SC3(), ADC_SC3_AVGS(3));
-        } else if (num < 16) {
-            num = 8;
-            atomic::changeBitFlag(ADC_SC3(), ADC_SC3_AVGS(3), ADC_SC3_AVGS(1));
-        } else if (num < 32) {
-            num = 16;
-            atomic::changeBitFlag(ADC_SC3(), ADC_SC3_AVGS(3), ADC_SC3_AVGS(2));
-        } else {
-            num = 32;
-            atomic::setBitFlag(ADC_SC3(), ADC_SC3_AVGS(3));
-        }
+        atomic::clearBitFlag(ADC_SC3(), ADC_SC3_AVGS(3));
+        break;
+    case ADC_AVERAGES::_8:
+        atomic::setBitFlag(ADC_SC3(), ADC_SC3_AVGE);
+        atomic::changeBitFlag(ADC_SC3(), ADC_SC3_AVGS(3), ADC_SC3_AVGS(1));
+        break;
+    case ADC_AVERAGES::_16:
+        atomic::setBitFlag(ADC_SC3(), ADC_SC3_AVGE);
+        atomic::changeBitFlag(ADC_SC3(), ADC_SC3_AVGS(3), ADC_SC3_AVGS(2));
+        break;
+    case ADC_AVERAGES::_32:
+        atomic::setBitFlag(ADC_SC3(), ADC_SC3_AVGE);
+        atomic::setBitFlag(ADC_SC3(), ADC_SC3_AVGS(3));
+        break;
     }
-    analog_num_average = num;
+    analog_num_average = averages;
 }
 
 

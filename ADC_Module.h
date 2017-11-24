@@ -382,6 +382,17 @@ enum class ADC_SAMPLING_SPEED : uint8_t {
 
 
 
+/*! ADC averages
+*/
+enum class ADC_AVERAGES : uint8_t {
+    _0  =  0, /*!< No averages. */
+    _4  =  4, /*!< 4 averages. */
+    _8  =  8, /*!< 8 averages. */
+    _16 = 16, /*!< 16 averages. */
+    _32 = 32, /*!< 32 averages. */
+};
+
+
 // Mask for the channel selection in ADCx_SC1A,
 // useful if you want to get the channel number from ADCx_SC1A
 #define ADC_SC1A_CHANNELS (0x1F)
@@ -618,7 +629,7 @@ public:
     *
     *  It doesn't recalibrate at the end.
     */
-    void setAveraging(uint8_t num);
+    void setAveraging(ADC_AVERAGES num);
 
 
     //! Enable interrupts
@@ -1010,7 +1021,7 @@ private:
     uint32_t analog_max_val = 0;
 
     // num of averages
-    uint8_t analog_num_average = 0;
+    ADC_AVERAGES analog_num_average = ADC_AVERAGES::_0;
 
     // reference can be internal or external
     ADC_REF_SOURCE analog_reference_internal = ADC_REF_SOURCE::REF_NONE;;
