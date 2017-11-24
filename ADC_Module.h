@@ -1024,7 +1024,7 @@ private:
 
     // the first calibration will use 32 averages and lowest speed,
     // when this calibration is over the averages and speed will be set to default.
-    uint8_t init_calib = true;
+    bool init_calib = true;
 
     // resolution
     ADC_RESOLUTION analog_res_bits = ADC_RESOLUTION::_8;

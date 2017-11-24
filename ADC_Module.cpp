@@ -59,11 +59,9 @@ void ADC_Module::analog_init() {
         - pga gain=1
         - conversion speed = medium
         - sampling speed = medium
-    initiate to 0 (or 1) so the corresponding functions change it to the correct value
     */
 
     // select b channels
-    // ADC_CFG2_muxsel = 1;
     atomic::setBitFlag(ADC_CFG2(), ADC_CFG2_MUXSEL);
 
     // set reference to vcc
