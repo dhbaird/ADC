@@ -31,7 +31,7 @@
 
 #include "ADC_Module.h"
 
-#if ADC_USE_INTERNAL_VREF == 1
+#if ADC_USE_INTERNAL_VREF
 // include the internal reference
 #include <VREF.h>
 #endif
@@ -496,6 +496,7 @@ void ADC_Module<ADC_num>::enableCompareRange(int16_t lowerLimit, int16_t upperLi
     }
 }
 
+#if ADC_USE_PGA
 /* Enables the PGA and sets the gain
 *   Use only for signals lower than 1.2 V
 *   \param gain can be 1, 2, 4, 8, 16 32 or 64
@@ -503,8 +504,6 @@ void ADC_Module<ADC_num>::enableCompareRange(int16_t lowerLimit, int16_t upperLi
 */
 template<uint8_t ADC_num>
 void ADC_Module<ADC_num>::enablePGA(uint8_t gain) {
-#if ADC_USE_PGA
-
     if (calibrating) wait_for_cal();
 
     uint8_t setting;
@@ -526,19 +525,17 @@ void ADC_Module<ADC_num>::enablePGA(uint8_t gain) {
 
     ADC_PGA() = ADC_PGA_PGAEN | ADC_PGA_PGAG(setting);
     pga_value=1<<setting;
-#endif
 }
 
 
 //! Disable PGA
 template<uint8_t ADC_num>
 void ADC_Module<ADC_num>::disablePGA() {
-#if ADC_USE_PGA
-    // ADC_PGA_pgaen = 0;
     atomic::clearBitFlag(ADC_PGA(), ADC_PGA_PGAEN);
-#endif
     pga_value = 1;
 }
+
+#endif // ADC_USE_PGA
 
 
 

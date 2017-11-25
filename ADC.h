@@ -334,7 +334,7 @@ class ADC
             adc[static_cast<uint8_t>(adc_num)]->disableCompare();
         }
 
-
+        #if ADC_USE_PGA
         //! Enable and set PGA
         /** Enables the PGA and sets the gain
         *   Use only for signals lower than 1.2 V and only in differential mode
@@ -361,6 +361,7 @@ class ADC
         void disablePGA(ADC_NUM adc_num = ADC_NUM::ADC_0) __attribute__((always_inline)) {
             adc[static_cast<uint8_t>(adc_num)]->disablePGA();
         }
+        #endif // ADC_USE_PGA
 
 
         ////////////// INFORMATION ABOUT THE STATE OF THE ADC /////////////////
