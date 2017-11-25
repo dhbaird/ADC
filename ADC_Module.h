@@ -764,9 +764,11 @@ public:
     virtual void enableCompareRange(int16_t lowerLimit, int16_t upperLimit, bool insideRange, bool inclusive) = 0;
     virtual void disableCompare() const = 0;
 
+    #if ADC_USE_PGA
     virtual void enablePGA(uint8_t gain) = 0;
     virtual uint8_t getPGA() const = 0;
     virtual void disablePGA() = 0;
+    #endif
 
     virtual void continuousMode() const = 0;
     virtual void singleMode() const = 0;
@@ -823,7 +825,7 @@ public:
 */
 template<uint8_t ADC_num>
 #if ADC_NUM_ADCS>1
-class ADC_Module: virtual public ADC_Module_Base {
+class ADC_Module: public ADC_Module_Base {
 #else
 class ADC_Module {
 #endif
