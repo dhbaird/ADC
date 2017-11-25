@@ -1383,7 +1383,11 @@ private:
     // registers point to the correct ADC module
     typedef volatile uint32_t& reg;
     // generate constexpr functions to get the right ADCx register
+    #if ADC_NUM_ADCS>1
     #define ADC_GENERATE_REG(name)   constexpr reg ADC_##name() const { return (ADC_num ? ADC1_##name : ADC0_##name); }
+    #else
+    #define ADC_GENERATE_REG(name)   constexpr reg ADC_##name() const { return ADC0_##name; }
+    #endif
 
     ADC_GENERATE_REG(SC1A)
     ADC_GENERATE_REG(SC1B)
@@ -1423,7 +1427,11 @@ private:
 
     constexpr reg PDB0_CHnC1() const { return (ADC_num ? PDB0_CH0C1 : PDB0_CH1C1); } // PDB channel 0 or 1
 
-    const uint8_t IRQ_ADC; // IRQ number will be IRQ_ADC0 or IRQ_ADC1
+    #if ADC_NUM_ADCS>1
+    const uint8_t IRQ_ADC = ADC_num? IRQ_ADC1 : IRQ_ADC0; // IRQ number will be IRQ_ADC0 or IRQ_ADC1
+    #else
+    const uint8_t IRQ_ADC = IRQ_ADC0;
+    #endif
 
 
 protected:
