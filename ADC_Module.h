@@ -723,6 +723,12 @@ struct Diff_Table<1> {
 };
 #endif
 
+//! Store the config of the adc
+struct ADC_Config {
+    //! ADC registers
+    uint32_t savedSC1A, savedSC2, savedSC3, savedCFG1, savedCFG2;
+};
+
 #if ADC_NUM_ADCS>1
 class ADC_Module_Base
 {
@@ -1367,12 +1373,6 @@ public:
 
 
     //////// OTHER STUFF ///////////
-
-    //! Store the config of the adc
-    struct ADC_Config {
-        //! ADC registers
-        uint32_t savedSC1A, savedSC2, savedSC3, savedCFG1, savedCFG2;
-    };
     ADC_Config adc_config{0, 0, 0, 0, 0};
 
     //! Was the adc in use before a call?
