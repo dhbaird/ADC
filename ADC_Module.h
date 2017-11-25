@@ -398,6 +398,7 @@ enum class ADC_RESOLUTION : uint8_t {
 */
 enum class ADC_AVERAGES : uint8_t {
     _0  =  0, /*!< No averages. */
+    _1  =  0, /*!< No averages, same as _0. */
     _4  =  4, /*!< 4 averages. */
     _8  =  8, /*!< 8 averages. */
     _16 = 16, /*!< 16 averages. */
@@ -1216,11 +1217,7 @@ public:
         // increase the counter of measurements
         num_measurements++;
 
-        //digitalWriteFast(LED_BUILTIN, !digitalReadFast(LED_BUILTIN));
-
         if (calibrating) wait_for_cal();
-
-        //digitalWriteFast(LED_BUILTIN, !digitalReadFast(LED_BUILTIN));
 
         // check if we are interrupting a measurement, store setting if so.
         // vars to save the current state of the ADC in case it's in use
