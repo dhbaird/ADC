@@ -723,11 +723,104 @@ struct Diff_Table<1> {
 };
 #endif
 
+#if ADC_NUM_ADCS>1
+class ADC_Module_Base
+{
+public:
+    // Empty virtual destructor for proper cleanup
+    virtual ~ADC_Module_Base() {}
+
+    virtual void analog_init() = 0;
+
+    virtual void recalibrate() = 0;
+    virtual void calibrate() = 0;
+    virtual void wait_for_cal() = 0;
+
+    virtual void setReference(ADC_REFERENCE ref_type) = 0;
+
+    virtual void setResolution(ADC_RESOLUTION bits) = 0;
+    virtual uint8_t getResolution() const = 0;
+    virtual uint32_t getMaxValue() const = 0;
+
+    virtual void setConversionSpeed(ADC_CONVERSION_SPEED speed) = 0;
+
+    virtual void setSamplingSpeed(ADC_SAMPLING_SPEED speed) = 0;
+
+    virtual void setAveraging(ADC_AVERAGES num) = 0;
+
+    virtual void enableInterrupts() = 0;
+    virtual void disableInterrupts() = 0;
+
+    virtual void enableDMA() const = 0;
+    virtual void disableDMA() const = 0;
+
+    virtual void enableCompare(int16_t compValue, bool greaterThan) = 0;
+    virtual void enableCompareRange(int16_t lowerLimit, int16_t upperLimit, bool insideRange, bool inclusive) = 0;
+    virtual void disableCompare() const = 0;
+
+    virtual void enablePGA(uint8_t gain) = 0;
+    virtual uint8_t getPGA() const = 0;
+    virtual void disablePGA() = 0;
+
+    virtual void continuousMode() const = 0;
+    virtual void singleMode() const = 0;
+
+    virtual void singleEndedMode() const = 0;
+    virtual void differentialMode() const = 0;
+
+    virtual void setSoftwareTrigger() const = 0;
+    virtual void setHardwareTrigger() const = 0;
+
+    virtual volatile bool isConverting() const = 0;
+    virtual volatile bool isComplete() const = 0;
+    virtual volatile bool isDifferential() const = 0;
+    virtual volatile bool isContinuous() const = 0;
+    virtual volatile bool isPGAEnabled() const = 0;
+
+    virtual bool checkPin(uint8_t pin) = 0;
+    virtual bool checkDifferentialPins(uint8_t pinP, uint8_t pinN) = 0;
+
+    virtual void startReadFast(uint8_t pin) = 0;
+    virtual void startDifferentialFast(uint8_t pinP, uint8_t pinN) = 0;
+
+    virtual uint16_t getResult() const = 0;
+
+    virtual int analogRead(uint8_t pin) = 0;
+    virtual int analogRead(ADC_INTERNAL_SOURCE pin) = 0;
+    virtual int analogReadDifferential(uint8_t pinP, uint8_t pinN) = 0;
+
+    virtual bool startSingleRead(uint8_t pin) = 0;
+    virtual bool startSingleDifferential(uint8_t pinP, uint8_t pinN) = 0;
+    virtual int readSingle() const;
+
+    virtual bool startContinuous(uint8_t pin) = 0;
+    virtual bool startContinuousDifferential(uint8_t pinP, uint8_t pinN) = 0;
+    virtual int analogReadContinuous() const = 0;
+    virtual void stopContinuous();
+
+    #if ADC_USE_PDB
+    virtual void startPDB(uint32_t freq) = 0;
+    virtual void stopPDB() = 0;
+    virtual uint32_t getPDBFrequency() = 0;
+    #endif
+
+    virtual void saveConfig(ADC_Config* config) = 0;
+    virtual void loadConfig(const ADC_Config* config) = 0;
+
+    virtual void printError() = 0;
+    virtual void resetError() = 0;
+};
+#endif
+
 /** Class ADC_Module: Implements all functions of the Teensy 3.x, LC analog to digital converter
 *
 */
 template<uint8_t ADC_num>
+#if ADC_NUM_ADCS>1
+class ADC_Module: virtual public ADC_Module_Base {
+#else
 class ADC_Module {
+#endif
 
 public:
 

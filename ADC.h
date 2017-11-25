@@ -159,6 +159,11 @@ class ADC
         ADC_Module<1> *const adc1 = &adc1_obj; // adc object pointer
         #endif
 
+        #if ADC_NUM_ADCS>1
+        ADC_Module_Base *const adc[ADC_NUM_ADCS] = {adc0, adc1};
+        #else
+        ADC_Module<0> *const adc[ADC_NUM_ADCS] = {adc0};
+        #endif
 
         /////////////// METHODS TO SET/GET SETTINGS OF THE ADC ////////////////////
 
