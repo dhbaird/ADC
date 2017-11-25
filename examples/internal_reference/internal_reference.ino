@@ -100,13 +100,13 @@ void setup() {
     Serial.begin(9600);
 
     // Best measurement conditions
-    adc->setAveraging(32);
-    adc->setResolution(16);
+    adc->setAveraging(ADC_AVERAGES::_32);
+    adc->setResolution(ADC_RESOLUTION::_16);
     adc->setConversionSpeed(ADC_CONVERSION_SPEED::VERY_LOW_SPEED);
     adc->setSamplingSpeed(ADC_SAMPLING_SPEED::VERY_LOW_SPEED);
     #if ADC_NUM_ADCS>1
-    adc->setAveraging(32, ADC_NUM::ADC_1);
-    adc->setResolution(16, ADC_NUM::ADC_1);
+    adc->setAveraging(ADC_AVERAGES::_32, ADC_NUM::ADC_1);
+    adc->setResolution(ADC_RESOLUTION::_16, ADC_NUM::ADC_1);
     adc->setConversionSpeed(ADC_CONVERSION_SPEED::VERY_LOW_SPEED, ADC_NUM::ADC_1);
     adc->setSamplingSpeed(ADC_SAMPLING_SPEED::VERY_LOW_SPEED, ADC_NUM::ADC_1);
     #endif // ADC_NUM_ADCS

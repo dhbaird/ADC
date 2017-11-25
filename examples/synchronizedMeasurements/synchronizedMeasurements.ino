@@ -24,8 +24,8 @@ void setup() {
     // reference can be ADC_REFERENCE::REF_3V3, ADC_REFERENCE::REF_1V2 (not for Teensy LC) or ADC_REFERENCE::REF_EXT.
     //adc->setReference(ADC_REFERENCE::REF_1V2, ADC_NUM::ADC_0); // change all 3.3 to 1.2 if you change the reference to 1V2
 
-    adc->setAveraging(1); // set number of averages
-    adc->setResolution(8); // set bits of resolution
+    adc->setAveraging(ADC_AVERAGES::_1); // set number of averages
+    adc->setResolution(ADC_RESOLUTION::_8); // set bits of resolution
 
     // it can be any of the ADC_CONVERSION_SPEED enum: VERY_LOW_SPEED, LOW_SPEED, MED_SPEED, HIGH_SPEED_16BITS, HIGH_SPEED or VERY_HIGH_SPEED
     // see the documentation for more information
@@ -44,8 +44,8 @@ void setup() {
 
 
     ////// ADC1 /////
-    adc->setAveraging(1, ADC_NUM::ADC_1); // set number of averages
-    adc->setResolution(8, ADC_NUM::ADC_1); // set bits of resolution
+    adc->setAveraging(ADC_AVERAGES::_1, ADC_NUM::ADC_1); // set number of averages
+    adc->setResolution(ADC_RESOLUTION::_8, ADC_NUM::ADC_1); // set bits of resolution
     adc->setConversionSpeed(ADC_CONVERSION_SPEED::HIGH_SPEED, ADC_NUM::ADC_1); // change the conversion speed
     adc->setSamplingSpeed(ADC_SAMPLING_SPEED::HIGH_SPEED, ADC_NUM::ADC_1); // change the sampling speed
 

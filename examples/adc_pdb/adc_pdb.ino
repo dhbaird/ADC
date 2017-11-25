@@ -21,15 +21,15 @@ void setup() {
     Serial.println("Begin setup");
 
     ///// ADC0 ////
-    adc->setAveraging(1); // set number of averages
-    adc->setResolution(8); // set bits of resolution
+    adc->setAveraging(ADC_AVERAGES::_1); // set number of averages
+    adc->setResolution(ADC_RESOLUTION::_8); // set bits of resolution
     adc->setConversionSpeed(ADC_CONVERSION_SPEED::VERY_HIGH_SPEED); // change the conversion speed
     adc->setSamplingSpeed(ADC_SAMPLING_SPEED::VERY_HIGH_SPEED); // change the sampling speed
 
     ////// ADC1 /////
     #if ADC_NUM_ADCS>1
-    adc->setAveraging(1, ADC_NUM::ADC_1); // set number of averages
-    adc->setResolution(8, ADC_NUM::ADC_1); // set bits of resolution
+    adc->setAveraging(ADC_AVERAGES::_1, ADC_NUM::ADC_1); // set number of averages
+    adc->setResolution(ADC_RESOLUTION::_8, ADC_NUM::ADC_1); // set bits of resolution
     adc->setConversionSpeed(ADC_CONVERSION_SPEED::VERY_HIGH_SPEED, ADC_NUM::ADC_1); // change the conversion speed
     adc->setSamplingSpeed(ADC_SAMPLING_SPEED::VERY_HIGH_SPEED, ADC_NUM::ADC_1); // change the sampling speed
     #endif
