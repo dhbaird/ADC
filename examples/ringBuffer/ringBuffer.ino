@@ -26,7 +26,7 @@ void setup() {
     adc->setResolution(ADC_RESOLUTION::_12, ADC_NUM::ADC_1); // set bits of resolution
 
     // always call the compare functions after changing the resolution!
-    //adc->enableCompare(1.0/3.3*adc->getMaxValue(ADC_NUM::ADC_0), 0, ADC_NUM::ADC_0); // measurement will be ready if value < 1.0V
+    //adc->enableCompare(1.0/3.3*adc->getMaxValue(ADC_NUM::ADC_0), ADC_CMP::OK_IF_SMALLER, ADC_NUM::ADC_0); // measurement will be ready if value < 1.0V
     //adc->enableCompareRange(1.0*adc->getMaxValue(ADC_NUM::ADC_1)/3.3, 2.0*adc->getMaxValue(ADC_NUM::ADC_1)/3.3, 0, 1, ADC_NUM::ADC_1); // ready if value lies out of [1.0,2.0] V
 
 

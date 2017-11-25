@@ -71,8 +71,8 @@ void setup() {
     adc->setSamplingSpeed(ADC_SAMPLING_SPEED::MED_SPEED); // change the sampling speed
 
     // always call the compare functions after changing the resolution!
-    //adc->enableCompare(1.0/3.3*adc->getMaxValue(ADC_NUM::ADC_0), 0, ADC_NUM::ADC_0); // measurement will be ready if value < 1.0V
-    //adc->enableCompareRange(1.0*adc->getMaxValue(ADC_NUM::ADC_0)/3.3, 2.0*adc->getMaxValue(ADC_NUM::ADC_0)/3.3, 0, 1, ADC_NUM::ADC_0); // ready if value lies out of [1.0,2.0] V
+    //adc->enableCompare(1.0/3.3*adc->getMaxValue(ADC_NUM::ADC_0), ADC_CMP::OK_IF_SMALLER, ADC_NUM::ADC_0); // measurement will be ready if value < 1.0V
+    //adc->enableCompareRange(1.0*adc->getMaxValue(ADC_NUM::ADC_0)/3.3, 2.0*adc->getMaxValue(ADC_NUM::ADC_0)/3.3, ADC_RANGE_CMP::OK_IF_OUTSIDE_INCLUSIVE, ADC_NUM::ADC_0); // ready if value lies out of [1.0,2.0] V
 
     // If you enable interrupts, notice that the isr will read the result, so that isComplete() will return false (most of the time)
     //adc->enableInterrupts(ADC_NUM::ADC_0);
@@ -88,7 +88,7 @@ void setup() {
     //adc->setReference(ADC_REFERENCE::REF_1V2, ADC_NUM::ADC_1);
 
     // always call the compare functions after changing the resolution!
-    //adc->enableCompare(1.0/3.3*adc->getMaxValue(ADC_NUM::ADC_1), 0, ADC_NUM::ADC_1); // measurement will be ready if value < 1.0V
+    //adc->enableCompare(1.0/3.3*adc->getMaxValue(ADC_NUM::ADC_1), ADC_CMP::OK_IF_SMALLER, ADC_NUM::ADC_1); // measurement will be ready if value < 1.0V
     //adc->enableCompareRange(1.0*adc->getMaxValue(ADC_NUM::ADC_1)/3.3, 2.0*adc->getMaxValue(ADC_NUM::ADC_1)/3.3, 0, 1, ADC_NUM::ADC_1); // ready if value lies out of [1.0,2.0] V
 
 

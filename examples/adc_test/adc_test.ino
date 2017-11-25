@@ -83,7 +83,7 @@ bool test_compare() {
     bool pass_test = true;
 
     // measurement will be ready if value < 1.0V
-    adc->enableCompare(1.0/3.3*adc->getMaxValue(ADC_NUM::ADC_0), 0, ADC_NUM::ADC_0);
+    adc->enableCompare(1.0/3.3*adc->getMaxValue(ADC_NUM::ADC_0), ADC_CMP::OK_IF_SMALLER);
 
     pinMode(pin_cmp, INPUT_PULLUP); // set to max
     // this should fail
@@ -112,7 +112,7 @@ bool test_compare_range() {
     bool pass_test = true;
 
     // ready if value lies out of [1.0,2.0] V
-    adc->enableCompareRange(1.0*adc->getMaxValue(ADC_NUM::ADC_0)/3.3, 2.0*adc->getMaxValue(ADC_NUM::ADC_0)/3.3, 0, 1, ADC_NUM::ADC_0);
+    adc->enableCompareRange(1.0*adc->getMaxValue(ADC_NUM::ADC_0)/3.3, 2.0*adc->getMaxValue(ADC_NUM::ADC_0)/3.3, ADC_RANGE_CMP::OK_IF_OUTSIDE_INCLUSIVE);
 
 
     pinMode(pin_cmp, INPUT_PULLUP); // set to max
