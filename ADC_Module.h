@@ -406,6 +406,21 @@ enum class ADC_AVERAGES : uint8_t {
 };
 
 
+/*! ADC comparison possibilities
+*/
+enum class ADC_CMP : uint8_t {
+    OK_IF_SMALLER = 0,   /*!< Conversion OK if value is smaller than the comparison value. */
+    OK_IF_LARGER  = 1,  /*!< Conversion OK if value is larger than the comparison value. */
+};
+/*! ADC range comparison possibilities
+*/
+enum class ADC_RANGE_CMP : uint8_t {
+    OK_IF_INSIDE_INCLUSIVE,  /*!< Conversion OK if value is within [lowerLimit, upperLimit], including the limits. */
+    OK_IF_INSIDE_EXCLUSIVE,  /*!< Conversion OK if value is within (lowerLimit, upperLimit), excluding the limits. */
+    OK_IF_OUTSIDE_INCLUSIVE, /*!< Conversion OK if value is in [0, lowerLimit] or [upperLimit, VREFH], including the limits. VREFH is the maximum possible input value. */
+    OK_IF_OUTSIDE_EXCLUSIVE  /*!< Conversion OK if value is in [0, lowerLimit) or (upperLimit, VREFH], excluding the limits. VREFH is the maximum possible input value. */
+};
+
 // Mask for the channel selection in ADCx_SC1A,
 // useful if you want to get the channel number from ADCx_SC1A
 #define ADC_SC1A_CHANNELS (0x1F)
@@ -764,8 +779,8 @@ public:
     virtual void enableDMA() const = 0;
     virtual void disableDMA() const = 0;
 
-    virtual void enableCompare(int16_t compValue, bool greaterThan) = 0;
-    virtual void enableCompareRange(int16_t lowerLimit, int16_t upperLimit, bool insideRange, bool inclusive) = 0;
+    virtual void enableCompare(int16_t compValue, ADC_CMP option) = 0;
+    virtual void enableCompareRange(int16_t lowerLimit, int16_t upperLimit, ADC_RANGE_CMP option) = 0;
     virtual void disableCompare() const = 0;
 
     #if ADC_USE_PGA
@@ -978,26 +993,29 @@ public:
 
     //! Enable the compare function to a single value
     /** A conversion will be completed only when the ADC value
-    *  is >= compValue (greaterThan=1) or < compValue (greaterThan=0)
+    *  is >= compValue (ADC_CMP::OK_IF_LARGER) or < compValue (ADC_CMP::OK_IF_SMALLER)
     *  Call it after changing the resolution
     *  Use with interrupts or poll conversion completion with isComplete()
     *   \param compValue value to compare
-    *   \param greaterThan true or false
+    *   \param option is one of ADC_CMP: OK_IF_SMALLER or OK_IF_LARGER.
     */
-    void enableCompare(int16_t compValue, bool greaterThan);
+    void enableCompare(int16_t compValue, ADC_CMP option);
 
     //! Enable the compare function to a range
-    /** A conversion will be completed only when the ADC value is inside (insideRange=1) or outside (=0)
-    *  the range given by (lowerLimit, upperLimit),including (inclusive=1) the limits or not (inclusive=0).
-    *  See Table 31-78, p. 617 of the freescale manual.
+    /** A conversion will be completed depending on the options:
+    *   OK_IF_INSIDE_INCLUSIVE: Conversion OK if value is within [lowerLimit, upperLimit], including the limits.
+    *   OK_IF_INSIDE_EXCLUSIVE: Conversion OK if value is within (lowerLimit, upperLimit), excluding the limits.
+    *   OK_IF_OUTSIDE_INCLUSIVE: Conversion OK if value is in [0, lowerLimit] or [upperLimit, VREFH], including the limits.
+    *   OK_IF_OUTSIDE_EXCLUSIVE: Conversion OK if value is in [0, lowerLimit) or (upperLimit, VREFH], excluding the limits.
+    *  VREFH is the maximum possible input value.
+    *  See ADC_RANGE_CMP.
     *  Call it after changing the resolution
     *  Use with interrupts or poll conversion completion with isComplete()
     *   \param lowerLimit lower value to compare
     *   \param upperLimit upper value to compare
-    *   \param insideRange true or false
-    *   \param inclusive true or false
+    *   \param option is one of ADC_RANGE_CMP: OK_IF_INSIDE_INCLUSIVE, OK_IF_INSIDE_EXCLUSIVE, OK_IF_OUTSIDE_INCLUSIVE, or OK_IF_OUTSIDE_EXCLUSIVE.
     */
-    void enableCompareRange(int16_t lowerLimit, int16_t upperLimit, bool insideRange, bool inclusive);
+    void enableCompareRange(int16_t lowerLimit, int16_t upperLimit, ADC_RANGE_CMP option);
 
     //! Disable the compare function
     void disableCompare() const{

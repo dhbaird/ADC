@@ -441,14 +441,14 @@ void ADC_Module<ADC_num>::setAveraging(ADC_AVERAGES averages) {
 *  Use with interrupts or poll conversion completion with isADC_Complete()
 */
 template<uint8_t ADC_num>
-void ADC_Module<ADC_num>::enableCompare(int16_t compValue, bool greaterThan) {
+void ADC_Module<ADC_num>::enableCompare(int16_t compValue, ADC_CMP option) {
 
     if (calibrating) wait_for_cal(); // if we modify the adc's registers when calibrating, it will fail
 
     // ADC_SC2_cfe = 1; // enable compare
     // ADC_SC2_cfgt = (int32_t)greaterThan; // greater or less than?
     atomic::setBitFlag(ADC_SC2(), ADC_SC2_ACFE);
-    atomic::changeBitFlag(ADC_SC2(), ADC_SC2_ACFGT, ADC_SC2_ACFGT*(uint8_t)greaterThan);
+    atomic::changeBitFlag(ADC_SC2(), ADC_SC2_ACFGT, static_cast<uint32_t>(option));
 
     ADC_CV1() = (int16_t)compValue; // comp value
 }
@@ -460,39 +460,33 @@ void ADC_Module<ADC_num>::enableCompare(int16_t compValue, bool greaterThan) {
 *  Call it after changing the resolution
 */
 template<uint8_t ADC_num>
-void ADC_Module<ADC_num>::enableCompareRange(int16_t lowerLimit, int16_t upperLimit, bool insideRange, bool inclusive) {
-
+void ADC_Module<ADC_num>::enableCompareRange(int16_t lowerLimit, int16_t upperLimit, ADC_RANGE_CMP option) {
     if (calibrating) wait_for_cal(); // if we modify the adc's registers when calibrating, it will fail
 
-    // ADC_SC2_cfe = 1; // enable compare
-    // ADC_SC2_cren = 1; // enable compare range
     atomic::setBitFlag(ADC_SC2(), ADC_SC2_ACFE);
     atomic::setBitFlag(ADC_SC2(), ADC_SC2_ACREN);
 
-    if(insideRange && inclusive) { // True if value is inside the range, including the limits. CV1 <= CV2 and ACFGT=1
-        // ADC_SC2_cfgt = 1;
+    switch(option) {
+    case ADC_RANGE_CMP::OK_IF_INSIDE_INCLUSIVE:
         atomic::setBitFlag(ADC_SC2(), ADC_SC2_ACFGT);
-
         ADC_CV1() = (int16_t)lowerLimit;
         ADC_CV2() = (int16_t)upperLimit;
-    } else if(insideRange && !inclusive) {// True if value is inside the range, excluding the limits. CV1 > CV2 and ACFGT=0
-        // ADC_SC2_cfgt = 0;
-        atomic::clearBitFlag(ADC_SC2(), ADC_SC2_ACFGT);
-
-        ADC_CV2() = (int16_t)lowerLimit;
-        ADC_CV1() = (int16_t)upperLimit;
-    } else if(!insideRange && inclusive) { // True if value is outside of range or is equal to either limit. CV1 > CV2 and ACFGT=1
-        // ADC_SC2_cfgt = 1;
+        break;
+    case ADC_RANGE_CMP::OK_IF_INSIDE_EXCLUSIVE:
         atomic::setBitFlag(ADC_SC2(), ADC_SC2_ACFGT);
-
         ADC_CV2() = (int16_t)lowerLimit;
         ADC_CV1() = (int16_t)upperLimit;
-    } else if(!insideRange && !inclusive) { // True if value is outside of range and not equal to either limit. CV1 > CV2 and ACFGT=0
-        // ADC_SC2_cfgt = 0;
+        break;
+    case ADC_RANGE_CMP::OK_IF_OUTSIDE_INCLUSIVE:
+        atomic::setBitFlag(ADC_SC2(), ADC_SC2_ACFGT);
+        ADC_CV2() = (int16_t)lowerLimit;
+        ADC_CV1() = (int16_t)upperLimit;
+        break;
+    case ADC_RANGE_CMP::OK_IF_OUTSIDE_EXCLUSIVE:
         atomic::clearBitFlag(ADC_SC2(), ADC_SC2_ACFGT);
-
         ADC_CV1() = (int16_t)lowerLimit;
         ADC_CV2() = (int16_t)upperLimit;
+        break;
     }
 }
 

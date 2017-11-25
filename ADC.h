@@ -306,8 +306,8 @@ class ADC
         *   \param greaterThan true or false
         *   \param adc_num ADC_NUM enum member. Selects the ADC module to use.
         */
-        void enableCompare(int16_t compValue, bool greaterThan, ADC_NUM adc_num = ADC_NUM::ADC_0) __attribute__((always_inline)) {
-            adc[static_cast<uint8_t>(adc_num)]->enableCompare(compValue, greaterThan);
+        void enableCompare(int16_t compValue, ADC_CMP option, ADC_NUM adc_num = ADC_NUM::ADC_0) __attribute__((always_inline)) {
+            adc[static_cast<uint8_t>(adc_num)]->enableCompare(compValue, option);
         }
 
         //! Enable the compare function to a range
@@ -322,8 +322,8 @@ class ADC
         *   \param inclusive true or false
         *   \param adc_num ADC_NUM enum member. Selects the ADC module to use.
         */
-        void enableCompareRange(int16_t lowerLimit, int16_t upperLimit, bool insideRange, bool inclusive, ADC_NUM adc_num = ADC_NUM::ADC_0)  {
-            adc[static_cast<uint8_t>(adc_num)]->enableCompareRange(lowerLimit, upperLimit, insideRange, inclusive);
+        void enableCompareRange(int16_t lowerLimit, int16_t upperLimit, ADC_RANGE_CMP option, ADC_NUM adc_num = ADC_NUM::ADC_0)  {
+            adc[static_cast<uint8_t>(adc_num)]->enableCompareRange(lowerLimit, upperLimit, option);
         }
 
         //! Disable the compare function
