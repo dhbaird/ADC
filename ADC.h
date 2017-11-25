@@ -497,7 +497,7 @@ class ADC
         int analogRead(uint8_t pin, ADC_NUM adc_num = ADC_NUM::ANY) {
             #if ADC_NUM_ADCS==1
             return adc0->analogRead(pin); // use ADC0
-            #elif ADC_NUM_ADCS==2
+            #else
             if(adc_num == ADC_NUM::ANY) { // use no ADC in particular
                 // check which ADC can read the pin
                 const bool adc0Pin = adc0->checkPin(pin);
@@ -558,7 +558,7 @@ class ADC
         int analogReadDifferential(uint8_t pinP, uint8_t pinN, ADC_NUM adc_num = ADC_NUM::ANY) {
             #if ADC_NUM_ADCS==1
             return adc0->analogReadDifferential(pinP, pinN); // use ADC0
-            #elif ADC_NUM_ADCS==2
+            #else
             if(adc_num == ADC_NUM::ANY) { // use no ADC in particular
                 // check which ADC can read the pinP, pinN
                 const bool adc0Pin = adc0->checkDifferentialPins(pinP, pinN);
@@ -601,7 +601,7 @@ class ADC
         bool startSingleRead(uint8_t pin, ADC_NUM adc_num = ADC_NUM::ANY) {
             #if ADC_NUM_ADCS==1
             return adc0->startSingleRead(pin); // use ADC0
-            #elif ADC_NUM_ADCS==2
+            #else
             if(adc_num == ADC_NUM::ANY) { // use no ADC in particular
                 // check which ADC can read the pin
                 const bool adc0Pin = adc0->checkPin(pin);
@@ -628,6 +628,7 @@ class ADC
             }
             adc0->fail_flag |= ADC_ERROR::OTHER;
             return false;
+            #endif
         }
 
         //! Start a differential conversion between two pins (pinP - pinN) and enables interrupts.
@@ -641,7 +642,7 @@ class ADC
         bool startSingleDifferential(uint8_t pinP, uint8_t pinN, ADC_NUM adc_num = ADC_NUM::ANY) {
             #if ADC_NUM_ADCS==1
             return adc0->startSingleDifferential(pinP, pinN); // use ADC0
-            #elif ADC_NUM_ADCS==2
+            #else
             if(adc_num == ADC_NUM::ANY) { // use no ADC in particular
                 // check which ADC can read the pinP, pinN
                 const bool adc0Pin = adc0->checkDifferentialPins(pinP, pinN);
@@ -697,7 +698,7 @@ class ADC
         bool startContinuous(uint8_t pin, ADC_NUM adc_num = ADC_NUM::ANY) {
             #if ADC_NUM_ADCS==1
             return adc0->startContinuous(pin); // use ADC0
-            #elif ADC_NUM_ADCS==2
+            #else
             if(adc_num == ADC_NUM::ANY) { // use no ADC in particular
                 // check which ADC can read the pin
                 const bool adc0Pin = adc0->checkPin(pin);
@@ -737,7 +738,7 @@ class ADC
         bool startContinuousDifferential(uint8_t pinP, uint8_t pinN, ADC_NUM adc_num = ADC_NUM::ANY) {
             #if ADC_NUM_ADCS==1
             return adc0->startContinuousDifferential(pinP, pinN); // use ADC0
-            #elif ADC_NUM_ADCS==2
+            #else
             if(adc_num == ADC_NUM::ANY) { // use no ADC in particular
                 // check which ADC can read the pinP, pinN
                 const bool adc0Pin = adc0->checkDifferentialPins(pinP, pinN);
