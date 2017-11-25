@@ -51,6 +51,81 @@ class ADC
         // Number of ADC objects
         const uint8_t num_ADCs = ADC_NUM_ADCS;
 
+        /*
+        #if ADC_NUM_ADCS>1
+        // Workload-based dispatch policy:
+        // Dispatch conversion to the selected ADC. If no specific ADC is selected (ADC_NUM::ANY):
+        // Check which ADC can handle the pin, if both:
+        // Use the ADC with lesser workload
+        // If only one ADC can measure pin, use it.
+        template<typename ret_type, typename... Args>
+        ret_type workload_dispatch_policy(bool (ADC_Module::*check_fun)(Args... args),
+                                          ret_type (ADC_Module::*conversion_fun)(Args... args), ADC_NUM adc_num, Args... args) {
+            if(adc_num==ADC_NUM::ANY) { // use no ADC in particular
+                // check which ADC can read the pin
+                bool adc0Pin = (adc0->*check_fun)(args...);
+                bool adc1Pin = (adc1->*check_fun)(args...);
+
+                if(adc0Pin && adc1Pin)  { // Both ADCs
+                    if( (adc0->num_measurements) > (adc1->num_measurements)) { // use the ADC with less workload
+                        return (adc1->*conversion_fun)(args...);
+                    } else {
+                        return (adc0->*conversion_fun)(args...);
+                    }
+                } else if(adc0Pin) { // ADC0
+                    return (adc0->*conversion_fun)(args...);
+                } else if(adc1Pin) { // ADC1
+                    return (adc1->*conversion_fun)(args...);
+                } else { // pin not valid in any ADC
+                    adc0->fail_flag |= ADC_ERROR::WRONG_PIN;
+                    adc1->fail_flag |= ADC_ERROR::WRONG_PIN;
+                    return ADC_ERROR_VALUE;   // all others are invalid
+                }
+            } else { // Use a specific ADC
+                return (adc[static_cast<uint8_t>(adc_num)]->*conversion_fun)(args...);
+            }
+        }
+
+        // Simple dispatch policy:
+        // Dispatch conversion to the selected ADC. If no specific ADC is selected (ADC_NUM::ANY):
+        // Check if ADC0 can handle it, if so, use it.
+        // If not, check ADC1, if so, use it.
+        template<typename ret_type, typename... Args>
+        ret_type simple_dispatch_policy(bool (ADC_Module::*check_fun)(Args... args),
+                                        ret_type (ADC_Module::*conversion_fun)(Args... args), ADC_NUM adc_num, Args... args) {
+            if(adc_num==ADC_NUM::ANY) { // use no ADC in particular
+                // check which ADC can read the pin
+                bool adc0Pin = (adc0->*check_fun)(args...);
+                if(adc0Pin) { // ADC0
+                    return (adc0->*conversion_fun)(args...);
+                }
+
+                bool adc1Pin = (adc1->*check_fun)(args...);
+                if(adc1Pin) { // ADC1
+                    return (adc1->*conversion_fun)(args...);
+                }
+
+                // Not valid for any ADC
+                adc0->fail_flag |= ADC_ERROR::WRONG_PIN;
+                adc1->fail_flag |= ADC_ERROR::WRONG_PIN;
+                return ADC_ERROR_VALUE;   // all others are invalid
+            } else { // Use a specific ADC
+                return (adc[static_cast<uint8_t>(adc_num)]->*conversion_fun)(args...);
+            }
+        }
+
+        // Change the return function to the policy that you want: workload_dispatch_policy or simple_dispatch_policy.
+        template<typename ret_type, typename... Args>
+        __attribute__((always_inline)) ret_type dispatch_policy(bool (ADC_Module::*check_fun)(Args... args),
+                                 ret_type (ADC_Module::*conversion_fun)(Args... args),
+                                 ADC_NUM adc_num, Args... args) {
+            return workload_dispatch_policy(check_fun, conversion_fun, adc_num, args...);
+            //return simple_dispatch_policy(check_fun, conversion_fun, adc_num, args...);
+        }
+        #endif // ADC_NUM_ADCS
+        */
+
+
     public:
 
         // ADCs objects
@@ -62,9 +137,13 @@ class ADC
         //! Constructor
         ADC() {
             // make sure the clocks to the ADC are on
-            atomic::setBitFlag(SIM_SCGC6, SIM_SCGC6_ADC0);
+            if (!(SIM_SCGC6 & SIM_SCGC6_ADC0)) { // if ADC0 clock wasn't on
+                atomic::setBitFlag(SIM_SCGC6, SIM_SCGC6_ADC0);
+            }
             #if ADC_NUM_ADCS>1
-            atomic::setBitFlag(SIM_SCGC3, SIM_SCGC3_ADC1);
+            if (!(SIM_SCGC3 & SIM_SCGC3_ADC1)) { // if ADC1 clock wasn't on
+                atomic::setBitFlag(SIM_SCGC3, SIM_SCGC3_ADC1);
+            }
             #endif
 
             adc0->analog_init();
@@ -107,7 +186,7 @@ class ADC
         *  Whenever you change the resolution, change also the comparison values (if you use them).
         *   \param adc_num ADC_NUM enum member. Selects the ADC module to use.
         */
-        void setResolution(uint8_t bits, ADC_NUM adc_num = ADC_NUM::ADC_0) __attribute__((always_inline)) {
+        void setResolution(ADC_RESOLUTION bits, ADC_NUM adc_num = ADC_NUM::ADC_0) __attribute__((always_inline)) {
             #if ADC_NUM_ADCS==1
             adc0->setResolution(bits);
             #else
@@ -195,7 +274,7 @@ class ADC
         * \param num can be 0, 4, 8, 16 or 32.
         *   \param adc_num ADC_NUM enum member. Selects the ADC module to use.
         */
-        void setAveraging(uint8_t num, ADC_NUM adc_num = ADC_NUM::ADC_0) __attribute__((always_inline)) {
+        void setAveraging(ADC_AVERAGES num, ADC_NUM adc_num = ADC_NUM::ADC_0) __attribute__((always_inline)) {
             #if ADC_NUM_ADCS==1
             adc0->setAveraging(num);
             #else
@@ -549,7 +628,6 @@ class ADC
             }
             adc0->fail_flag |= ADC_ERROR::OTHER;
             return false;
-            #endif
         }
 
         //! Start a differential conversion between two pins (pinP - pinN) and enables interrupts.

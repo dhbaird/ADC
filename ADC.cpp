@@ -417,4 +417,4 @@ void ADC::stopSynchronizedContinuous() {
     adc1->stopContinuous();
 }
 
-#endif
+#endif  // ADC_NUM_ADCS>1

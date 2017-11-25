@@ -129,7 +129,6 @@ enum class ADC_NUM : int8_t {
         #define ADC_USE_INTERNAL_VREF (1)
 #endif
 
-
 // Select the voltage reference sources for ADC. This is an internal setting, do not use
 enum class ADC_REF_SOURCE : uint8_t {REF_DEFAULT = 0, REF_ALT = 1, REF_NONE = 2}; // internal, do not use
 #if defined(ADC_TEENSY_3_0) || defined(ADC_TEENSY_3_1) || defined(ADC_TEENSY_3_5) || defined(ADC_TEENSY_3_6)
@@ -382,6 +381,29 @@ enum class ADC_SAMPLING_SPEED : uint8_t {
 };
 
 
+/*! ADC Resolution in bits
+*/
+enum class ADC_RESOLUTION : uint8_t {
+    _8  =  8, /*!< 8 bits for single-ended and 9 bits for differential measurements. */
+    _9  =  8,
+    _10 = 10, /*!< 10 bits for single-ended and 11 bits for differential measurements. */
+    _11 = 10,
+    _12 = 12, /*!< 12 bits for single-ended and 13 bits for differential measurements. */
+    _13 = 12,
+    _16 = 16, /*!< 16 bits for single-ended and 16 bits for differential measurements. */
+};
+
+
+/*! ADC averages
+*/
+enum class ADC_AVERAGES : uint8_t {
+    _0  =  0, /*!< No averages. */
+    _4  =  4, /*!< 4 averages. */
+    _8  =  8, /*!< 8 averages. */
+    _16 = 16, /*!< 16 averages. */
+    _32 = 32, /*!< 32 averages. */
+};
+
 
 // Mask for the channel selection in ADCx_SC1A,
 // useful if you want to get the channel number from ADCx_SC1A
@@ -492,24 +514,6 @@ using ADC_Error::ADC_ERROR;
 
 // debug mode: blink the led light
 #define ADC_debug 0
-
-// Define masks for settings that need more than one bit
-#define ADC_CFG1_ADIV_MASK_1 (1<<6)
-#define ADC_CFG1_ADIV_MASK_0 (1<<5)
-
-#define ADC_CFG1_MODE_MASK_1 (1<<3)
-#define ADC_CFG1_MODE_MASK_0 (1<<2)
-
-#define ADC_CFG1_ADICLK_MASK_1 (1<<1)
-#define ADC_CFG1_ADICLK_MASK_0 (1<<0)
-
-#define ADC_CFG2_ADLSTS_MASK_1 (1<<1)
-#define ADC_CFG2_ADLSTS_MASK_0 (1<<0)
-
-#define ADC_SC2_REFSEL_MASK_0 (1<<0)
-
-#define ADC_SC3_AVGS_MASK_1 (1<<1)
-#define ADC_SC3_AVGS_MASK_0 (1<<0)
 
 
 // translate pin number to SC1A nomenclature and viceversa
@@ -719,7 +723,6 @@ struct Diff_Table<1> {
 };
 #endif
 
-
 /** Class ADC_Module: Implements all functions of the Teensy 3.x, LC analog to digital converter
 *
 */
@@ -735,14 +738,7 @@ public:
     *   \param a_channel2sc1a contains an index that pairs each pin to its SC1A number (used to start a conversion on that pin)
     *   \param a_diff_table is similar to a_channel2sc1a, but for differential pins.
     */
-    constexpr ADC_Module():
-        #if ADC_NUM_ADCS==2
-        // IRQ_ADC0 and IRQ_ADC1 aren't consecutive in Teensy 3.6
-        IRQ_ADC(ADC_num? IRQ_ADC1 : IRQ_ADC0) // fix by SB, https://github.com/pedvide/ADC/issues/19
-        #else
-        IRQ_ADC(IRQ_ADC0)
-        #endif
-        {}
+    constexpr ADC_Module() {}
 
     static constexpr const uint8_t* const channel2sc1a{Channel2SC1A<ADC_num>::channel2sc1a};
     static constexpr const ADC_NLIST* const diff_table{Diff_Table<ADC_num>::diff_table};
@@ -785,7 +781,7 @@ public:
     *
     *  Whenever you change the resolution, change also the comparison values (if you use them).
     */
-    void setResolution(uint8_t bits);
+    void setResolution(ADC_RESOLUTION bits);
 
     //! Returns the resolution of the ADC_Module.
     /**
@@ -840,7 +836,7 @@ public:
     *
     *  It doesn't recalibrate at the end.
     */
-    void setAveraging(uint8_t num);
+    void setAveraging(ADC_AVERAGES num);
 
 
     //! Enable interrupts
@@ -1261,14 +1257,6 @@ public:
     //// Only works for Teensy 3.0 and 3.1, not LC (it doesn't have PDB)
     #if ADC_USE_PDB
 
-    //                  software trigger    enable PDB     PDB interrupt
-    #define ADC_PDB_CONFIG (PDB_SC_TRGSEL(15) | PDB_SC_PDBEN | PDB_SC_PDBIE \
-        | PDB_SC_CONT |  PDB_SC_LDMOD(0))
-    //    continuous mode load immediately
-
-    #define PDB_CHnC1_TOS_1 0x0100
-    #define PDB_CHnC1_EN_1 0x01
-
     //! Start PDB triggering the ADC at the frequency
     /** Call startSingleRead or startSingleDifferential on the pin that you want to measure before calling this function.
     *   See the example adc_pdb.ino.
@@ -1299,20 +1287,36 @@ public:
 
     //! Save config of the ADC to the ADC_Config struct
     void saveConfig(ADC_Config* config) {
+        #if ADC_NUM_ADCS>1
         config->savedSC1A = ADC_SC1A();
         config->savedCFG1 = ADC_CFG1();
         config->savedCFG2 = ADC_CFG2();
         config->savedSC2 = ADC_SC2();
         config->savedSC3 = ADC_SC3();
+        #else
+        config->savedSC1A = ADC0_SC1A;
+        config->savedCFG1 = ADC0_CFG1;
+        config->savedCFG2 = ADC0_CFG2;
+        config->savedSC2 = ADC0_SC2;
+        config->savedSC3 = ADC0_SC3;
+        #endif
     }
 
     //! Load config to the ADC
     void loadConfig(const ADC_Config* config) {
+        #if ADC_NUM_ADCS>1
         ADC_CFG1() = config->savedCFG1;
         ADC_CFG2() = config->savedCFG2;
         ADC_SC2() = config->savedSC2;
         ADC_SC3() = config->savedSC3;
         ADC_SC1A() = config->savedSC1A; // restore last
+        #else
+        ADC0_CFG1 = config->savedCFG1;
+        ADC0_CFG2 = config->savedCFG2;
+        ADC0_SC2 = config->savedSC2;
+        ADC0_SC3 = config->savedSC3;
+        ADC0_SC1A = config->savedSC1A; // restore last
+        #endif
     }
 
 
@@ -1343,18 +1347,18 @@ private:
 
     // the first calibration will use 32 averages and lowest speed,
     // when this calibration is over the averages and speed will be set to default.
-    uint8_t init_calib = true;
+    bool init_calib = true;
 
     bool interrupt_enabled = false;
 
     // resolution
-    uint8_t analog_res_bits = 0;
+    ADC_RESOLUTION analog_res_bits = ADC_RESOLUTION::_8;
 
     // maximum value possible 2^res-1
     uint32_t analog_max_val = 0;
 
     // num of averages
-    uint8_t analog_num_average = 0;
+    ADC_AVERAGES analog_num_average = ADC_AVERAGES::_0;
 
     // reference can be internal or external
     ADC_REF_SOURCE analog_reference_internal = ADC_REF_SOURCE::REF_NONE;;
@@ -1425,7 +1429,12 @@ private:
     ADC_GENERATE_REG(CLM1);
     ADC_GENERATE_REG(CLM0);
 
-    constexpr reg PDB0_CHnC1() const { return (ADC_num ? PDB0_CH0C1 : PDB0_CH1C1); } // PDB channel 0 or 1
+
+    #if ADC_NUM_ADCS>1
+    constexpr reg PDB0_CHnC1() const { return (ADC_num ? PDB0_CH1C1 : PDB0_CH0C1); } // PDB channel 0 or 1
+    #else
+    constexpr reg PDB0_CHnC1() const { return PDB0_CH0C1; } // PDB channel 0 or 1
+    #endif
 
     #if ADC_NUM_ADCS>1
     const uint8_t IRQ_ADC = ADC_num? IRQ_ADC1 : IRQ_ADC0; // IRQ number will be IRQ_ADC0 or IRQ_ADC1

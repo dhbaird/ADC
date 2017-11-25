@@ -54,7 +54,7 @@ int value = 0;
 
 // test the analog pins that also have a digital function
 bool test_pullup_down(bool pullup) {
-    uint8_t mode = pullup ? INPUT_PULLUP : INPUT_PULLDOWN;
+    const uint8_t mode = pullup ? INPUT_PULLUP : INPUT_PULLDOWN;
 
     const int max_val = adc->getMaxValue(ADC_NUM::ADC_0);
 
@@ -62,6 +62,7 @@ bool test_pullup_down(bool pullup) {
 
     for (int i=0;i<DIG_PINS;i++) {
         pinMode(adc_pins_dig[i], mode);
+        delay(50); // settle time
         value = adc->analogRead(adc_pins_dig[i]);
         bool fail_condition = pullup ? (value < 0.95*max_val) : (value > 0.05*max_val);
         if (fail_condition) {
@@ -143,15 +144,16 @@ bool test_averages() {
     elapsedMicros timeElapsed;
     bool pass_test = true;
     const uint32_t num_samples = 100;
-    const uint8_t averages[] = {4, 8, 16, 32};
+    const ADC_AVERAGES averages[] = {ADC_AVERAGES::_4, ADC_AVERAGES::_8, ADC_AVERAGES::_16, ADC_AVERAGES::_32};
     float avg_times[4];
 
-    adc->setAveraging(1);
+    adc->setAveraging(ADC_AVERAGES::_0);
     timeElapsed = 0;
     for(uint32_t i=0; i<num_samples; i++) {
         adc->analogRead(A0, ADC_NUM::ADC_0);
     }
     float one_avg_time = timeElapsed/num_samples;
+    //Serial.print("1: "); Serial.println(one_avg_time);
 
 
     for(uint8_t i=0; i<4; i++) {
@@ -162,25 +164,25 @@ bool test_averages() {
         }
         float time = (float)timeElapsed/num_samples;
         avg_times[i] = time;
-//        Serial.print(averages[i]); Serial.print(": "); Serial.print(time);
-//        Serial.print(", "); Serial.println(time/one_avg_time);
+        //Serial.print(static_cast<uint8_t>(averages[i])); Serial.print(": "); Serial.print(time);
+        //Serial.print(", "); Serial.println(time/one_avg_time);
     }
 
     // the 4 averages is not 4 times as long as the 1 average because
     // the first sample always takes longer, therefore the 4 avgs take about 3.5 times the first.
     // 8 avgs take twice as long as 4 and so on.
-    if((avg_times[0] < 3*one_avg_time) || (avg_times[0] > 4*one_avg_time)) {
+    // this is even worse for Teensy LC, where 4 avgs take about 2.6 more than none.
+    if((avg_times[0] < 2*one_avg_time) || (avg_times[0] > 4*one_avg_time)) {
         pass_test = false;
         Serial.print("4 averages should take about 4 times longer than one, but it took ");
         Serial.print(avg_times[0]/one_avg_time); Serial.println(" times longer");
     }
     // check that the times are between 90% and 110% their theoretical value.
     for(uint8_t i=1; i<4; i++) {
-        if((avg_times[i] < pow(2, i)*0.9*avg_times[0]) || (avg_times[i] > pow(2, i)*1.1*avg_times[0])) {
+        if((avg_times[i] < 2*0.9*avg_times[i-1]) || (avg_times[i] > 2*1.1*avg_times[i-1])) {
             pass_test = false;
-            Serial.print(averages[i]); Serial.print(" averages should take about "); Serial.print(pow(2, i));
-            Serial.print(" times longer than 4, but it took ");
-            Serial.print(avg_times[i]/avg_times[0]); Serial.println(" times longer.");
+            Serial.print(static_cast<uint8_t>(averages[i])); Serial.print(" averages should take about twice as long as "); Serial.print(pow(2, i-1), 0);
+            Serial.print(", but it took "); Serial.print(avg_times[i]/avg_times[i-1]); Serial.println(" times longer.");
         }
     }
 
@@ -191,10 +193,6 @@ void setup() {
 
     pinMode(LED_BUILTIN, OUTPUT);
 
-    for (int i=0;i<PINS;i++) {
-        pinMode(adc_pins[i], INPUT);
-    }
-
     Serial.begin(9600);
 
 
@@ -202,8 +200,8 @@ void setup() {
     // reference can be ADC_REFERENCE::REF_3V3, ADC_REFERENCE::REF_1V2 (not for Teensy LC) or ADC_REFERENCE::REF_EXT.
     //adc->setReference(ADC_REFERENCE::REF_1V2, ADC_NUM::ADC_0); // change all 3.3 to 1.2 if you change the reference to 1V2
 
-    adc->setAveraging(16); // set number of averages
-    adc->setResolution(16); // set bits of resolution
+    adc->setAveraging(ADC_AVERAGES::_16); // set number of averages
+    adc->setResolution(ADC_RESOLUTION::_16); // set bits of resolution
 
     // it can be any of the ADC_CONVERSION_SPEED enum: VERY_LOW_SPEED, LOW_SPEED, MED_SPEED, HIGH_SPEED_16BITS, HIGH_SPEED or VERY_HIGH_SPEED
     // see the documentation for more information
@@ -219,8 +217,8 @@ void setup() {
 
     ////// ADC1 /////
     #if ADC_NUM_ADCS>1
-    adc->setAveraging(16, ADC_NUM::ADC_1); // set number of averages
-    adc->setResolution(16, ADC_NUM::ADC_1); // set bits of resolution
+    adc->setAveraging(ADC_AVERAGES::_16, ADC_NUM::ADC_1); // set number of averages
+    adc->setResolution(ADC_RESOLUTION::_16, ADC_NUM::ADC_1); // set bits of resolution
     adc->setConversionSpeed(ADC_CONVERSION_SPEED::LOW_SPEED, ADC_NUM::ADC_1); // change the conversion speed
     adc->setSamplingSpeed(ADC_SAMPLING_SPEED::LOW_SPEED, ADC_NUM::ADC_1); // change the sampling speed
 
@@ -232,7 +230,12 @@ void setup() {
 
     #endif
 
-    delay(2000);
+    adc->adc0->recalibrate();
+    #if ADC_NUM_ADCS>1
+    adc->adc1->recalibrate();
+    #endif
+
+    delay(1000);
 
     ////// START TESTS /////////////
 
