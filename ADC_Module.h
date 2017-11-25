@@ -731,6 +731,9 @@ struct ADC_Config {
 };
 
 #if ADC_NUM_ADCS>1
+// Base class for ADC_Module if the board has more than 1.
+// Used so that we can have an array of adcs with type ADC_Module_Base,
+// because the ADC_Modules<num> are different types
 class ADC_Module_Base
 {
 public:
