@@ -26,48 +26,68 @@
 #ifndef RINGBUFFER_H
 #define RINGBUFFER_H
 
-// include new and delete
-//#include <Arduino.h>
 
-// THE SIZE MUST BE A POWER OF 2!!
-#define RING_BUFFER_DEFAULT_BUFFER_SIZE 8
-
-
-
-/** Class RingBuffer implements a circular buffer of fixed size (must be power of 2)
-*   Code adapted from http://en.wikipedia.org/wiki/Circular_buffer#Mirroring
+/** Class RingBuffer implements a circular buffer of fixed size, must be power of 2.
+*   This is a purely software implementation, so it works for all boards.
 */
+template<uint32_t max_capacity>
 class RingBuffer
 {
     public:
-        //! Default constructor, buffer has a size DEFAULT_BUFFER_SIZE
-        RingBuffer();
+        //! Default constructor
+        constexpr RingBuffer() {
+            static_assert(max_capacity%2==0, "RingBuffer's max_capacity must be a power of two.");
+        }
 
         /** Default destructor */
-        virtual ~RingBuffer();
+        virtual ~RingBuffer() {}
 
-        //! Returns 1 (true) if the buffer is full
-        int isFull();
+        //! Returns true if the buffer is full
+        bool isFull() {
+            return size() == b_size;
+        }
 
-        //! Returns 1 (true) if the buffer is empty
-        int isEmpty();
+        //! Returns true if the buffer is empty
+        bool isEmpty() {
+            return b_read == b_write;
+        }
 
         //! Write a value into the buffer
-        void write(int value);
+        void write(int16_t value) {
+            if(isFull()) {
+                b_read++;
+            }
+            elems[restrict(b_write++)] = value;
+        }
 
-        //! Read a value from the buffer
-        int read();
+        //! Read a value from the buffer. Make sure it's not empty first.
+        int16_t read() {
+            return elems[restrict(b_read++)];
+        }
 
-    protected:
-    private:
+        uint32_t size() {
+            // take care of overflow
+            // get the maximum value for b_read (same as for b_write)
+            // this is calculated at compile time
+            return (b_write - b_read) & (std::numeric_limits<decltype(b_read)>::max());
+        }
 
-        int increase(int p);
+        int16_t elems[max_capacity];
 
-        int b_size = RING_BUFFER_DEFAULT_BUFFER_SIZE;
-        int b_start = 0;
-        int b_end = 0;
-        //int *elems;
-        int elems[RING_BUFFER_DEFAULT_BUFFER_SIZE];
+    public:
+
+        uint32_t restrict(uint32_t p) {
+            return p&(b_size-1);
+        }
+
+        const uint32_t b_size = max_capacity;
+        // we don't restrict them to b_size, but let them increment.
+        // when they reach the maximum number they'll overflow to 0 and continue working (we need to be careful in size() though).
+        // This is why the max_capacity must be a power of two,
+        // otherwise the after the overflow the positions wouldn't be correct relative to each other.
+        // (overflow happens at a power of two, therefore a multiple of the max_capacity.)
+        uint32_t b_read = 0;
+        uint32_t b_write = 0;
 };
 
 

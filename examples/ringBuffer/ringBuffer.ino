@@ -1,47 +1,46 @@
 #include "ADC.h"
 #include "RingBuffer.h"
 
-const int readPin = A9;
+const uint8_t readPin = A9;
 
 ADC *adc = new ADC(); // adc object
 
-RingBuffer *buffer = new RingBuffer;
+const uint32_t buffer_size = 8;
+RingBuffer<buffer_size> *buffer = new RingBuffer<buffer_size>;
 
 
 void setup() {
-
     pinMode(LED_BUILTIN, OUTPUT);
-    pinMode(readPin, INPUT); //pin 23 single ended
-
     Serial.begin(9600);
-
-    // reference can be ADC_REFERENCE::REF_3V3, ADC_REFERENCE::REF_1V2 (not for Teensy LC) or ADC_REF_EXT.
-    //adc->setReference(ADC_REFERENCE::REF_1V2, ADC_NUM::ADC_0); // change all 3.3 to 1.2 if you change the reference to 1V2
-
-    adc->setAveraging(ADC_AVERAGES::_8); // set number of averages
-    adc->setResolution(ADC_RESOLUTION::_12); // set bits of resolution
-
-
-    adc->setAveraging(ADC_AVERAGES::_32, ADC_NUM::ADC_1); // set number of averages
-    adc->setResolution(ADC_RESOLUTION::_12, ADC_NUM::ADC_1); // set bits of resolution
-
-    // always call the compare functions after changing the resolution!
-    //adc->enableCompare(1.0/3.3*adc->getMaxValue(ADC_NUM::ADC_0), ADC_CMP::OK_IF_SMALLER, ADC_NUM::ADC_0); // measurement will be ready if value < 1.0V
-    //adc->enableCompareRange(1.0*adc->getMaxValue(ADC_NUM::ADC_1)/3.3, 2.0*adc->getMaxValue(ADC_NUM::ADC_1)/3.3, 0, 1, ADC_NUM::ADC_1); // ready if value lies out of [1.0,2.0] V
-
-
 }
 
-double value = 0;
+int16_t value = 0;
+char c=0;
 
 void loop() {
 
     value = adc->analogRead(readPin);
 
-    buffer->write(value);
-
-    Serial.print("Buffer read:");
-    Serial.println(buffer->read()*3.3/adc->getMaxValue());
+    if (Serial.available()) {
+        c = Serial.read();
+        if(c=='r') { // read buffer
+            Serial.print("Read: ");
+            Serial.println(buffer->read());
+        } else if(c=='f') { // full?
+            Serial.print("isFull(): ");
+            Serial.println(buffer->isFull());
+        } else if(c=='e') { // empty?
+            Serial.print("isEmpty(): ");
+            Serial.println(buffer->isEmpty());
+        } else if(c=='p'){
+            for(uint32_t i = 0; i<buffer_size; i++) {
+                Serial.print(i); Serial.print(": "); Serial.println(buffer->elems[i]);
+            }
+        } else if(c=='w') { // empty?
+            Serial.println("Write value.");
+            buffer->write(value);
+        }
+    }
 
     delay(100);
 }
