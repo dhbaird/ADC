@@ -70,6 +70,7 @@ class RingBuffer
             return elems[restrict(b_read++)];
         }
 
+        //! Current number of elements in the buffer
         uint32_t size() {
             // take care of overflow
             // get the maximum value for b_read (same as for b_write)
