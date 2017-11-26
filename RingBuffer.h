@@ -60,8 +60,13 @@ class RingBuffer
             elems[restrict(b_write++)] = value;
         }
 
-        //! Read a value from the buffer. Make sure it's not empty first.
+        //! Read a value from the buffer.
+        /** If the buffer is empty, return the right value, but don't increment the pointer.
+        */
         int16_t read() {
+            if(isEmpty()) {
+                return elems[restrict(b_read)];
+            }
             return elems[restrict(b_read++)];
         }
 
