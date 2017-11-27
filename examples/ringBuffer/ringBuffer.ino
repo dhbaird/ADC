@@ -34,7 +34,7 @@ void loop() {
             Serial.println(buffer->isEmpty());
         } else if(c=='p'){
             for(uint32_t i = 0; i<buffer_size; i++) {
-                Serial.print(i); Serial.print(": "); Serial.println(buffer->elems[i]);
+                Serial.print(i); Serial.print(": "); Serial.println(buffer->buffer[i]);
             }
         } else if(c=='w') { // empty?
             Serial.println("Write value.");
