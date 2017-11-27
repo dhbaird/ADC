@@ -44,7 +44,7 @@ class RingBuffer
 
         //! Returns true if the buffer is full
         bool isFull() {
-            return size() == b_size;
+            return size() == max_capacity;
         }
 
         //! Returns true if the buffer is empty
@@ -78,15 +78,17 @@ class RingBuffer
             return (b_write - b_read) & (std::numeric_limits<decltype(b_read)>::max());
         }
 
+        //! Pointer to the data
+        volatile int16_t* const buffer() {return elems;}
+
+    private:
+
         int16_t elems[max_capacity];
 
-    public:
-
         uint32_t restrict(uint32_t p) {
-            return p&(b_size-1);
+            return p&(max_capacity-1);
         }
 
-        const uint32_t b_size = max_capacity;
         // we don't restrict them to b_size, but let them increment.
         // when they reach the maximum number they'll overflow to 0 and continue working (we need to be careful in size() though).
         // This is why the max_capacity must be a power of two,
