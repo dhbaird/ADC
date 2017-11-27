@@ -6,18 +6,11 @@
 #include "RingBufferDMA.h"
 
 const int readPin = A9;
-
 ADC *adc = new ADC(); // adc object
 
-
-// Define the array that holds the conversions here.
-// buffer_size must be a power of two.
 const uint8_t buffer_size = 8;
-
-volatile int16_t buffer[buffer_size];
-
 // use dma with ADC0
-RingBufferDMA<buffer_size> dmaBuffer(buffer, ADC_NUM::ADC_0);
+RingBufferDMA<buffer_size> dmaBuffer(ADC_NUM::ADC_0);
 
 
 void setup() {
@@ -34,12 +27,12 @@ void setup() {
     adc->enableDMA();
 
     // ADC interrupt enabled isn't mandatory for DMA to work.
-    //adc->enableInterrupts(ADC_NUM::ADC_0);
+    adc->enableInterrupts(ADC_NUM::ADC_0);
 
     //dmaBuffer.start();
     dmaBuffer.start();
 
-
+    // setup ADC internal settings
     adc->analogRead(readPin, ADC_NUM::ADC_0);
     adc->adc0->stopPDB();
     // At 2 Hz it's easy to see the buffer being filled.
@@ -58,18 +51,13 @@ void loop() {
             Serial.println("Conversion.");
             adc->analogRead(readPin, ADC_NUM::ADC_0);
         } else if(c=='p') { // print buffer
-            printBuffer();
-        } else if(c=='l') { // toggle led
-            digitalWriteFast(LED_BUILTIN, !digitalReadFast(LED_BUILTIN));
-        } else if(c=='r') { // read
-            //Serial.print("read(): ");
-            //Serial.println(dmaBuffer->read());
-        } else if(c=='f') { // full?
             Serial.print("isFull(): ");
             Serial.println(dmaBuffer.isFull());
-        } else if(c=='e') { // empty?
-            Serial.print("isEmpty(): ");
-            Serial.println(dmaBuffer.isEmpty());
+            Serial.print("size(): ");
+            Serial.println(dmaBuffer.size());
+            printBuffer();
+        } else if(c=='i') {
+            dmaBuffer.add_interrupt(&dmaBuffer_isr);
         }
   }
 

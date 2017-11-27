@@ -36,20 +36,9 @@ template<uint32_t max_capacity>
 class RingBufferDMA
 {
     public:
-        //! Constructor, buffer stores the conversions of ADC number ADC_num
-        /** There are no interrupts when the buffer is full.
-        */
-        RingBufferDMA(volatile int16_t* const elems, ADC_NUM ADC_num) : RingBufferDMA(elems, ADC_num, &do_nothing_isr) {
-            dmaChannel.clearInterrupt();
-            dmaChannel.detachInterrupt();
-        }
-        //! Constructor, buffer stores the conversions of ADC number ADC_num
-        /**
-        *   \param dma_isr is a function pointer than will be called when the buffer is full.
-        */
-        RingBufferDMA(volatile int16_t* const elems, ADC_NUM ADC_num, void (*dma_isr)(void)) :
-            ADC_RA(ADC_num==ADC_NUM::ADC_0 ? ADC0_RA : ADC1_RA),
-            elems(elems)
+        //! Constructor, stores the conversions of ADC number ADC_num
+        RingBufferDMA(ADC_NUM ADC_num) :
+            ADC_RA(ADC_num==ADC_NUM::ADC_0 ? ADC0_RA : ADC1_RA)
         {
             static_assert(max_capacity%2==0, "RingBufferDMA's max_capacity must be a power of two.");
 
@@ -60,7 +49,6 @@ class RingBufferDMA
             dmaChannel.source(ADC_RA);
             dmaChannel.destinationBuffer(elems, 2*max_capacity); // 2 bytes per element
             dmaChannel.transferSize(2); // both SRC and DST size
-            dmaChannel.interruptAtCompletion(); //interruptAtHalf or interruptAtCompletion
 
             uint8_t DMAMUX_SOURCE_ADC = DMAMUX_SOURCE_ADC0;
             #if ADC_NUM_ADCS>1
@@ -70,7 +58,6 @@ class RingBufferDMA
             #endif // ADC_NUM_ADCS
 
             dmaChannel.triggerAtHardwareEvent(DMAMUX_SOURCE_ADC); // start DMA transfer when ADC finishes a conversion
-            dmaChannel.attachInterrupt(dma_isr);
         }
 
         //! Destructor
@@ -79,14 +66,14 @@ class RingBufferDMA
             dmaChannel.disable();
         }
 
-        //! Returns true if the buffer is full
-        bool isFull() {
-            return dmaChannel.complete();
-        }
-
-        //! Returns true if the buffer is empty
-        bool isEmpty() {
-            return false;
+        //! Add an interrupt at completion of halfway.
+        void add_interrupt(void (*dma_isr)(void), bool at_completion = true) {
+            dmaChannel.attachInterrupt(dma_isr);
+            if(at_completion) {
+                dmaChannel.interruptAtCompletion();
+            } else {
+                dmaChannel.interruptAtHalf();
+            }
         }
 
         //! Start DMA operation
@@ -96,9 +83,13 @@ class RingBufferDMA
             dmaChannel.enable();
         }
 
-        //! Position DMA will write to next
-        uint32_t write_pos() {
-            //return (reinterpret_cast<uint32_t>(dmaChannel.destinationAddress()) - reinterpret_cast<uint32_t>(elems))/2;
+        //! Returns true if the buffer is full
+        volatile bool isFull() {
+            return dmaChannel.complete();
+        }
+
+        //! Number of elements written so far
+        volatile uint32_t size() {
             return (int16_t*)dmaChannel.destinationAddress() - elems;
         }
 
@@ -112,18 +103,13 @@ class RingBufferDMA
     protected:
     private:
 
-        //! Size of buffer
-        const uint32_t b_size = max_capacity;
-
         //! ADC module of the instance
         uint8_t ADC_number;
 
         volatile uint32_t& ADC_RA;
 
         //! Pointer to the elements of the buffer
-        volatile int16_t* const elems;
-
-        static void do_nothing_isr() {}
+        volatile int16_t elems[max_capacity] __attribute__((aligned(1)));
 
 };
 
