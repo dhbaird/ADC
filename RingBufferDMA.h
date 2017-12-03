@@ -42,22 +42,23 @@ class RingBufferDMA
         {
             static_assert(max_capacity%2==0, "RingBufferDMA's max_capacity must be a power of two.");
 
-            // set up a DMA channel to store the ADC data
-            // The idea is to have ADC_RA as a source,
-            // each ADC conversion triggers a DMA transfer of size 2 bytes
-            // when it's full it will overwrite the old elements.
-            dmaChannel.source(ADC_RA);
-            dmaChannel.destinationBuffer(elems, 2*max_capacity); // 2 bytes per element
-            dmaChannel.transferSize(2); // both SRC and DST size
-
             uint8_t DMAMUX_SOURCE_ADC = DMAMUX_SOURCE_ADC0;
             #if ADC_NUM_ADCS>1
             if(ADC_num==ADC_NUM::ADC_1){
                 DMAMUX_SOURCE_ADC = DMAMUX_SOURCE_ADC1;
             }
             #endif // ADC_NUM_ADCS
+            dmaChannel.triggerAtHardwareEvent(DMAMUX_SOURCE_ADC);
 
-            dmaChannel.triggerAtHardwareEvent(DMAMUX_SOURCE_ADC); // start DMA transfer when ADC finishes a conversion
+            dmaChannel.source((volatile uint16_t &)ADC_RA);
+            dmaChannel.destinationCircular(elems, max_capacity*sizeof(elems[0])); // 2 bytes per element
+
+            #if defined(KINETISL)
+            // fix bug in DMAChannel.h that doesn't set the right destination size. https://github.com/PaulStoffregen/cores/pull/77
+            dmaChannel.CFG->DCR &= ~DMA_DCR_DSIZE(3);
+            dmaChannel.CFG->DCR |= DMA_DCR_DSIZE(2);
+            dmaChannel.transferCount(max_capacity);
+            #endif
         }
 
         //! Destructor
@@ -69,11 +70,15 @@ class RingBufferDMA
         //! Add an interrupt at completion of halfway.
         void add_interrupt(void (*dma_isr)(void), bool at_completion = true) {
             dmaChannel.attachInterrupt(dma_isr);
+            #if defined(KINETISK)
             if(at_completion) {
                 dmaChannel.interruptAtCompletion();
             } else {
                 dmaChannel.interruptAtHalf();
             }
+            #elif defined(KINETISL)
+            dmaChannel.interruptAtCompletion();
+            #endif
         }
 
         //! Start DMA operation
@@ -89,12 +94,12 @@ class RingBufferDMA
         }
 
         //! Number of elements written so far
-        volatile uint32_t size() {
-            return (int16_t*)dmaChannel.destinationAddress() - elems;
+        volatile uint32_t num_elems() {
+            return (uint32_t*)dmaChannel.destinationAddress() - (uint32_t*)&elems[0];
         }
 
         //! Pointer to the data
-        volatile int16_t* const buffer() {return elems;}
+        volatile uint16_t* const buffer() {return elems;}
 
         //! DMAChannel to handle all low level DMA code.
         DMAChannel dmaChannel{};
@@ -109,7 +114,7 @@ class RingBufferDMA
         volatile uint32_t& ADC_RA;
 
         //! Pointer to the elements of the buffer
-        volatile int16_t elems[max_capacity] __attribute__((aligned(1)));
+        volatile uint16_t elems[max_capacity] alignas(max_capacity*sizeof(uint16_t));
 
 };
 

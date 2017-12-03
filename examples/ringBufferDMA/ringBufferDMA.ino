@@ -23,20 +23,18 @@ void setup() {
     adc->setAveraging(ADC_AVERAGES::_8); // set number of averages
     adc->setResolution(ADC_RESOLUTION::_12); // set bits of resolution
 
-    // enable DMA and interrupts
+    // enable DMA
     adc->enableDMA();
 
-    // ADC interrupt enabled isn't mandatory for DMA to work.
-    adc->enableInterrupts(ADC_NUM::ADC_0);
-
-    //dmaBuffer.start();
     dmaBuffer.start();
 
+    #if ADC_USE_PDB
     // setup ADC internal settings
     adc->analogRead(readPin, ADC_NUM::ADC_0);
     adc->adc0->stopPDB();
     // At 2 Hz it's easy to see the buffer being filled.
     adc->adc0->startPDB(2);
+    #endif // ADC_USE_PDB
 }
 
 char c=0;
@@ -52,14 +50,24 @@ void loop() {
             adc->analogRead(readPin, ADC_NUM::ADC_0);
         } else if(c=='p') { // print buffer
             Serial.print("isFull(): ");
-            Serial.println(dmaBuffer.isFull());
-            Serial.print("size(): ");
-            Serial.println(dmaBuffer.size());
+            Serial.println(dmaBuffer.isFull() ? "True" : "False");
+            Serial.print("num_elems: ");
+            Serial.println(dmaBuffer.num_elems());
+            Serial.print("destinationAddress: ");
+            Serial.println(reinterpret_cast<uint32_t>(dmaBuffer.dmaChannel.destinationAddress()), HEX);
+            #if defined(KINETISL)
+            Serial.print("DSR: ");
+            Serial.println(dmaBuffer.dmaChannel.CFG->DSR_BCR>>24, BIN);
+            Serial.print("BCR: ");
+            Serial.println(dmaBuffer.dmaChannel.CFG->DSR_BCR&0x00FFFFFF);
+            Serial.print("DCR: ");
+            Serial.println(dmaBuffer.dmaChannel.CFG->DCR, HEX);
+            #endif
             printBuffer();
         } else if(c=='i') {
             dmaBuffer.add_interrupt(&dmaBuffer_isr);
         }
-  }
+    }
 
 
     //digitalWriteFast(LED_BUILTIN, !digitalReadFast(LED_BUILTIN));
@@ -67,43 +75,25 @@ void loop() {
 }
 
 void dmaBuffer_isr() {
-    //digitalWriteFast(LED_BUILTIN, !digitalReadFast(LED_BUILTIN));
     Serial.println("dmaBuffer_isr");
-    // update the internal buffer positions
+    // clear the interrupt
     dmaBuffer.dmaChannel.clearInterrupt();
-}
 
+    // RESET NUMBER OF TRANSFERS (IN BYTES) FOR TEENSY LC, OTHERWISE THE BUFFER WON'T CONTINUE WORKING WHEN IT'S FULL
+    #if defined(KINETISL)
+    dmaBuffer.dmaChannel.CFG->DSR_BCR = buffer_size*sizeof(uint16_t);
+    #endif // defined
 
-// it can be called everytime a new value is converted. The DMA isr is called first
-void adc0_isr(void) {
-    //int t = micros();
-    Serial.println("ADC0_ISR"); //Serial.println(t);
-    adc->adc0->readSingle(); // clear interrupt
 }
 
 
 void printBuffer() {
     Serial.println("Buffer: Address, Value");
-
-    uint8_t i = 0;
-    // we can get this info from the dmaBuffer object, even though we should have it already
-    volatile int16_t* buffer = dmaBuffer.buffer();
-    for (i = 0; i < buffer_size; i++) {
+    volatile uint16_t* buffer = dmaBuffer.buffer();
+    for (uint32_t i = 0; i < buffer_size; i++) {
         Serial.print(uint32_t(&buffer[i]), HEX);
         Serial.print(", ");
         Serial.println(buffer[i]);
     }
-//
-//    Serial.print("Current pos: ");
-//    Serial.println(uint32_t(dmaBuffer->dmaChannel->destinationAddress()), HEX);
-//
-//    Serial.print("p_elems: ");
-//    Serial.println(uint32_t(dmaBuffer->p_elems), HEX);
-//
-//    Serial.print("b_start: ");
-//    Serial.println(dmaBuffer->b_start);
-//    Serial.print("b_end: ");
-//    Serial.println(dmaBuffer->b_end);
-
 }
 
