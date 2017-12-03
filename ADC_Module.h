@@ -775,6 +775,7 @@ public:
 
     virtual void enableInterrupts() = 0;
     virtual void disableInterrupts() = 0;
+    virtual void clearInterrupts() = 0;
 
     virtual void enableDMA() const = 0;
     virtual void disableDMA() const = 0;
@@ -974,6 +975,11 @@ public:
         atomic::clearBitFlag(ADC_SC1A(), ADC_SC1_AIEN);
         NVIC_DISABLE_IRQ(IRQ_ADC);
         interrupt_enabled = false;
+    }
+
+    //! Clear any pending ADC interrupt
+    void clearInterrupts() {
+        getResult();
     }
 
 
