@@ -30,7 +30,7 @@
 #include "ADC_Module.h"
 
 
-/** Class RingBufferDMA implements a DMA ping-pong buffer of fixed size
+/** Class RingBufferDMA implements a circular DMA buffer of fixed size
 */
 template<uint32_t max_capacity>
 class RingBufferDMA
@@ -55,8 +55,20 @@ class RingBufferDMA
             // fix bug in DMAChannel.h that doesn't set the right destination size. https://github.com/PaulStoffregen/cores/pull/77
             dmaChannel.CFG->DCR &= ~DMA_DCR_DSIZE(3);
             dmaChannel.CFG->DCR |= DMA_DCR_DSIZE(2);
-            // b/c that bug, the transfer count is also incorrect.
+            // b/c of that bug, the transfer count is also incorrect.
             dmaChannel.transferCount(max_capacity);
+
+            // Interrupt resets the number of bytes to copy to continue
+            if(dmaChannel.channel == 0) {
+                dmaChannel.attachInterrupt(dma_isr_0);
+            } else if(dmaChannel.channel == 1) {
+                dmaChannel.attachInterrupt(dma_isr_1);
+            } else if(dmaChannel.channel == 2) {
+                dmaChannel.attachInterrupt(dma_isr_2);
+            } else if(dmaChannel.channel == 3) {
+                dmaChannel.attachInterrupt(dma_isr_3);
+            }
+            dmaChannel.interruptAtCompletion();
             #endif
         }
 
@@ -66,7 +78,19 @@ class RingBufferDMA
             dmaChannel.disable();
         }
 
+        //! Clears the dmaChannel interrupt.
+        /** In addition, for Teensy LC it also resets the buffer so the transfers continue.
+        */
+        void clearInterrupt() {
+            dmaChannel.clearInterrupt();
+            #if defined(KINETISL)
+            dmaChannel.CFG->DSR_BCR = max_capacity*sizeof(uint16_t);
+            #endif
+        }
+
         //! Add an interrupt at completion of halfway (not for Teensy LC).
+        /** For Teensy LC you must call clearInterrupt() at the beginning of your custom interrupt function
+        */
         void attachInterrupt(void (*dma_isr)(void), bool at_completion = true) {
             dmaChannel.attachInterrupt(dma_isr);
             #if defined(KINETISK)
@@ -85,15 +109,19 @@ class RingBufferDMA
             // read ADC_RA to clear any DMA trigger
             volatile uint16_t val __attribute__((unused)) = ADC_RA;
             dmaChannel.enable();
+
         }
 
         //! Returns true if the buffer is full
+        /** This is only true when last element is filled, but not when the buffer starts to be overwritten.
+        *   i.e., when numElements == max_capacity
+        */
         volatile bool isFull() {
             return dmaChannel.complete();
         }
 
         //! Number of elements written so far
-        volatile uint32_t num_elems() {
+        volatile uint32_t numElements() {
             return (uint32_t*)dmaChannel.destinationAddress() - (uint32_t*)&elems[0];
         }
 
@@ -112,11 +140,27 @@ class RingBufferDMA
 
         volatile uint32_t& ADC_RA;
 
-        //! Buffer
+        //! Buffer, aligned correctly to the number of bytes.
         volatile uint16_t elems[max_capacity] alignas(max_capacity*sizeof(uint16_t));
 
+        // static isr's to reset the right DMA channel for Teensy LC
+        static void dma_isr_0() {
+            DMA_DSR_BCR0 = DMA_DSR_BCR_DONE;
+            DMA_DSR_BCR0 = (max_capacity*sizeof(uint16_t) & 0x00FFFFFF);
+        }
+        static void dma_isr_1() {
+            DMA_DSR_BCR1 = DMA_DSR_BCR_DONE;
+            DMA_DSR_BCR1 = (max_capacity*sizeof(uint16_t) & 0x00FFFFFF);
+        }
+        static void dma_isr_2() {
+            DMA_DSR_BCR2 = DMA_DSR_BCR_DONE;
+            DMA_DSR_BCR2 = (max_capacity*sizeof(uint16_t) & 0x00FFFFFF);
+        }
+        static void dma_isr_3() {
+            DMA_DSR_BCR3 = DMA_DSR_BCR_DONE;
+            DMA_DSR_BCR3 = (max_capacity*sizeof(uint16_t) & 0x00FFFFFF);
+        }
+
 };
-
-
 
 #endif // RINGBUFFERDMA_H

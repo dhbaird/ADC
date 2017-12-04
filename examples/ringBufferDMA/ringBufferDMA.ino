@@ -26,11 +26,7 @@ void setup() {
     // enable DMA
     adc->enableDMA();
 
-    #if defined(KINETISL)
-    // This interrupt is necessary for Teensy LC
-    dmaBuffer.attachInterrupt(&dmaBuffer_isr);
-    #endif // only for Teensy LC
-
+    // Start the buffer and wait for the conversions
     dmaBuffer.start();
 
     #if ADC_USE_PDB
@@ -54,11 +50,7 @@ void loop() {
             Serial.println("Conversion.");
             adc->analogRead(readPin, ADC_NUM::ADC_0);
         } else if(c=='p') { // print buffer
-            Serial.print("isFull(): ");
-            Serial.println(dmaBuffer.isFull() ? "True" : "False");
-            Serial.print("num_elems: ");
-            Serial.println(dmaBuffer.num_elems());
-            Serial.print("destinationAddress: ");
+            Serial.print("Current destination address: ");
             Serial.println(reinterpret_cast<uint32_t>(dmaBuffer.dmaChannel.destinationAddress()), HEX);
             #if defined(KINETISL)
             Serial.print("DSR: ");
@@ -75,20 +67,21 @@ void loop() {
     }
 
 
-    //digitalWriteFast(LED_BUILTIN, !digitalReadFast(LED_BUILTIN));
+    digitalWriteFast(LED_BUILTIN, !digitalReadFast(LED_BUILTIN));
     delay(100);
 }
 
+// This isr will be called if you set it up with attachInterrupt for Teensy 3.x (not mandatory)
+// For Teensy LC it is NECESSARY for the isr to clear the interrupt and reset the number of bytes to transfer
+// The example below shows how to do it
 void dmaBuffer_isr() {
-    Serial.println("dmaBuffer_isr");
     // clear the interrupt
-    dmaBuffer.dmaChannel.clearInterrupt();
+    // FOR TEENSY LC IT RESETS THE NUMBER OF TRANSFERS (IN BYTES), OTHERWISE THE BUFFER WON'T CONTINUE WORKING WHEN IT'S FULL
+    // YOU MUST CALL THIS (OR INLINE THE CODE DIRECTLY).
+    dmaBuffer.clearInterrupt();
 
-    // RESET NUMBER OF TRANSFERS (IN BYTES) FOR TEENSY LC, OTHERWISE THE BUFFER WON'T CONTINUE WORKING WHEN IT'S FULL
-    #if defined(KINETISL)
-    dmaBuffer.dmaChannel.CFG->DSR_BCR = buffer_size*sizeof(uint16_t);
-    #endif // defined
-
+    // You can do some other stuff afterwards
+    Serial.println("dmaBuffer_isr");
 }
 
 
