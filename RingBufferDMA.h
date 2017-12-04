@@ -143,6 +143,7 @@ class RingBufferDMA
         //! Buffer, aligned correctly to the number of bytes.
         volatile uint16_t elems[max_capacity] alignas(max_capacity*sizeof(uint16_t));
 
+        #if defined(KINETISL)
         // static isr's to reset the right DMA channel for Teensy LC
         static void dma_isr_0() {
             DMA_DSR_BCR0 = DMA_DSR_BCR_DONE;
@@ -160,6 +161,7 @@ class RingBufferDMA
             DMA_DSR_BCR3 = DMA_DSR_BCR_DONE;
             DMA_DSR_BCR3 = (max_capacity*sizeof(uint16_t) & 0x00FFFFFF);
         }
+        #endif // Teensy LC
 
 };
 

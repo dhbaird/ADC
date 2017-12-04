@@ -1,5 +1,8 @@
 /*
-*   It doesn't work for Teensy LC yet!
+*   For Teensy 3.x it fills the buffer automatically using PDB
+    For Teensy LC you can fill it yourself by pressing c
+
+    For all boards you can see the buffer's contents by pressing p.
 */
 
 #include "ADC.h"
@@ -26,6 +29,9 @@ void setup() {
     // enable DMA
     adc->enableDMA();
 
+    // You could attach a custom interrupt function
+    //dmaBuffer.attachInterrupt(&dmaBuffer_isr);
+
     // Start the buffer and wait for the conversions
     dmaBuffer.start();
 
@@ -50,19 +56,7 @@ void loop() {
             Serial.println("Conversion.");
             adc->analogRead(readPin, ADC_NUM::ADC_0);
         } else if(c=='p') { // print buffer
-            Serial.print("Current destination address: ");
-            Serial.println(reinterpret_cast<uint32_t>(dmaBuffer.dmaChannel.destinationAddress()), HEX);
-            #if defined(KINETISL)
-            Serial.print("DSR: ");
-            Serial.println(dmaBuffer.dmaChannel.CFG->DSR_BCR>>24, BIN);
-            Serial.print("BCR: ");
-            Serial.println(dmaBuffer.dmaChannel.CFG->DSR_BCR&0x00FFFFFF);
-            Serial.print("DCR: ");
-            Serial.println(dmaBuffer.dmaChannel.CFG->DCR, HEX);
-            #endif
             printBuffer();
-        } else if(c=='i') {
-            dmaBuffer.attachInterrupt(&dmaBuffer_isr);
         }
     }
 
