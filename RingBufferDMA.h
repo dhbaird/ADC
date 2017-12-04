@@ -37,9 +37,7 @@ class RingBufferDMA
 {
     public:
         //! Constructor, stores the conversions of ADC number ADC_num
-        RingBufferDMA(ADC_NUM ADC_num) :
-            ADC_RA(ADC_num==ADC_NUM::ADC_0 ? ADC0_RA : ADC1_RA)
-        {
+        RingBufferDMA(ADC_NUM ADC_num) : ADC_RA(ADC_num==ADC_NUM::ADC_0 ? ADC0_RA : ADC1_RA) {
             static_assert(max_capacity%2==0, "RingBufferDMA's max_capacity must be a power of two.");
 
             uint8_t DMAMUX_SOURCE_ADC = DMAMUX_SOURCE_ADC0;
@@ -57,6 +55,7 @@ class RingBufferDMA
             // fix bug in DMAChannel.h that doesn't set the right destination size. https://github.com/PaulStoffregen/cores/pull/77
             dmaChannel.CFG->DCR &= ~DMA_DCR_DSIZE(3);
             dmaChannel.CFG->DCR |= DMA_DCR_DSIZE(2);
+            // b/c that bug, the transfer count is also incorrect.
             dmaChannel.transferCount(max_capacity);
             #endif
         }
@@ -67,8 +66,8 @@ class RingBufferDMA
             dmaChannel.disable();
         }
 
-        //! Add an interrupt at completion of halfway.
-        void add_interrupt(void (*dma_isr)(void), bool at_completion = true) {
+        //! Add an interrupt at completion of halfway (not for Teensy LC).
+        void attachInterrupt(void (*dma_isr)(void), bool at_completion = true) {
             dmaChannel.attachInterrupt(dma_isr);
             #if defined(KINETISK)
             if(at_completion) {
@@ -113,10 +112,11 @@ class RingBufferDMA
 
         volatile uint32_t& ADC_RA;
 
-        //! Pointer to the elements of the buffer
+        //! Buffer
         volatile uint16_t elems[max_capacity] alignas(max_capacity*sizeof(uint16_t));
 
 };
+
 
 
 #endif // RINGBUFFERDMA_H

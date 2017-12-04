@@ -26,6 +26,11 @@ void setup() {
     // enable DMA
     adc->enableDMA();
 
+    #if defined(KINETISL)
+    // This interrupt is necessary for Teensy LC
+    dmaBuffer.attachInterrupt(&dmaBuffer_isr);
+    #endif // only for Teensy LC
+
     dmaBuffer.start();
 
     #if ADC_USE_PDB
@@ -65,7 +70,7 @@ void loop() {
             #endif
             printBuffer();
         } else if(c=='i') {
-            dmaBuffer.add_interrupt(&dmaBuffer_isr);
+            dmaBuffer.attachInterrupt(&dmaBuffer_isr);
         }
     }
 
