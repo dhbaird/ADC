@@ -11,6 +11,7 @@
 const int readPin = A9;
 ADC *adc = new ADC(); // adc object
 
+// Must be a power of 2!
 const uint8_t buffer_size = 8;
 // use dma with ADC0
 RingBufferDMA<buffer_size> dmaBuffer(ADC_NUM::ADC_0);
