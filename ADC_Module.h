@@ -788,6 +788,7 @@ public:
     virtual void enablePGA(uint8_t gain) = 0;
     virtual uint8_t getPGA() const = 0;
     virtual void disablePGA() = 0;
+    virtual volatile bool isPGAEnabled() const = 0;
     #endif
 
     virtual void continuousMode() const = 0;
@@ -803,7 +804,6 @@ public:
     virtual volatile bool isComplete() const = 0;
     virtual volatile bool isDifferential() const = 0;
     virtual volatile bool isContinuous() const = 0;
-    virtual volatile bool isPGAEnabled() const = 0;
 
     virtual bool checkPin(uint8_t pin) = 0;
     virtual bool checkDifferentialPins(uint8_t pinP, uint8_t pinN) = 0;
