@@ -35,6 +35,8 @@
 
 #include <atomic.h>
 
+#include "DMAChannel.h"
+
 // Easier names for the boards
 #if defined(__MK20DX256__) // Teensy 3.1
 #define ADC_TEENSY_3_1
@@ -1396,6 +1398,83 @@ public:
     uint32_t getPDBFrequency();
 
     #endif
+
+
+    /////////////// MULTIPLE PINS /////////////
+    ///////////////////////////////////////////
+    struct ADC_Futures {
+        // TODO: add constructor that gets the arrays as arguments
+        ADC_Futures(uint8_t num) :
+            num(num),
+            arr_SC1(new uint8_t[num]),
+            arr_res(new volatile int16_t[num]),
+            arr_ready(new volatile bool[num]{false}) {}
+
+        ~ADC_Futures() {
+            delete[] arr_SC1;
+            delete[] arr_res;
+            delete[] arr_ready;
+        }
+
+        int16_t get(uint8_t index) {
+            // wait while the value is converted, then return it
+            while(!isReady(index)) {
+                yield();
+            }
+            return arr_res[index];
+        }
+
+        volatile bool isReady(uint8_t index) {
+            return arr_ready[index];
+        }
+
+        uint8_t num;
+
+        DMAChannel dmaSC1A{}, dmaRA{};
+
+        // settings of SC1A for each pin
+        volatile uint8_t* arr_SC1;
+        // arr_res has the result in the least significant
+        volatile int16_t* arr_res;
+        // each value becomes true as the results are converted
+        volatile bool* arr_ready;
+    };
+
+    ADC_Futures readPins(std::initializer_list<uint8_t> pin_list) {
+        uint8_t num = pin_list.size();
+
+        // futures has, for each pin, the SC1A value, a value and a available var.
+        ADC_Futures futures{num};
+
+        // fill the SC1 arrays to the right values
+        auto it = pin_list.begin();
+        for(uint8_t i = 0 ; i<num; i++) {
+            futures.arr_SC1[i] = channel2sc1a[it[i]];
+        }
+
+        // use DMA (dmaSC1A) to transfer the registers to ADC_SC1A
+        // use DMA (dmaRA) to transfer the result from ADC_RA to arr_res.
+
+        futures.dmaSC1A.sourceBuffer((volatile uint8_t *)futures.arr_SC1, num*sizeof(uint8_t));
+        futures.dmaSC1A.destination((volatile uint8_t &)ADC0_SC1A);
+        //futures.dmaSC1A.transferCount(num);
+        //futures.dmaSC1A.transferSize(sizeof(uint8_t));
+
+        futures.dmaRA.source((volatile uint16_t &)ADC0_RA);
+        futures.dmaRA.destinationBuffer((volatile uint16_t *)futures.arr_res, num*sizeof(int16_t));
+        futures.dmaRA.triggerAtHardwareEvent(DMAMUX_SOURCE_ADC0);
+
+        enableDMA();
+        getResult();  // read ADC_RA to clear any DMA triggers
+        futures.dmaSC1A.enable();
+        futures.dmaRA.enable();
+
+        // first trigger manually, then trigger when dmaRA finished transferring the conversion result.
+        //futures.dmaSC1A.triggerManual();
+        //futures.dmaSC1A.triggerAtTransfersOf(futures.dmaRA);
+
+        return futures;
+    }
 
 
     //////// OTHER STUFF ///////////
